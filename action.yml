@@ -2,9 +2,6 @@ name: 'Code Analyzer Action'
 description: 'GHA to run Code Analyzer'
 author: 'Roopa Mohan'
 inputs:
-  github_token:
-    required: true
-    description: secret to use
   runtype:
     required: false
     description: 'Type of run. Valid values are "simple", "dfa". Defaults to "simple".'
