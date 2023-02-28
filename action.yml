@@ -1,11 +1,175 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Code Analyzer Action'
+description: 'GHA to run Code Analyzer'
+author: 'Roopa Mohan'
 inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  runtype:
+    required: false
+    description: 'Type of run. Valid values are "simple", "dfa". Defaults to "simple".'
+    type: string
+    default: 'simple'
+  engine:
+    required: false
+    description: 'Provide comma-separated values of Code Analyzer engine(s) to excecute. Defaults to Code Analyzer defaults based on runtype.'
+    type: string
+  projectdir:
+    required: false
+    description: 'Path to project repository. Necessary when invoking sfge engine. Defaults to current directory.'
+    type: string
+  outfile:
+    required: false
+    description: 'Output file to collect the results in. Format depends on the extension of the filename. Defaults to sfca_results.json'
+    default: 'sfca_results.json'
+
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: 'composite'
+  steps:
+
+  #### Part 1 - User input validation ####
+
+  # Validate runtype and derive code analyzer command to execute
+    - id: validate-runtype
+      run: |
+        echo "Validating runtype . . ."
+        if [[ "${{ inputs.runtype }}" == 'simple' ]]; then
+          COMMAND="scanner:run"
+        elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+          COMMAND="scanner:run:dfa"
+        else
+          echo "Unsupported runtype: ${{ inputs.runtype }}"
+          exit 10
+        fi
+        echo "Command=$COMMAND" >> $GITHUB_OUTPUT
+      shell: bash
+
+
+  # Populate --outfile
+    - id: populate-outfile
+      run: |
+        echo "Populating outfile . . ."
+        OUTFILE="--outfile \"${{ inputs.outfile }}\""
+        echo "Outfile=$OUTFILE" >> $GITHUB_OUTPUT
+      shell: bash
+
+
+  # Populate --engine value based on input
+    - id: populate-engine
+      run: |
+        echo "Populating parameters . . ."
+        if [[ "${{ inputs.engine }}" == "" ]]; then
+          ENGINE=""
+          echo "No specific engine requested. Using defaults"
+        else
+          ENGINE="--engine \"${{ inputs.engine }}\""
+        fi
+        echo "Engine=$ENGINE" >> $GITHUB_OUTPUT
+      shell: bash
+
+  # Populate --projectdir if necessary
+    - id: populate-projdir
+      run: |
+        echo "Evaluating need for projectdir . . ."
+        if [[ "${{ inputs.engine}}" = *"sfge"* ]]; then
+          PROJDIR_NEEDED="true"
+          PROJDIR="--projectdir \"${{ inputs.projectdir }}\""
+          echo "Input engine contains sfge. Project dir param = $PROJDIR"
+        elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+          PROJDIR_NEEDED="true"
+          PROJDIR="--projectdir \"${{ inputs.projectdir }}\""
+          echo "Run type is DFA. Project dir needed = $PROJDIR"
+        else
+          PROJDIR_NEEDED=
+          PROJDIR=
+          echo "Project dir is not needed"
+        fi
+        if [[ -n "$PROJDIR_NEEDED" && -z "${{ inputs.projectdir }}" ]]; then
+          echo "'projectdir' is a required when invoking sfge. Add and rerun."
+          exit 10
+        fi
+        echo "ProjDir=$PROJDIR" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Display derived information
+      run: |
+        echo "Confirming parameters . . ."
+        echo "Command = ${{steps.validate-runtype.outputs.Command}}"
+        echo "Outfile = ${{steps.populate-outfile.outputs.Outfile}}"
+        echo "Engine = ${{steps.populate-engine.outputs.Engine}}"
+        echo "ProjDir = ${{steps.populate-projdir.outputs.ProjDir}}"
+      shell: bash
+
+  #### Part 2 - Setup dependencies ####
+
+  # Setup node
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 'lts/*'
+
+  # Setup JVM
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    - name: Install Salesforce CLI
+      run: |
+        echo "Installing Salesforce CLI . . ."
+        npm install -g sfdx-cli
+      shell: bash
+
+    - name: Install Salesforce Code Analyzer
+      run: |
+        echo "Installing Code Analyzer . . ."
+        sfdx plugins:install @salesforce/sfdx-scanner
+      shell: bash
+
+  #### Part 3 - Checkout code and determine target files
+    - uses: actions/checkout@v3
+
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v35
+      with:
+        files: ${{ inputs.targethome }}
+
+    - id: populate-target
+      shell: bash
+      run: |
+        TARGET_LIST=""
+        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          TARGET_LIST=$file,$TARGET_LIST
+        done
+        TARGET=${TARGET_LIST::-1}
+        echo "Target=$TARGET" >> $GITHUB_OUTPUT
+
+
+  #### Part 3 - Execute code analyzer ####
+
+    - run: mkdir -p $HOME/sfca
+      shell: bash
+
+    - name: Execute Code Analyzer
+      run: |
+        sfdx ${{steps.validate-runtype.outputs.Command}} \
+          --target "${{steps.populate-target.outputs.Target}}" \
+          ${{steps.populate-engine.outputs.Engine}} \
+          ${{steps.populate-projdir.outputs.ProjDir}} \
+          ${{steps.populate-outfile.outputs.Outfile}}
+      shell: bash
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: SFCA-Results
+        path: ${{inputs.outfile}}
+
+
+  ##### Part 4 - Process output
+    # - name: Test comment
+    #   run: |
+    #     curl \
+    #       -X POST \
+    #       -H "Accept: application/vnd.github+json" \
+    #       -H "Authorization: Bearer ${{inputs.github_token}}"\
+    #       -H "X-GitHub-Api-Version: 2022-11-28" \
+    #       https://api.github.com/repos/forcedotcom/tdx23-sfca-demo/pulls/1/comments \
+    #       -d '{"body":"Test comment","commit_id":"f07ab6ac4c33ab3035042200b8d00d20663e95b1","path":"force-app/main/default/classes/Cat.cls","line":2}'
+    #   shell: bash
