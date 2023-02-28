@@ -29,6 +29,7 @@ runs:
   # Validate runtype and derive code analyzer command to execute
     - id: validate-runtype
       run: |
+        echo "Validating runtype . . ."
         if [[ "${{ inputs.runtype }}" == 'simple' ]]; then
           COMMAND="scanner:run"
           PROJDIR=""
@@ -47,6 +48,7 @@ runs:
   # Populate --engine value based on input
     - id: populate-engine
       run: |
+        echo "Populating parameters . . ."
         if [[ "${{ inputs.engine }}" == "" ]]; then
           ENGINE=""
           echo "No specific engine requested. Using defaults"
@@ -60,6 +62,7 @@ runs:
 
     - name: Display derived information
       run: |
+        echo "Confirming parameters . . ."
         echo "Command = ${{steps.validate-runtype.outputs.Command}}"
         echo "Engine = ${{steps.populate-engine.outputs.Engine}}"
         echo "Projdir = ${{steps.validate-runtype.outputs.Projdir}}"
@@ -67,29 +70,44 @@ runs:
 
   #### Part 2 - Setup dependencies ####
 
-    - name: Install Node
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 'lts'
+  # Setup node
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 'lts/*'
 
-    - name: Install JVM
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '11'
+  # Setup JVM
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
 
     - name: Install Salesforce CLI
-      run: npm install -g sfdx-cli
+      run: |
+        echo "Installing Salesforce CLI . . ."
+        npm install -g sfdx-cli
+      shell: bash
 
     - name: Install Salesforce Code Analyzer
-      run: sfdx plugins:install @salesforce/sfdx-scanner
+      run: |
+        echo "Installing Code Analyzer . . ."
+        sfdx plugins:install @salesforce/sfdx-scanner
+      shell: bash
 
   #### Part 3 - Execute code analyzer ####
 
+    - run: mkdir -p $HOME/sfca
+      shell: bash
+      
     - name: 
       run: |
         sfdx ${{steps.validate-runtype.outputs.Command}} \
           --target "./" \
-          ${{steps.populate-engine.outputs.Engine}}" \
+          ${{steps.populate-engine.outputs.Engine}} \
           "Projdir = ${{steps.validate-runtype.outputs.Projdir}}" \
-          --format csv
+          --outfile $HOME/sfca/results.json
+      shell: bash
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: SFCA-Results
+        path: $HOME/sfca/results.json
