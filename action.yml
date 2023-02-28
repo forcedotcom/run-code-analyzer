@@ -9,6 +9,9 @@ inputs:
     required: false
     description: 'Type of run. Valid values are "simple", "dfa", "all". Defaults to "simple".'
     default: 'simple'
+  targethome:
+    required: true
+    description: 'Directory with source files. Changes from only these files will be considered for analysis.'
   engine:
     required: false
     description: 'Provide comma-separated values of Code Analyzer engine(s) to excecute. Defaults to Code Analyzer defaults based on runtype.'
@@ -20,6 +23,7 @@ inputs:
     required: false
     description: 'Boolean to indicate if violations should be posted as comments. Defaults to false.'
     default: false
+
 runs:
   using: 'composite'
   steps:
@@ -36,12 +40,12 @@ runs:
         elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
           COMMAND="scanner:run:dfa"
           PROJDIR="--projectdir ${{ inputs.projectdir }}"
+          echo "Projdir=$PROJDIR" >> $GITHUB_OUTPUT
         else
           echo "Unsupported runtype: ${{ inputs.runtype }}"
           exit 10
         fi
         echo "Command=$COMMAND" >> $GITHUB_OUTPUT
-        echo "Projdir=$PROJDIR" >> $GITHUB_OUTPUT
       shell: bash
 
 
@@ -53,7 +57,9 @@ runs:
           ENGINE=""
           echo "No specific engine requested. Using defaults"
         elif [[ "${{ inputs.engine}}" == *"sfge"* ]]; then
-          ENGINE="--engine ${{ inputs.engine }}"
+          ENGINE="--engine \"${{ inputs.engine }}\""
+          PROJDIR="--projectdir ${{ inputs.projectdir }}"
+          echo "Projdir=$PROJDIR" >> GITHUB_OUTPUT
         else
           ENGINE="--engine ${{ inputs.engine }}"
         fi
@@ -93,21 +99,53 @@ runs:
         sfdx plugins:install @salesforce/sfdx-scanner
       shell: bash
 
+  #### Part 3 - Checkout code and determine target files
+    - uses: actions/checkout@v3
+
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v35
+      with:
+        files: ${{ inputs.targethome }}
+
+    - id: populate-target
+      shell: bash
+      run: |
+        TARGET_LIST=""
+        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          TARGET_LIST=$file,$TARGET_LIST
+        done
+        TARGET=${TARGET_LIST::-1}
+        echo "Target=$TARGET" >> $GITHUB_OUTPUT
+
+
   #### Part 3 - Execute code analyzer ####
 
     - run: mkdir -p $HOME/sfca
       shell: bash
-      
-    - name: 
+
+    - name: Execute Code Analyzer
       run: |
         sfdx ${{steps.validate-runtype.outputs.Command}} \
-          --target "./" \
+          --target "${{steps.populate-target.outputs.Target}}" \
           ${{steps.populate-engine.outputs.Engine}} \
-          "Projdir = ${{steps.validate-runtype.outputs.Projdir}}" \
-          --outfile $HOME/sfca/results.json
+          ${{steps.validate-runtype.outputs.Projdir}} \
+          --outfile ./sfca_results.csv
       shell: bash
 
     - uses: actions/upload-artifact@v3
       with:
         name: SFCA-Results
-        path: $HOME/sfca/results.json
+        path: ./sfca_results.csv
+
+
+  ##### Part 4 - Process output
+    - run: |
+        curl \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{inputs.github_token}}"\
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/repos/forcedotcom/tdx23-sfca-demo/pulls/1/comments \
+          -d '{"body":"Test comment","commit_id":"f07ab6ac4c33ab3035042200b8d00d20663e95b1","path":"force-app/main/default/classes/Cat.cls","line":2}'
+    - shell: bash
