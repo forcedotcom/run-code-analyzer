@@ -51,6 +51,7 @@ runs:
         echo "Populating outfile . . ."
         OUTFILE="--outfile \"${{ inputs.outfile }}\""
         echo "Outfile=$OUTFILE" >> $GITHUB_OUTPUT
+      shell: bash
 
 
   # Populate --engine value based on input
