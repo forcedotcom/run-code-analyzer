@@ -7,22 +7,21 @@ inputs:
     description: secret to use
   runtype:
     required: false
-    description: 'Type of run. Valid values are "simple", "dfa", "all". Defaults to "simple".'
+    description: 'Type of run. Valid values are "simple", "dfa". Defaults to "simple".'
+    type: string
     default: 'simple'
-  targethome:
-    required: true
-    description: 'Directory with source files. Changes from only these files will be considered for analysis.'
   engine:
     required: false
     description: 'Provide comma-separated values of Code Analyzer engine(s) to excecute. Defaults to Code Analyzer defaults based on runtype.'
+    type: string
   projectdir:
     required: false
     description: 'Path to project repository. Necessary when invoking sfge engine. Defaults to current directory.'
-    default: './.'
-  resultascomments:
+    type: string
+  outfile:
     required: false
-    description: 'Boolean to indicate if violations should be posted as comments. Defaults to false.'
-    default: false
+    description: 'Output file to collect the results in. Format depends on the extension of the filename. Defaults to sfca_results.json'
+    default: 'sfca_results.json'
 
 runs:
   using: 'composite'
@@ -46,6 +45,14 @@ runs:
       shell: bash
 
 
+  # Populate --outfile
+    - id: populate-outfile
+      run: |
+        echo "Populating outfile . . ."
+        OUTFILE="--outfile \"${{ inputs.outfile }}\""
+        echo "Outfile=$OUTFILE" >> $GITHUB_OUTPUT
+
+
   # Populate --engine value based on input
     - id: populate-engine
       run: |
@@ -59,29 +66,37 @@ runs:
         echo "Engine=$ENGINE" >> $GITHUB_OUTPUT
       shell: bash
 
+  # Populate --projectdir if necessary
     - id: populate-projdir
       run: |
         echo "Evaluating need for projectdir . . ."
         if [[ "${{ inputs.engine}}" = *"sfge"* ]]; then
           PROJDIR_NEEDED="true"
-          echo "Input engine contains sfge. Project dir needed = $PROJDIR_NEEDED"
-        elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
-          echo "Run type is DFA. Project dir needed = $PROJDIR_NEEDED"
-          PROJDIR_NEEDED="true"
-        fi
-        if [[ -n "$PROJDIR_NEEDED" ]]; then
           PROJDIR="--projectdir \"${{ inputs.projectdir }}\""
-          echo "Populating PROJDIR as $PROJDIR"
+          echo "Input engine contains sfge. Project dir param = $PROJDIR"
+        elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+          PROJDIR_NEEDED="true"
+          PROJDIR="--projectdir \"${{ inputs.projectdir }}\""
+          echo "Run type is DFA. Project dir needed = $PROJDIR"
+        else
+          PROJDIR_NEEDED=
+          PROJDIR=
+          echo "Project dir is not needed"
         fi
-        echo "Projdir=$PROJDIR" >> GITHUB_OUTPUT
+        if [[ -n "$PROJDIR_NEEDED" && -z "${{ inputs.projectdir }}" ]]; then
+          echo "'projectdir' is a required when invoking sfge. Add and rerun."
+          exit 10
+        fi
+        echo "ProjDir=$PROJDIR" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Display derived information
       run: |
         echo "Confirming parameters . . ."
         echo "Command = ${{steps.validate-runtype.outputs.Command}}"
+        echo "Outfile = ${{steps.populate-outfile.outputs.Outfile}}"
         echo "Engine = ${{steps.populate-engine.outputs.Engine}}"
-        echo "Projdir = ${{steps.populate-projdir.outputs.Projdir}}"
+        echo "ProjDir = ${{steps.populate-projdir.outputs.ProjDir}}"
       shell: bash
 
   #### Part 2 - Setup dependencies ####
@@ -139,14 +154,14 @@ runs:
         sfdx ${{steps.validate-runtype.outputs.Command}} \
           --target "${{steps.populate-target.outputs.Target}}" \
           ${{steps.populate-engine.outputs.Engine}} \
-          ${{steps.populate-projdir.outputs.Projdir}} \
-          --outfile ./sfca_results.csv
+          ${{steps.populate-projdir.outputs.ProjDir}} \
+          ${{steps.populate-outfile.outputs.Outfile}}
       shell: bash
 
     - uses: actions/upload-artifact@v3
       with:
         name: SFCA-Results
-        path: ./sfca_results.csv
+        path: ${{inputs.outfile}}
 
 
   ##### Part 4 - Process output
