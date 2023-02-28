@@ -23,30 +23,73 @@ inputs:
 runs:
   using: 'composite'
   steps:
+
+  #### Part 1 - User input validation ####
+
+  # Validate runtype and derive code analyzer command to execute
     - id: validate-runtype
       run: |
-        if [[ ${{ inputs.runtype == 'simple' }} ]]; then
-          echo "COMMAND=scanner:run" >> $GITHUB_ENV
-          echo "'simple' run selected: ${{ env.COMMAND }}"
-        elif [[ ${{ inputs.runtype == 'dfa' }} ]]; then
-          echo "COMMAND=scanner:run:dfa" >> $GITHUB_ENV
-          echo "PROJDIR=--projectdir ${{ inputs.projectdir }}" >> $GITHUB_ENV
-          echo "'dfa' run selected: ${{ env.COMMAND }}, ${{ env.PROJDIR }}"
+        if [[ "${{ inputs.runtype }}" == 'simple' ]]; then
+          COMMAND="scanner:run"
+          PROJDIR=""
+        elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+          COMMAND="scanner:run:dfa"
+          PROJDIR="--projectdir ${{ inputs.projectdir }}"
         else
           echo "Unsupported runtype: ${{ inputs.runtype }}"
-          exit 1
+          exit 10
         fi
+        echo "Command=$COMMAND" >> $GITHUB_OUTPUT
+        echo "Projdir=$PROJDIR" >> $GITHUB_OUTPUT
       shell: bash
+
+
+  # Populate --engine value based on input
     - id: populate-engine
       run: |
-        if [[ ${{ inputs.engine != '' }} ]]; then
+        if [[ "${{ inputs.engine }}" == "" ]]; then
+          ENGINE=""
           echo "No specific engine requested. Using defaults"
-        elif [[ ${{ inputs.engine}} == *"sfge"* ]]; then
-          echo "ENGINE=--engine ${{ inputs.engine }}"
-          echo "Adding engine clause for sfge: ${{ env.ENGINE }}"            echo "PROJDIR=--projectdir ${{ inputs.projectdir }}" >> $GITHUB_ENV
-          echo "Adding project dir: ${{ env.PROJDIR }}"
+        elif [[ "${{ inputs.engine}}" == *"sfge"* ]]; then
+          ENGINE="--engine ${{ inputs.engine }}"
         else
-          echo "ENGINE=--engine ${{ inputs.engine }}"
-          echo "Adding engine clause: ${{ env.ENGINE }}"
+          ENGINE="--engine ${{ inputs.engine }}"
         fi
+        echo "Engine=$ENGINE" >> $GITHUB_OUTPUT
       shell: bash
+
+    - name: Display derived information
+      run: |
+        echo "Command = ${{steps.validate-runtype.outputs.Command}}"
+        echo "Engine = ${{steps.populate-engine.outputs.Engine}}"
+        echo "Projdir = ${{steps.validate-runtype.outputs.Projdir}}"
+      shell: bash
+
+  #### Part 2 - Setup dependencies ####
+
+    - name: Install Node
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 'lts'
+
+    - name: Install JVM
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+    - name: Install Salesforce CLI
+      run: npm install -g sfdx-cli
+
+    - name: Install Salesforce Code Analyzer
+      run: sfdx plugins:install @salesforce/sfdx-scanner
+
+  #### Part 3 - Execute code analyzer ####
+
+    - name: 
+      run: |
+        sfdx ${{steps.validate-runtype.outputs.Command}} \
+          --target "./" \
+          ${{steps.populate-engine.outputs.Engine}}" \
+          "Projdir = ${{steps.validate-runtype.outputs.Projdir}}" \
+          --format csv
