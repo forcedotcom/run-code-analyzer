@@ -36,11 +36,8 @@ runs:
         echo "Validating runtype . . ."
         if [[ "${{ inputs.runtype }}" == 'simple' ]]; then
           COMMAND="scanner:run"
-          PROJDIR=""
         elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
           COMMAND="scanner:run:dfa"
-          PROJDIR="--projectdir ${{ inputs.projectdir }}"
-          echo "Projdir=$PROJDIR" >> $GITHUB_OUTPUT
         else
           echo "Unsupported runtype: ${{ inputs.runtype }}"
           exit 10
@@ -56,14 +53,27 @@ runs:
         if [[ "${{ inputs.engine }}" == "" ]]; then
           ENGINE=""
           echo "No specific engine requested. Using defaults"
-        elif [[ "${{ inputs.engine}}" == *"sfge"* ]]; then
-          ENGINE="--engine \"${{ inputs.engine }}\""
-          PROJDIR="--projectdir ${{ inputs.projectdir }}"
-          echo "Projdir=$PROJDIR" >> GITHUB_OUTPUT
         else
-          ENGINE="--engine ${{ inputs.engine }}"
+          ENGINE="--engine \"${{ inputs.engine }}\""
         fi
         echo "Engine=$ENGINE" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - id: populate-projdir
+      run: |
+        echo "Evaluating need for projectdir . . ."
+        if [[ "${{ inputs.engine}}" = *"sfge"* ]]; then
+          PROJDIR_NEEDED="true"
+          echo "Input engine contains sfge. Project dir needed = $PROJDIR_NEEDED"
+        elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+          echo "Run type is DFA. Project dir needed = $PROJDIR_NEEDED"
+          PROJDIR_NEEDED="true"
+        fi
+        if [[ -n "$PROJDIR_NEEDED" ]]; then
+          PROJDIR="--projectdir \"${{ inputs.projectdir }}\""
+          echo "Populating PROJDIR as $PROJDIR"
+        fi
+        echo "Projdir=$PROJDIR" >> GITHUB_OUTPUT
       shell: bash
 
     - name: Display derived information
@@ -71,7 +81,7 @@ runs:
         echo "Confirming parameters . . ."
         echo "Command = ${{steps.validate-runtype.outputs.Command}}"
         echo "Engine = ${{steps.populate-engine.outputs.Engine}}"
-        echo "Projdir = ${{steps.validate-runtype.outputs.Projdir}}"
+        echo "Projdir = ${{steps.populate-projdir.outputs.Projdir}}"
       shell: bash
 
   #### Part 2 - Setup dependencies ####
@@ -129,7 +139,7 @@ runs:
         sfdx ${{steps.validate-runtype.outputs.Command}} \
           --target "${{steps.populate-target.outputs.Target}}" \
           ${{steps.populate-engine.outputs.Engine}} \
-          ${{steps.validate-runtype.outputs.Projdir}} \
+          ${{steps.populate-projdir.outputs.Projdir}} \
           --outfile ./sfca_results.csv
       shell: bash
 
@@ -140,12 +150,13 @@ runs:
 
 
   ##### Part 4 - Process output
-    - run: |
-        curl \
-          -X POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{inputs.github_token}}"\
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/forcedotcom/tdx23-sfca-demo/pulls/1/comments \
-          -d '{"body":"Test comment","commit_id":"f07ab6ac4c33ab3035042200b8d00d20663e95b1","path":"force-app/main/default/classes/Cat.cls","line":2}'
-    - shell: bash
+    # - name: Test comment
+    #   run: |
+    #     curl \
+    #       -X POST \
+    #       -H "Accept: application/vnd.github+json" \
+    #       -H "Authorization: Bearer ${{inputs.github_token}}"\
+    #       -H "X-GitHub-Api-Version: 2022-11-28" \
+    #       https://api.github.com/repos/forcedotcom/tdx23-sfca-demo/pulls/1/comments \
+    #       -d '{"body":"Test comment","commit_id":"f07ab6ac4c33ab3035042200b8d00d20663e95b1","path":"force-app/main/default/classes/Cat.cls","line":2}'
+    #   shell: bash
