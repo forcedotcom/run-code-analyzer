@@ -77,6 +77,7 @@ runs:
         echo "Populating severitythreshold . . ."
         SEVTHRESHOLD="--severitythreshold ${{ inputs.severitythreshold}} "
         echo "SevThreshold=$SEVTHRESHOLD" >> $GITHUB_OUTPUT
+      shell: bash
 
   # Populate --projectdir if necessary
     - id: populate-projdir
