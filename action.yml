@@ -37,9 +37,9 @@ runs:
         script: |
           core.setFailed("Unsupported runtype: ${{ inputs.runtype }}")
 
-    - id: validate-runtype
+    - id: populate-command
       run: |
-        echo "Validating runtype . . ."
+        echo "Populating command . . ."
         if [[ "${{ inputs.runtype }}" == 'simple' ]]; then
           COMMAND="scanner:run"
         elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
@@ -71,6 +71,13 @@ runs:
         echo "Engine=$ENGINE" >> $GITHUB_OUTPUT
       shell: bash
 
+  # Populate --severitythreshold
+    - id: populate-sevthreshold
+      run: |
+        echo "Populating severitythreshold . . ."
+        SEVTHRESHOLD="--severitythreshold ${{ inputs.severitythreshold}} "
+        echo "SevThreshold=$SEVTHRESHOLD" >> $GITHUB_OUTPUT
+
   # Populate --projectdir if necessary
     - id: populate-projdir
       run: |
@@ -84,24 +91,28 @@ runs:
           PROJDIR="--projectdir \"${{ inputs.projectdir }}\""
           echo "Run type is DFA. Project dir needed = $PROJDIR"
         else
-          PROJDIR_NEEDED=
+          PROJDIR_NEEDED="false"
           PROJDIR=
           echo "Project dir is not needed"
         fi
-        if [[ -n "$PROJDIR_NEEDED" && -z "${{ inputs.projectdir }}" ]]; then
-          echo "'projectdir' is a required when invoking sfge. Add and rerun."
-          exit 10
-        fi
         echo "ProjDir=$PROJDIR" >> $GITHUB_OUTPUT
+        echo "ProjDirNeeded=$PROJDIR_NEEDED" >> $GITHUB_OUTPUT
       shell: bash
+
+    - if: ${{ steps.populate-projdir.ProjDirNeeded }} == "true" && ${{ steps.populate-projdir.ProjDir }} == ""
+      uses: actions/github-script@v6
+      with:
+        script: |
+          core.setFailed("'projectdir' is a required parameter when invoking sfge. Add and rerun.")
 
     - name: Display derived information
       run: |
         echo "Confirming parameters . . ."
-        echo "Command = ${{steps.validate-runtype.outputs.Command}}"
+        echo "Command = ${{steps.populate-command.outputs.Command}}"
         echo "Outfile = ${{steps.populate-outfile.outputs.Outfile}}"
         echo "Engine = ${{steps.populate-engine.outputs.Engine}}"
         echo "ProjDir = ${{steps.populate-projdir.outputs.ProjDir}}"
+        echo "SevThreshold = ${{steps.populate-sevthreshold.outputs.SevThreshold}}"
       shell: bash
 
   #### Part 2 - Setup dependencies ####
@@ -156,10 +167,11 @@ runs:
 
     - name: Execute Code Analyzer
       run: |
-        sfdx ${{steps.validate-runtype.outputs.Command}} \
+        sfdx ${{steps.populate-command.outputs.Command}} \
           --target "${{steps.populate-target.outputs.Target}}" \
           ${{steps.populate-engine.outputs.Engine}} \
           ${{steps.populate-projdir.outputs.ProjDir}} \
+          ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
           ${{steps.populate-outfile.outputs.Outfile}}
       shell: bash
 
