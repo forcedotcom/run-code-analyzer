@@ -7,6 +7,10 @@ inputs:
     description: 'Type of run. Valid values are "simple", "dfa". Defaults to "simple".'
     type: string
     default: 'simple'
+  severitythreshold:
+    required: true
+    description: 'Fail run when violation severity equals or exceeds this number'
+    default: 3
   engine:
     required: false
     description: 'Provide comma-separated values of Code Analyzer engine(s) to excecute. Defaults to Code Analyzer defaults based on runtype.'
@@ -27,6 +31,12 @@ runs:
   #### Part 1 - User input validation ####
 
   # Validate runtype and derive code analyzer command to execute
+    - if: ${{ inputs.runtype }} != "dfa" && ${{ inputs.runtype }} != "simple"
+      uses: actions/github-script@v6
+      with:
+        script: |
+          core.setFailed("Unsupported runtype: ${{ inputs.runtype }}")
+
     - id: validate-runtype
       run: |
         echo "Validating runtype . . ."
@@ -34,9 +44,6 @@ runs:
           COMMAND="scanner:run"
         elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
           COMMAND="scanner:run:dfa"
-        else
-          echo "Unsupported runtype: ${{ inputs.runtype }}"
-          exit 10
         fi
         echo "Command=$COMMAND" >> $GITHUB_OUTPUT
       shell: bash
