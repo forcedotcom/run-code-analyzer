@@ -31,11 +31,11 @@ runs:
   #### Part 1 - User input validation ####
 
   # Validate runtype and derive code analyzer command to execute
-    - if: ${{ inputs.runtype }} != "dfa" && ${{ inputs.runtype }} != "simple"
+    - id: input-validations-start
       uses: actions/github-script@v6
       with:
         script: |
-          core.setFailed("Unsupported runtype: ${{ inputs.runtype }}")
+          core.startgroup("Input Validations")
 
     - id: populate-command
       run: |
@@ -44,6 +44,9 @@ runs:
           COMMAND="scanner:run"
         elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
           COMMAND="scanner:run:dfa"
+        else
+          echo "Unsupported runtype: ${{ inputs.runtype }}"
+          exit 10
         fi
         echo "Command=$COMMAND" >> $GITHUB_OUTPUT
       shell: bash
@@ -77,7 +80,6 @@ runs:
         echo "Populating severitythreshold . . ."
         SEVTHRESHOLD="--severitythreshold ${{ inputs.severitythreshold}} "
         echo "SevThreshold=$SEVTHRESHOLD" >> $GITHUB_OUTPUT
-      shell: bash
 
   # Populate --projectdir if necessary
     - id: populate-projdir
@@ -92,19 +94,16 @@ runs:
           PROJDIR="--projectdir \"${{ inputs.projectdir }}\""
           echo "Run type is DFA. Project dir needed = $PROJDIR"
         else
-          PROJDIR_NEEDED="false"
+          PROJDIR_NEEDED=
           PROJDIR=
           echo "Project dir is not needed"
         fi
+        if [[ -n "$PROJDIR_NEEDED" && -z "${{ inputs.projectdir }}" ]]; then
+          echo "'projectdir' is a required when invoking sfge. Add and rerun."
+          exit 10
+        fi
         echo "ProjDir=$PROJDIR" >> $GITHUB_OUTPUT
-        echo "ProjDirNeeded=$PROJDIR_NEEDED" >> $GITHUB_OUTPUT
       shell: bash
-
-    - if: ${{ steps.populate-projdir.ProjDirNeeded }} == "true" && ${{ steps.populate-projdir.ProjDir }} == ""
-      uses: actions/github-script@v6
-      with:
-        script: |
-          core.setFailed("'projectdir' is a required parameter when invoking sfge. Add and rerun.")
 
     - name: Display derived information
       run: |
@@ -115,6 +114,12 @@ runs:
         echo "ProjDir = ${{steps.populate-projdir.outputs.ProjDir}}"
         echo "SevThreshold = ${{steps.populate-sevthreshold.outputs.SevThreshold}}"
       shell: bash
+
+    - id: input-validations-end
+      uses: actions/github-script@v6
+      with:
+        script: |
+          core.endgroup("Input Validations")
 
   #### Part 2 - Setup dependencies ####
 
