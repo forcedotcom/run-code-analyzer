@@ -78,7 +78,7 @@ runs:
     - id: populate-sevthreshold
       run: |
         echo "Populating severitythreshold . . ."
-        SEVTHRESHOLD="--severitythreshold ${{ inputs.severitythreshold}} "
+        SEVTHRESHOLD="--severity-threshold ${{ inputs.severitythreshold}} "
         echo "SevThreshold=$SEVTHRESHOLD" >> $GITHUB_OUTPUT
       shell: bash
 
