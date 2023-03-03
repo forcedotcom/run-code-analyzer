@@ -22,7 +22,7 @@ inputs:
   outfile:
     required: false
     description: 'Output file to collect the results in. Format depends on the extension of the filename. Defaults to sfca_results.json'
-    default: 'sfca_results.json'
+    default: 'sfca_results.html'
 
 runs:
   using: 'composite'
@@ -180,6 +180,7 @@ runs:
           ${{steps.populate-projdir.outputs.ProjDir}} \
           ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
           ${{steps.populate-outfile.outputs.Outfile}}
+        echo $(cat sfca_results.html) >> $GITHUB_STEP_SUMMARY
       shell: bash
 
     - if: failure()
