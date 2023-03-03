@@ -182,7 +182,8 @@ runs:
           ${{steps.populate-outfile.outputs.Outfile}}
       shell: bash
 
-    - uses: actions/upload-artifact@v3
+    - if: failure()
+      uses: actions/upload-artifact@v3
       with:
         name: SFCA-Results
         path: ${{inputs.outfile}}
