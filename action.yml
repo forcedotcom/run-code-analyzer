@@ -181,7 +181,6 @@ runs:
           ${{steps.populate-projdir.outputs.ProjDir}} \
           ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
           ${{steps.populate-outfile.outputs.Outfile}}
-        echo $(cat sfca_results.html) >> $GITHUB_STEP_SUMMARY
       shell: bash
 
     - if: failure()
