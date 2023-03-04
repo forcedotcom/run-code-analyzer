@@ -7,6 +7,10 @@ inputs:
     description: 'Type of run. Valid values are "simple", "dfa". Defaults to "simple".'
     type: string
     default: 'simple'
+  severitythreshold:
+    required: true
+    description: 'Fail run when violation severity equals or exceeds this number'
+    default: 3
   engine:
     required: false
     description: 'Provide comma-separated values of Code Analyzer engine(s) to excecute. Defaults to Code Analyzer defaults based on runtype.'
@@ -18,7 +22,7 @@ inputs:
   outfile:
     required: false
     description: 'Output file to collect the results in. Format depends on the extension of the filename. Defaults to sfca_results.json'
-    default: 'sfca_results.json'
+    default: 'sfca_results.html'
 
 runs:
   using: 'composite'
@@ -27,9 +31,15 @@ runs:
   #### Part 1 - User input validation ####
 
   # Validate runtype and derive code analyzer command to execute
-    - id: validate-runtype
+    - id: input-validations-start
+      uses: actions/github-script@v6
+      with:
+        script: |
+          core.startgroup
+
+    - id: populate-command
       run: |
-        echo "Validating runtype . . ."
+        echo "Populating command . . ."
         if [[ "${{ inputs.runtype }}" == 'simple' ]]; then
           COMMAND="scanner:run"
         elif [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
@@ -64,6 +74,14 @@ runs:
         echo "Engine=$ENGINE" >> $GITHUB_OUTPUT
       shell: bash
 
+  # Populate --severitythreshold
+    - id: populate-sevthreshold
+      run: |
+        echo "Populating severitythreshold . . ."
+        SEVTHRESHOLD="--severity-threshold ${{ inputs.severitythreshold}} "
+        echo "SevThreshold=$SEVTHRESHOLD" >> $GITHUB_OUTPUT
+      shell: bash
+
   # Populate --projectdir if necessary
     - id: populate-projdir
       run: |
@@ -91,11 +109,18 @@ runs:
     - name: Display derived information
       run: |
         echo "Confirming parameters . . ."
-        echo "Command = ${{steps.validate-runtype.outputs.Command}}"
+        echo "Command = ${{steps.populate-command.outputs.Command}}"
         echo "Outfile = ${{steps.populate-outfile.outputs.Outfile}}"
         echo "Engine = ${{steps.populate-engine.outputs.Engine}}"
         echo "ProjDir = ${{steps.populate-projdir.outputs.ProjDir}}"
+        echo "SevThreshold = ${{steps.populate-sevthreshold.outputs.SevThreshold}}"
       shell: bash
+
+    - id: input-validations-end
+      uses: actions/github-script@v6
+      with:
+        script: |
+          core.endgroup
 
   #### Part 2 - Setup dependencies ####
 
@@ -148,28 +173,24 @@ runs:
       shell: bash
 
     - name: Execute Code Analyzer
+      id: code-analyzer
       run: |
-        sfdx ${{steps.validate-runtype.outputs.Command}} \
+        sfdx ${{steps.populate-command.outputs.Command}} \
           --target "${{steps.populate-target.outputs.Target}}" \
           ${{steps.populate-engine.outputs.Engine}} \
           ${{steps.populate-projdir.outputs.ProjDir}} \
+          ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
           ${{steps.populate-outfile.outputs.Outfile}}
       shell: bash
 
-    - uses: actions/upload-artifact@v3
+    - if: failure()
+      uses: actions/upload-artifact@v3
       with:
         name: SFCA-Results
         path: ${{inputs.outfile}}
 
-
-  ##### Part 4 - Process output
-    # - name: Test comment
-    #   run: |
-    #     curl \
-    #       -X POST \
-    #       -H "Accept: application/vnd.github+json" \
-    #       -H "Authorization: Bearer ${{inputs.github_token}}"\
-    #       -H "X-GitHub-Api-Version: 2022-11-28" \
-    #       https://api.github.com/repos/forcedotcom/tdx23-sfca-demo/pulls/1/comments \
-    #       -d '{"body":"Test comment","commit_id":"f07ab6ac4c33ab3035042200b8d00d20663e95b1","path":"force-app/main/default/classes/Cat.cls","line":2}'
-    #   shell: bash
+    - if: ${{steps.code-analyzer.outcome}} == "failure"
+      uses: actions/github-script@v6
+      with:
+        script: |
+          core.setFailed("Code Analyzer detected violations")
