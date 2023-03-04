@@ -193,4 +193,10 @@ runs:
       uses: actions/github-script@v6
       with:
         script: |
+          dist/index.js
+
+    - if: ${{steps.code-analyzer.outcome}} == "failure"
+      uses: actions/github-script@v6
+      with:
+        script: |
           core.setFailed("Code Analyzer detected violations")
