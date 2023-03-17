@@ -7,22 +7,42 @@ inputs:
     description: 'Type of run. Valid values are "simple", "dfa". Defaults to "simple".'
     type: string
     default: 'simple'
-  severitythreshold:
-    required: true
-    description: 'Fail run when violation severity equals or exceeds this number'
-    default: 3
+  category:
+    required: false
+    description: 'Comma-separated categories to run'
+    type: string
   engine:
     required: false
     description: 'Provide comma-separated values of Code Analyzer engine(s) to excecute. Defaults to Code Analyzer defaults based on runtype.'
+    type: string
+  env:
+    required: false
+    description: 'Override ESLint default environment variables, in JSON-formatted string'
+    type: string
+  eslintconfig:
+    required: false
+    description: 'Location of custom config to execute eslint engine'
+    type: string
+  outfile:
+    required: false
+    description: 'Output file to collect the results in. Format depends on the extension of the filename. Defaults to sfca_results.json'
+    default: 'sfca_results.json'
+  pmdconfig:
+    required: false
+    description: 'Location of PMD Rule Reference XML to customize PMD engine'
     type: string
   projectdir:
     required: false
     description: 'Path to project repository. Necessary when invoking sfge engine. Defaults to current directory.'
     type: string
-  outfile:
+  severitythreshold:
+    required: true
+    description: 'Fail run when violation severity equals or exceeds this number'
+    default: 3
+  tsconfig:
     required: false
-    description: 'Output file to collect the results in. Format depends on the extension of the filename. Defaults to sfca_results.json'
-    default: 'sfca_results.html'
+    description: 'Location of tsconfig file while executing eslint-typescript engine'
+    type: string
 
 runs:
   using: 'composite'
@@ -60,6 +80,18 @@ runs:
         echo "Outfile=$OUTFILE" >> $GITHUB_OUTPUT
       shell: bash
 
+  # Populate --category value based on input
+    - id: populate-category
+      run: |
+        echo "Populating parameters . . ."
+        if [[ "${{ inputs.category }}" == "" ]]; then
+          CATEGORY=""
+          echo "No category requested"
+        else
+          CATEGORY="--category \"${{ inputs.category }}\""
+        fi
+        echo "Category=$CATEGORY" >> $GITHUB_OUTPUT
+      shell: bash
 
   # Populate --engine value based on input
     - id: populate-engine
@@ -74,12 +106,64 @@ runs:
         echo "Engine=$ENGINE" >> $GITHUB_OUTPUT
       shell: bash
 
+  # Populate --env value based on input
+    - id: populate-env
+      run: |
+        echo "Populating env . . ."
+        if [[ "${{ inputs.env }}" == "" ]]; then
+          ENV=""
+          echo "No env requested"
+        else
+          ENV="--env \"${{ inputs.env }}\""
+        fi
+        echo "Env=$ENV" >> $GITHUB_OUTPUT
+      shell: bash
+
+  # Populate --eslintconfig value based on input
+    - id: populate-eslintconfig
+      run: |
+        echo "Populating eslintconfig . . ."
+        if [[ "${{ inputs.eslintconfig }}" == "" ]]; then
+          ESLINTCONFIG=""
+          echo "No eslintconfig requested"
+        else
+          ESLINTCONFIG="--env \"${{ inputs.eslintconfig }}\""
+        fi
+        echo "EslintConfig=$ESLINTCONFIG" >> $GITHUB_OUTPUT
+      shell: bash
+
+  # Populate --pmdconfig value based on input
+    - id: populate-pmdconfig
+      run: |
+        echo "Populating pmdconfig . . ."
+        if [[ "${{ inputs.pmdconfig }}" == "" ]]; then
+          PMDCONFIG=""
+          echo "No pmdconfig requested"
+        else
+          PMDCONFIG="--env \"${{ inputs.pmdconfig }}\""
+        fi
+        echo "PmdConfig=$PMDCONFIG" >> $GITHUB_OUTPUT
+      shell: bash
+
   # Populate --severitythreshold
     - id: populate-sevthreshold
       run: |
         echo "Populating severitythreshold . . ."
         SEVTHRESHOLD="--severity-threshold ${{ inputs.severitythreshold}} "
         echo "SevThreshold=$SEVTHRESHOLD" >> $GITHUB_OUTPUT
+      shell: bash
+
+  # Populate --tsconfig value based on input
+    - id: populate-tsconfig
+      run: |
+        echo "Populating tsconfig . . ."
+        if [[ "${{ inputs.tsconfig }}" == "" ]]; then
+          TSCONFIG=""
+          echo "No tsconfig requested"
+        else
+          TSCONFIG="--env \"${{ inputs.tsconfig }}\""
+        fi
+        echo "TsConfig=$TSCONFIG" >> $GITHUB_OUTPUT
       shell: bash
 
   # Populate --projectdir if necessary
@@ -112,8 +196,13 @@ runs:
         echo "Command = ${{steps.populate-command.outputs.Command}}"
         echo "Outfile = ${{steps.populate-outfile.outputs.Outfile}}"
         echo "Engine = ${{steps.populate-engine.outputs.Engine}}"
+        echo "Category = ${{steps.populate-category.outputs.Category}}"
+        echo "Env = ${{steps.populate-env.outputs.Env}}"
+        echo "EslintConfig = ${{steps.populate-eslintconfig.outputs.EslintConfig}}"
+        echo "PmdConfig = ${{steps.populate-pmdconfig.outputs.PmdConfig}}"
         echo "ProjDir = ${{steps.populate-projdir.outputs.ProjDir}}"
         echo "SevThreshold = ${{steps.populate-sevthreshold.outputs.SevThreshold}}"
+        echo "TsConfig = ${{steps.populate-tsconfig.outputs.TsConfig}}"
       shell: bash
 
     - id: input-validations-end
@@ -178,8 +267,13 @@ runs:
         sfdx ${{steps.populate-command.outputs.Command}} \
           --target "${{steps.populate-target.outputs.Target}}" \
           ${{steps.populate-engine.outputs.Engine}} \
+          ${{steps.populate-category.outputs.Category}} \
+          ${{steps.populate-env.outputs.Env}} \
+          ${{steps.populate-eslintconfig.outputs.EslintConfig}} \
+          ${{steps.populate-pmdconfig.outputs.PmdConfig}} \
           ${{steps.populate-projdir.outputs.ProjDir}} \
           ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
+          ${{steps.populate-tsconfig.outputs.TsConfig}} \
           ${{steps.populate-outfile.outputs.Outfile}}
       shell: bash
 
