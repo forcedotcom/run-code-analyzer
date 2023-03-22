@@ -391,10 +391,12 @@ runs:
           ${{steps.populate-tsconfig.outputs.TsConfig}} \
           ${{steps.populate-dfa-params.outputs.DfaParams}} \
           ${{steps.populate-outfile.outputs.Outfile}}
-        echo "ExitCode=$?" >> $GITHUB_OUTPUT
+        EXIT_CODE=$?
+        echo "EXIT_CODE=$EXIT_CODE"
+        echo "ExitCode=$EXIT_CODE" >> $GITHUB_OUTPUT
       shell: bash
 
-    - if: failure() && "${{ steps.code-analyzer.outputs.ExitCode <= inputs.severitythreshold }}"
+    - if: "${{ steps.code-analyzer.outputs.ExitCode > 0 && steps.code-analyzer.outputs.ExitCode <= inputs.severitythreshold }}"
       uses: actions/upload-artifact@v3
       with:
         name: SFCA-Results
