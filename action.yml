@@ -216,7 +216,7 @@ runs:
         if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
           echo "Populating DFA optional param pathexpvalue"
           if [[ -n "${{ inputs.pathexplimit }}" ]]; then
-            PATHEXPLIMIT = "--pathexplimit ${{ inputs.pathexplimit }}"
+            PATHEXPLIMIT="--pathexplimit ${{ inputs.pathexplimit }}"
             echo "PathExpLimit=$PATHEXPLIMIT" >> $GITHUB_OUTPUT
           else
             echo "PathExpLimit=" >> $GITHUB_OUTPUT
@@ -226,9 +226,9 @@ runs:
     - id: dfa-populate-sfgejvmargs
       run: |
         if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
-          echo "Populating DFA optional param pathexpvalue"
+          echo "Populating DFA optional param sfgejvmargs"
           if [[ -n "${{ inputs.sfgejvmargs }}" ]]; then
-            SFGEJVMARGS = "--sfgejvmargs ${{ inputs.sfgejvmargs }}"
+            SFGEJVMARGS="--sfgejvmargs ${{ inputs.sfgejvmargs }}"
             echo "SfgeJvmArgs=$SFGEJVMARGS" >> $GITHUB_OUTPUT
           else
             echo "SfgeJvmArgs=" >> $GITHUB_OUTPUT
