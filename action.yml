@@ -238,6 +238,7 @@ runs:
       
     - name: Build DFA-specific params
       id: populate-dfa-params
+      shell: bash
       run: |
         if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
           DFA_PARAMS="${{steps.dfa-populate-pathexpvalue.outputs.PathExpLimit}}"
