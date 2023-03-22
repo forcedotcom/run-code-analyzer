@@ -117,13 +117,15 @@ runs:
     - id: populate-engine
       run: |
         echo "Populating parameters . . ."
-        if [[ "${{ inputs.engine }}" == "" ]]; then
-          ENGINE=""
-          echo "No specific engine requested. Using defaults"
-        else
-          ENGINE="--engine \"${{ inputs.engine }}\""
+        if [[ -n "${{ inputs.engine }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'simple' ]]; then
+            ENGINE="--engine \"${{ inputs.engine }}\""
+            echo "Engine=$ENGINE" >> $GITHUB_OUTPUT
+          else
+            echo "'engine' parameter can be used only with runtype 'simple'."
+            exit 10
+          fi
         fi
-        echo "Engine=$ENGINE" >> $GITHUB_OUTPUT
       shell: bash
 
   # Populate --env value based on input
