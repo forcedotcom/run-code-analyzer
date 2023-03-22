@@ -398,7 +398,7 @@ runs:
         name: SFCA-Results
         path: ${{inputs.outfile}}
 
-    - if: "${{steps.code-analyzer.outcome}}" == "failure"
+    - if: "${{steps.code-analyzer.outcome}} == 'failure'"
       uses: actions/github-script@v6
       with:
         script: |
