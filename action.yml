@@ -212,39 +212,91 @@ runs:
         echo "ProjDir=$PROJDIR" >> $GITHUB_OUTPUT
       shell: bash
 
-    # Populate DFA-specific optional fields
-    - id: dfa-populate-pathexpvalue
+    # Populate DFA-specific optional field, pathexplimit
+    - id: dfa-populate-pathexplimit
       run: |
         if [[ -n "${{ inputs.pathexplimit }}" ]]; then
           if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
-            echo "Populating DFA optional param pathexpvalue"
+            echo "Populating DFA optional param pathexplimit"
             PATHEXPLIMIT="--pathexplimit ${{ inputs.pathexplimit }}"
             echo "PathExpLimit=$PATHEXPLIMIT" >> $GITHUB_OUTPUT
           else
-            echo "pathexplimit should be provided only with runtype 'dfa'."
+            echo "Input 'pathexplimit' should be provided only with runtype 'dfa'."
             exit 10
           fi 
         fi
       shell: bash
+
+    # Populate DFA-specific optional field, rule-disable-warning-violation
+    - id: dfa-populate-rule-disable-warning-violation
+      run: |
+        if [[ -n "${{ inputs.rule-disable-warning-violation }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+            echo "Populating DFA optional param rule-disable-warning-violation"
+            RULE_DISABLE_WARNING_VIOLATION="--rule-disable-warning-violation ${{ inputs.rule-disable-warning-violation }}"
+            echo "RuleDisableWarningViolation=$RULE_DISABLE_WARNING_VIOLATION" >> $GITHUB_OUTPUT
+          else
+            echo "Input 'rule-disable-warning-violation' should be provided only with runtype 'dfa'."
+            exit 10
+          fi 
+        fi
+      shell: bash
+
+  # Populate DFA-specific optional field, rule-thread-count
+    - id: dfa-populate-rule-thread-count
+      run: |
+        if [[ -n "${{ inputs.rule-thread-count }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+            echo "Populating DFA optional param rule-thread-count"
+            RULE_THREAD_COUNT="--rule-thread-count ${{ inputs.rule-thread-count }}"
+            echo "RuleThreadCount=$RULE_THREAD_COUNT" >> $GITHUB_OUTPUT
+          else
+            echo "Input 'rule-thread-count' should be provided only with runtype 'dfa'."
+            exit 10
+          fi 
+        fi
+      shell: bash
+
+  # Populate DFA-specific optional field, rule-thread-timeout
+    - id: dfa-populate-rule-thread-timeout
+      run: |
+        if [[ -n "${{ inputs.rule-thread-timeout }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+            echo "Populating DFA optional param rule-thread-timeout"
+            RULE_THREAD_TIMEOUT="--rule-thread-timeout ${{ inputs.rule-thread-timeout }}"
+            echo "RuleThreadTimeout=$RULE_THREAD_TIMEOUT" >> $GITHUB_OUTPUT
+          else
+            echo "Input 'rule-thread-timeout' should be provided only with runtype 'dfa'."
+            exit 10
+          fi 
+        fi
+      shell: bash
+    
+  # Populate DFA-specific optional field, sfgejvmargs
     - id: dfa-populate-sfgejvmargs
       run: |
-        if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
-          echo "Populating DFA optional param sfgejvmargs"
-          if [[ -n "${{ inputs.sfgejvmargs }}" ]]; then
+        if [[ -n "${{ inputs.sfgejvmargs }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+            echo "Populating DFA optional param sfgejvmargs"
             SFGEJVMARGS="--sfgejvmargs ${{ inputs.sfgejvmargs }}"
             echo "SfgeJvmArgs=$SFGEJVMARGS" >> $GITHUB_OUTPUT
           else
-            echo "SfgeJvmArgs=" >> $GITHUB_OUTPUT
-          fi
+            echo "Input 'sfgejvmargs' should be provided only with runtype 'dfa'."
+            exit 10
+          fi 
         fi
       shell: bash
-      
+
+
     - name: Build DFA-specific params
       id: populate-dfa-params
       shell: bash
       run: |
         if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
           DFA_PARAMS="${{steps.dfa-populate-pathexpvalue.outputs.PathExpLimit}}"
+          DFA_PARAMS="$DFA_PARAMS ${{steps.dfa-populate-rule-disable-warning-violation.outputs.RuleDisableWarningViolation}}"
+          DFA_PARAMS="$DFA_PARAMS ${{steps.dfa-populate-rule-thread-count.outputs.RuleThreadCount}}"
+          DFA_PARAMS="$DFA_PARAMS ${{steps.dfa-populate-rule-thread-timeout.outputs.RuleThreadTimeout}}"
           DFA_PARAMS="$DFA_PARAMS ${{steps.dfa-populate-sfgejvmargs.outputs.SfgeJvmArgs}}"
           echo "DfaParams=$DFA_PARAMS" >> $GITHUB_OUTPUT
         else
