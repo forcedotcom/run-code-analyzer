@@ -213,14 +213,15 @@ runs:
     # Populate DFA-specific optional fields
     - id: dfa-populate-pathexpvalue
       run: |
-        if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
-          echo "Populating DFA optional param pathexpvalue"
-          if [[ -n "${{ inputs.pathexplimit }}" ]]; then
+        if [[ -n "${{ inputs.pathexplimit }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+            echo "Populating DFA optional param pathexpvalue"
             PATHEXPLIMIT="--pathexplimit ${{ inputs.pathexplimit }}"
             echo "PathExpLimit=$PATHEXPLIMIT" >> $GITHUB_OUTPUT
           else
-            echo "PathExpLimit=" >> $GITHUB_OUTPUT
-          fi
+            echo "pathexplimit should be provided only with runtype 'dfa'."
+            exit 10
+          fi 
         fi
       shell: bash
     - id: dfa-populate-sfgejvmargs
