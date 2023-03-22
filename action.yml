@@ -54,6 +54,7 @@ inputs:
   severitythreshold:
     required: true
     description: 'Fail run when violation severity equals or exceeds this number'
+    type: number
     default: 3
   sfgejvmargs:
     required: false
@@ -390,15 +391,16 @@ runs:
           ${{steps.populate-tsconfig.outputs.TsConfig}} \
           ${{steps.populate-dfa-params.outputs.DfaParams}} \
           ${{steps.populate-outfile.outputs.Outfile}}
+        echo "ExitCode=$?" >> $GITHUB_OUTPUT
       shell: bash
 
-    - if: failure()
+    - if: failure() && "${{ steps.code-analyzer.outputs.ExitCode <= inputs.severitythreshold }}"
       uses: actions/upload-artifact@v3
       with:
         name: SFCA-Results
         path: ${{inputs.outfile}}
 
-    - if: "${{steps.code-analyzer.outcome}} == 'failure'"
+    - if: "${{ steps.code-analyzer.outputs.ExitCode > 0 }}"
       uses: actions/github-script@v6
       with:
         script: |
