@@ -379,7 +379,7 @@ runs:
     - name: Execute Code Analyzer
       id: code-analyzer
       run: |
-        sfdx ${{steps.populate-command.outputs.Command}} \
+        (sfdx ${{steps.populate-command.outputs.Command}} \
           --target "${{steps.populate-target.outputs.Target}}" \
           ${{steps.populate-engine.outputs.Engine}} \
           ${{steps.populate-category.outputs.Category}} \
@@ -390,7 +390,7 @@ runs:
           ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
           ${{steps.populate-tsconfig.outputs.TsConfig}} \
           ${{steps.populate-dfa-params.outputs.DfaParams}} \
-          ${{steps.populate-outfile.outputs.Outfile}}
+          ${{steps.populate-outfile.outputs.Outfile}}) && true
         EXIT_CODE=$?
         echo "EXIT_CODE=$EXIT_CODE"
         echo "ExitCode=$EXIT_CODE" >> $GITHUB_OUTPUT
