@@ -65,6 +65,17 @@ inputs:
     description: 'Location of tsconfig file while executing eslint-typescript engine'
     type: string
 
+outputs:
+  artifact-name:
+    description: "Artifact that contains Code Analyzer's results"
+    value: 'SFCA-Results'
+  artifact-path:
+    description: "Path used while uploading the results artifact"
+    value: "./sfca_results.json"
+  exit-code:
+    description: "Exit code returned by Code Analyzer run"
+    value: ${{ steps.code-analyzer.outputs.ExitCode }}
+
 runs:
   using: 'composite'
   steps:
