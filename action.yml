@@ -7,22 +7,63 @@ inputs:
     description: 'Type of run. Valid values are "simple", "dfa". Defaults to "simple".'
     type: string
     default: 'simple'
-  severitythreshold:
-    required: true
-    description: 'Fail run when violation severity equals or exceeds this number'
-    default: 3
+  category:
+    required: false
+    description: 'Comma-separated categories to run'
+    type: string
   engine:
     required: false
     description: 'Provide comma-separated values of Code Analyzer engine(s) to excecute. Defaults to Code Analyzer defaults based on runtype.'
+    type: string
+  env:
+    required: false
+    description: 'Override ESLint default environment variables, in JSON-formatted string'
+    type: string
+  eslintconfig:
+    required: false
+    description: 'Location of custom config to execute eslint engine'
+    type: string
+  outfile:
+    required: false
+    description: 'Output file to collect the results in. Format depends on the extension of the filename. Defaults to sfca_results.json'
+    default: 'sfca_results.json'
+  pathexplimit:
+    required: false
+    description: 'path expansion upper boundary limit. Can be used only with DFA runs.'
+    type: number
+  pmdconfig:
+    required: false
+    description: 'Location of PMD Rule Reference XML to customize PMD engine'
     type: string
   projectdir:
     required: false
     description: 'Path to project repository. Necessary when invoking sfge engine. Defaults to current directory.'
     type: string
-  outfile:
+  rule-disable-warning-violation:
     required: false
-    description: 'Output file to collect the results in. Format depends on the extension of the filename. Defaults to sfca_results.json'
-    default: 'sfca_results.html'
+    description: 'Disables warning violations. Can be used only with DFA runs.'
+    type: boolean
+  rule-thread-count:
+    required: false
+    description: 'Number to threads to execute rules in Graph Engine. Can be used only with DFA runs.'
+    type: number
+  rule-thread-timeout:
+    required: false
+    description: 'Thread timeout in milliseconds on Graph Engine. Can be used only with DFA runs.'
+    type: number
+  severitythreshold:
+    required: true
+    description: 'Fail run when violation severity equals or exceeds this number'
+    type: number
+    default: 3
+  sfgejvmargs:
+    required: false
+    description: 'JVM args to control Graph Engine run. Can be used only with DFA runs.'
+    type: string
+  tsconfig:
+    required: false
+    description: 'Location of tsconfig file while executing eslint-typescript engine'
+    type: string
 
 runs:
   using: 'composite'
@@ -60,18 +101,71 @@ runs:
         echo "Outfile=$OUTFILE" >> $GITHUB_OUTPUT
       shell: bash
 
+  # Populate --category value based on input
+    - id: populate-category
+      run: |
+        echo "Populating parameters . . ."
+        if [[ "${{ inputs.category }}" == "" ]]; then
+          CATEGORY=""
+          echo "No category requested"
+        else
+          CATEGORY="--category \"${{ inputs.category }}\""
+        fi
+        echo "Category=$CATEGORY" >> $GITHUB_OUTPUT
+      shell: bash
 
   # Populate --engine value based on input
     - id: populate-engine
       run: |
         echo "Populating parameters . . ."
-        if [[ "${{ inputs.engine }}" == "" ]]; then
-          ENGINE=""
-          echo "No specific engine requested. Using defaults"
-        else
-          ENGINE="--engine \"${{ inputs.engine }}\""
+        if [[ -n "${{ inputs.engine }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'simple' ]]; then
+            ENGINE="--engine \"${{ inputs.engine }}\""
+            echo "Engine=$ENGINE" >> $GITHUB_OUTPUT
+          else
+            echo "'engine' parameter can be used only with runtype 'simple'."
+            exit 10
+          fi
         fi
-        echo "Engine=$ENGINE" >> $GITHUB_OUTPUT
+      shell: bash
+
+  # Populate --env value based on input
+    - id: populate-env
+      run: |
+        echo "Populating env . . ."
+        if [[ "${{ inputs.env }}" == "" ]]; then
+          ENV=""
+          echo "No env requested"
+        else
+          ENV="--env \"${{ inputs.env }}\""
+        fi
+        echo "Env=$ENV" >> $GITHUB_OUTPUT
+      shell: bash
+
+  # Populate --eslintconfig value based on input
+    - id: populate-eslintconfig
+      run: |
+        echo "Populating eslintconfig . . ."
+        if [[ "${{ inputs.eslintconfig }}" == "" ]]; then
+          ESLINTCONFIG=""
+          echo "No eslintconfig requested"
+        else
+          ESLINTCONFIG="--env \"${{ inputs.eslintconfig }}\""
+        fi
+        echo "EslintConfig=$ESLINTCONFIG" >> $GITHUB_OUTPUT
+      shell: bash
+
+  # Populate --pmdconfig value based on input
+    - id: populate-pmdconfig
+      run: |
+        echo "Populating pmdconfig . . ."
+        if [[ "${{ inputs.pmdconfig }}" == "" ]]; then
+          PMDCONFIG=""
+          echo "No pmdconfig requested"
+        else
+          PMDCONFIG="--env \"${{ inputs.pmdconfig }}\""
+        fi
+        echo "PmdConfig=$PMDCONFIG" >> $GITHUB_OUTPUT
       shell: bash
 
   # Populate --severitythreshold
@@ -80,6 +174,19 @@ runs:
         echo "Populating severitythreshold . . ."
         SEVTHRESHOLD="--severity-threshold ${{ inputs.severitythreshold}} "
         echo "SevThreshold=$SEVTHRESHOLD" >> $GITHUB_OUTPUT
+      shell: bash
+
+  # Populate --tsconfig value based on input
+    - id: populate-tsconfig
+      run: |
+        echo "Populating tsconfig . . ."
+        if [[ "${{ inputs.tsconfig }}" == "" ]]; then
+          TSCONFIG=""
+          echo "No tsconfig requested"
+        else
+          TSCONFIG="--env \"${{ inputs.tsconfig }}\""
+        fi
+        echo "TsConfig=$TSCONFIG" >> $GITHUB_OUTPUT
       shell: bash
 
   # Populate --projectdir if necessary
@@ -106,14 +213,111 @@ runs:
         echo "ProjDir=$PROJDIR" >> $GITHUB_OUTPUT
       shell: bash
 
+    # Populate DFA-specific optional field, pathexplimit
+    - id: dfa-populate-pathexplimit
+      run: |
+        if [[ -n "${{ inputs.pathexplimit }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+            echo "Populating DFA optional param pathexplimit"
+            PATHEXPLIMIT="--pathexplimit ${{ inputs.pathexplimit }}"
+            echo "PathExpLimit=$PATHEXPLIMIT" >> $GITHUB_OUTPUT
+          else
+            echo "Input 'pathexplimit' should be provided only with runtype 'dfa'."
+            exit 10
+          fi 
+        fi
+      shell: bash
+
+    # Populate DFA-specific optional field, rule-disable-warning-violation
+    - id: dfa-populate-rule-disable-warning-violation
+      run: |
+        if [[ -n "${{ inputs.rule-disable-warning-violation }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+            echo "Populating DFA optional param rule-disable-warning-violation"
+            RULE_DISABLE_WARNING_VIOLATION="--rule-disable-warning-violation ${{ inputs.rule-disable-warning-violation }}"
+            echo "RuleDisableWarningViolation=$RULE_DISABLE_WARNING_VIOLATION" >> $GITHUB_OUTPUT
+          else
+            echo "Input 'rule-disable-warning-violation' should be provided only with runtype 'dfa'."
+            exit 10
+          fi 
+        fi
+      shell: bash
+
+  # Populate DFA-specific optional field, rule-thread-count
+    - id: dfa-populate-rule-thread-count
+      run: |
+        if [[ -n "${{ inputs.rule-thread-count }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+            echo "Populating DFA optional param rule-thread-count"
+            RULE_THREAD_COUNT="--rule-thread-count ${{ inputs.rule-thread-count }}"
+            echo "RuleThreadCount=$RULE_THREAD_COUNT" >> $GITHUB_OUTPUT
+          else
+            echo "Input 'rule-thread-count' should be provided only with runtype 'dfa'."
+            exit 10
+          fi 
+        fi
+      shell: bash
+
+  # Populate DFA-specific optional field, rule-thread-timeout
+    - id: dfa-populate-rule-thread-timeout
+      run: |
+        if [[ -n "${{ inputs.rule-thread-timeout }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+            echo "Populating DFA optional param rule-thread-timeout"
+            RULE_THREAD_TIMEOUT="--rule-thread-timeout ${{ inputs.rule-thread-timeout }}"
+            echo "RuleThreadTimeout=$RULE_THREAD_TIMEOUT" >> $GITHUB_OUTPUT
+          else
+            echo "Input 'rule-thread-timeout' should be provided only with runtype 'dfa'."
+            exit 10
+          fi 
+        fi
+      shell: bash
+    
+  # Populate DFA-specific optional field, sfgejvmargs
+    - id: dfa-populate-sfgejvmargs
+      run: |
+        if [[ -n "${{ inputs.sfgejvmargs }}" ]]; then
+          if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+            echo "Populating DFA optional param sfgejvmargs"
+            SFGEJVMARGS="--sfgejvmargs ${{ inputs.sfgejvmargs }}"
+            echo "SfgeJvmArgs=$SFGEJVMARGS" >> $GITHUB_OUTPUT
+          else
+            echo "Input 'sfgejvmargs' should be provided only with runtype 'dfa'."
+            exit 10
+          fi 
+        fi
+      shell: bash
+
+
+    - name: Build DFA-specific params
+      id: populate-dfa-params
+      shell: bash
+      run: |
+        if [[ "${{ inputs.runtype }}" == 'dfa' ]]; then
+          DFA_PARAMS="${{steps.dfa-populate-pathexpvalue.outputs.PathExpLimit}}"
+          DFA_PARAMS="$DFA_PARAMS ${{steps.dfa-populate-rule-disable-warning-violation.outputs.RuleDisableWarningViolation}}"
+          DFA_PARAMS="$DFA_PARAMS ${{steps.dfa-populate-rule-thread-count.outputs.RuleThreadCount}}"
+          DFA_PARAMS="$DFA_PARAMS ${{steps.dfa-populate-rule-thread-timeout.outputs.RuleThreadTimeout}}"
+          DFA_PARAMS="$DFA_PARAMS ${{steps.dfa-populate-sfgejvmargs.outputs.SfgeJvmArgs}}"
+          echo "DfaParams=$DFA_PARAMS" >> $GITHUB_OUTPUT
+        else
+          echo "DfaParams=" >> $GITHUB_OUTPUT
+        fi
+
     - name: Display derived information
       run: |
         echo "Confirming parameters . . ."
         echo "Command = ${{steps.populate-command.outputs.Command}}"
         echo "Outfile = ${{steps.populate-outfile.outputs.Outfile}}"
         echo "Engine = ${{steps.populate-engine.outputs.Engine}}"
+        echo "Category = ${{steps.populate-category.outputs.Category}}"
+        echo "Env = ${{steps.populate-env.outputs.Env}}"
+        echo "EslintConfig = ${{steps.populate-eslintconfig.outputs.EslintConfig}}"
+        echo "PmdConfig = ${{steps.populate-pmdconfig.outputs.PmdConfig}}"
         echo "ProjDir = ${{steps.populate-projdir.outputs.ProjDir}}"
         echo "SevThreshold = ${{steps.populate-sevthreshold.outputs.SevThreshold}}"
+        echo "TsConfig = ${{steps.populate-tsconfig.outputs.TsConfig}}"
+        echo "DfaParams = ${{steps.populate-dfa-params.outputs.DfaParams}}"
       shell: bash
 
     - id: input-validations-end
@@ -175,21 +379,30 @@ runs:
     - name: Execute Code Analyzer
       id: code-analyzer
       run: |
-        sfdx ${{steps.populate-command.outputs.Command}} \
+        (sfdx ${{steps.populate-command.outputs.Command}} \
           --target "${{steps.populate-target.outputs.Target}}" \
           ${{steps.populate-engine.outputs.Engine}} \
+          ${{steps.populate-category.outputs.Category}} \
+          ${{steps.populate-env.outputs.Env}} \
+          ${{steps.populate-eslintconfig.outputs.EslintConfig}} \
+          ${{steps.populate-pmdconfig.outputs.PmdConfig}} \
           ${{steps.populate-projdir.outputs.ProjDir}} \
           ${{steps.populate-sevthreshold.outputs.SevThreshold}} \
-          ${{steps.populate-outfile.outputs.Outfile}}
+          ${{steps.populate-tsconfig.outputs.TsConfig}} \
+          ${{steps.populate-dfa-params.outputs.DfaParams}} \
+          ${{steps.populate-outfile.outputs.Outfile}}) && true
+        EXIT_CODE=$?
+        echo "EXIT_CODE=$EXIT_CODE"
+        echo "ExitCode=$EXIT_CODE" >> $GITHUB_OUTPUT
       shell: bash
 
-    - if: failure()
+    - if: "${{ steps.code-analyzer.outputs.ExitCode > 0 && steps.code-analyzer.outputs.ExitCode <= inputs.severitythreshold }}"
       uses: actions/upload-artifact@v3
       with:
         name: SFCA-Results
         path: ${{inputs.outfile}}
 
-    - if: ${{steps.code-analyzer.outcome}} == "failure"
+    - if: "${{ steps.code-analyzer.outputs.ExitCode > 0 }}"
       uses: actions/github-script@v6
       with:
         script: |
