@@ -195,7 +195,7 @@ runs:
     - id: populate-target
       run: |
         echo "Populating target . . ."
-        TARGET="--target ${{ inputs.target}} "
+        TARGET="--target \"${{ inputs.target }}\""
         echo "Target=$TARGET" >> $GITHUB_OUTPUT
       shell: bash
 
@@ -385,7 +385,7 @@ runs:
       id: code-analyzer
       run: |
         (sfdx ${{steps.populate-command.outputs.Command}} \
-          "${{steps.populate-target.outputs.Target}}" \
+          ${{steps.populate-target.outputs.Target}} \
           ${{steps.populate-engine.outputs.Engine}} \
           ${{steps.populate-category.outputs.Category}} \
           ${{steps.populate-env.outputs.Env}} \
