@@ -13,6 +13,8 @@ Overall, it takes care of:
 * Executing Code Analyzer and collecting results
 * Rendering results if requested
 
+This repository is maintained by Salesforce Code Analyzer team.
+
 ## Usage
 
 Execute Code Analyzer and render output as markdown. By default, "simple" runtype is invoked. A previous step in the workflow has collected the list of target files that were changed in the PR. You can find the full example in [forcedotcom/tdx23-sfca-demo](https://github.com/forcedotcom/tdx23-sfca-demo).
@@ -145,8 +147,8 @@ Code Analyzer Action is implemented as a composite GitHub Actions plugin written
 
 ## Contributing
 
+We welcome external contributions for features and bug fixes.
+
 ### Publish to a distribution branch
- 
 
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
+See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md).
