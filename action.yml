@@ -2,9 +2,17 @@ name: 'Code Analyzer Action'
 description: 'GHA to run Code Analyzer'
 author: 'Roopa Mohan'
 inputs:
+  render-results:
+    required: true
+    description: "If 'true', code-analyzer-action will render results as a markdown summary using code-analyzer-translator. Else, 'outfile-artifact-name' and 'outfile' should be provided to upload results."
+  outfile-artifact-name:
+    required: false
+    description: 'Artifact name to be used for uploading results file. Defaults to "SFCA-Results". Use this name to download results if needed.'
+    default: 'SFCA-Results'
+    type: string
   runtype:
     required: false
-    description: 'Type of run. Valid values are "simple", "dfa". Defaults to "simple".'
+    description: 'Type of run. Valid values are "simple" and "dfa". Defaults to "simple".'
     type: string
     default: 'simple'
   category:
@@ -60,18 +68,22 @@ inputs:
     required: false
     description: 'JVM args to control Graph Engine run. Can be used only with DFA runs.'
     type: string
+  target:
+    required: true
+    description: 'Glob pattern, directory, or comma separated list of files to execute Code Analyzer'
+    type: string
   tsconfig:
     required: false
     description: 'Location of tsconfig file while executing eslint-typescript engine'
     type: string
 
 outputs:
-  artifact-name:
-    description: "Artifact that contains Code Analyzer's results"
-    value: 'SFCA-Results'
-  artifact-path:
-    description: "Path used while uploading the results artifact"
-    value: "./sfca_results.json"
+  # artifact-name:
+  #   description: "Artifact that contains Code Analyzer's results"
+  #   value: 'SFCA-Results'
+  # artifact-path:
+  #   description: "Path used while uploading the results artifact"
+  #   value: "./sfca_results.json"
   exit-code:
     description: "Exit code returned by Code Analyzer run"
     value: ${{ steps.code-analyzer.outputs.ExitCode }}
@@ -88,6 +100,21 @@ runs:
       with:
         script: |
           core.startgroup
+
+    - id: validate-result-render
+      shell: bash
+      run: |
+        echo "Validating result rendering options. . ."
+        if [[ -z "${{ inputs.render-results }}" ]]; then
+          echo "'render-results' is a required input parameter."
+          exit 10
+        fi
+        if [[ "${{ inputs.render-results == false }}" ]]; then
+          if [[ -z "${{ inputs.outfile-artifact-name }}" || -z "${{ inputs.outfile }}" ]]; then
+            echo "If 'render-results' is false, 'outfile-artifact-name' and 'outfile' should be provided."
+            exit 10
+          fi
+        fi
 
     - id: populate-command
       run: |
@@ -185,6 +212,14 @@ runs:
         echo "Populating severitythreshold . . ."
         SEVTHRESHOLD="--severity-threshold ${{ inputs.severitythreshold}} "
         echo "SevThreshold=$SEVTHRESHOLD" >> $GITHUB_OUTPUT
+      shell: bash
+
+  # Populate --target
+    - id: populate-target
+      run: |
+        echo "Populating target . . ."
+        TARGET="--target \"${{ inputs.target }}\""
+        echo "Target=$TARGET" >> $GITHUB_OUTPUT
       shell: bash
 
   # Populate --tsconfig value based on input
@@ -327,6 +362,7 @@ runs:
         echo "PmdConfig = ${{steps.populate-pmdconfig.outputs.PmdConfig}}"
         echo "ProjDir = ${{steps.populate-projdir.outputs.ProjDir}}"
         echo "SevThreshold = ${{steps.populate-sevthreshold.outputs.SevThreshold}}"
+        echo "Target = ${{steps.populate-target.outputs.Target}}"
         echo "TsConfig = ${{steps.populate-tsconfig.outputs.TsConfig}}"
         echo "DfaParams = ${{steps.populate-dfa-params.outputs.DfaParams}}"
       shell: bash
@@ -362,27 +398,8 @@ runs:
         sfdx plugins:install @salesforce/sfdx-scanner
       shell: bash
 
-  #### Part 3 - Checkout code and determine target files
+  #### Part 3 - Checkout code and execute Code Analyzer
     - uses: actions/checkout@v3
-
-    - name: Get changed files
-      id: changed-files
-      uses: tj-actions/changed-files@v35
-      with:
-        files: ${{ inputs.targethome }}
-
-    - id: populate-target
-      shell: bash
-      run: |
-        TARGET_LIST=""
-        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-          TARGET_LIST=$file,$TARGET_LIST
-        done
-        TARGET=${TARGET_LIST::-1}
-        echo "Target=$TARGET" >> $GITHUB_OUTPUT
-
-
-  #### Part 3 - Execute code analyzer ####
 
     - run: mkdir -p $HOME/sfca
       shell: bash
@@ -391,7 +408,7 @@ runs:
       id: code-analyzer
       run: |
         (sfdx ${{steps.populate-command.outputs.Command}} \
-          --target "${{steps.populate-target.outputs.Target}}" \
+          ${{steps.populate-target.outputs.Target}} \
           ${{steps.populate-engine.outputs.Engine}} \
           ${{steps.populate-category.outputs.Category}} \
           ${{steps.populate-env.outputs.Env}} \
@@ -410,8 +427,16 @@ runs:
     - if: "${{ steps.code-analyzer.outputs.ExitCode > 0 && steps.code-analyzer.outputs.ExitCode <= inputs.severitythreshold }}"
       uses: actions/upload-artifact@v3
       with:
-        name: SFCA-Results
-        path: ${{inputs.outfile}}
+        name: "${{ inputs.outfile-artifact-name }}"
+        path: "${{ inputs.outfile }}"
+
+    - if: "${{ inputs.render-results == 'true' }}"
+      uses: rmohan20/code-analyzer-translator@readme-draft
+      with:
+        runtype: "${{inputs.runtype}}"
+        outfile-artifact-name: "${{ inputs.outfile-artifact-name }}"
+        outfile-artifact-path: "${{ inputs.outfile }}"
+        code-analyzer-exit-code: "${{ steps.code-analyzer.outputs.ExitCode }}"
 
     - if: "${{ steps.code-analyzer.outputs.ExitCode > 0 }}"
       uses: actions/github-script@v6
