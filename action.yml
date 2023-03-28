@@ -429,11 +429,11 @@ runs:
 
     - if: "${{ inputs.render-results == 'true' }}"
       uses: rmohan20/code-analyzer-translator@readme-draft
-        with:
-          runtype: "${{inputs.runtype}}"
-          outfile-artifact-name: "${{ inputs.outfile-artifact-name }}"
-          outfile-artifact-path: "${{ inputs.outfile }}"
-          code-analyzer-exit-code: "${{ steps.code-analyzer.outputs.ExitCode }}"
+      with:
+        runtype: "${{inputs.runtype}}"
+        outfile-artifact-name: "${{ inputs.outfile-artifact-name }}"
+        outfile-artifact-path: "${{ inputs.outfile }}"
+        code-analyzer-exit-code: "${{ steps.code-analyzer.outputs.ExitCode }}"
 
     - if: "${{ steps.code-analyzer.outputs.ExitCode > 0 }}"
       uses: actions/github-script@v6
