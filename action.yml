@@ -106,8 +106,8 @@ runs:
       shell: bash
       run: |
         echo "Validating result rendering options. . ."
-        if [[ "${{ inputs.render-results == false }}"]]; then
-          if [[ -z "${{ inputs.outfile-artifact-name }}" || -z "${{ inputs.outfile }}"]]; then
+        if [[ "${{ inputs.render-results == false }}" ]]; then
+          if [[ -z "${{ inputs.outfile-artifact-name }}" || -z "${{ inputs.outfile }}" ]]; then
             echo "If 'render-results' is false, 'outfile-artifact-name' and 'outfile' should be provided."
             exit 10
           fi
