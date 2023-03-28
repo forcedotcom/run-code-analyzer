@@ -105,6 +105,10 @@ runs:
       shell: bash
       run: |
         echo "Validating result rendering options. . ."
+        if [[ -z "${{ inputs.render-results }}" ]]; then
+          echo "'render-results' is a required input parameter."
+          exit 10
+        fi
         if [[ "${{ inputs.render-results == false }}" ]]; then
           if [[ -z "${{ inputs.outfile-artifact-name }}" || -z "${{ inputs.outfile }}" ]]; then
             echo "If 'render-results' is false, 'outfile-artifact-name' and 'outfile' should be provided."
