@@ -103,6 +103,7 @@ runs:
           core.startgroup
 
     - id: validate-result-render
+      shell: bash
       run: |
         echo "Validating result rendering options. . ."
         if [[ "${{ inputs.render-results == false }}"]]; then
@@ -426,7 +427,7 @@ runs:
         name: "${{ inputs.outfile-artifact-name }}"
         path: "${{ inputs.outfile }}"
 
-    - if: "${{ inputs.render-results == true }}"
+    - if: "${{ inputs.render-results == 'true' }}"
       uses: rmohan20/code-analyzer-translator@readme-draft
         with:
           runtype: "${{inputs.runtype}}"
