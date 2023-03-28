@@ -5,7 +5,6 @@ inputs:
   render-results:
     required: true
     description: "If 'true', code-analyzer-action will render results as a markdown summary using code-analyzer-translator. Else, 'outfile-artifact-name' and 'outfile' should be provided to upload results."
-    type: boolean
   outfile-artifact-name:
     required: false
     description: 'Artifact name to be used for uploading results file. Defaults to "SFCA-Results". Use this name to download results if needed.'
