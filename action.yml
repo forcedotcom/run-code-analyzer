@@ -2,9 +2,18 @@ name: 'Code Analyzer Action'
 description: 'GHA to run Code Analyzer'
 author: 'Roopa Mohan'
 inputs:
+  render-results:
+    required: true
+    description: "If 'true', code-analyzer-action will render results as a markdown summary using code-analyzer-translator. Else, 'outfile-artifact-name' and 'outfile' should be provided to upload results."
+    type: boolean
+  outfile-artifact-name:
+    required: false
+    description: 'Artifact name to be used for uploading results file. Defaults to "SFCA-Results". Use this name to download results if needed.'
+    default: 'SFCA-Results'
+    type: string
   runtype:
     required: false
-    description: 'Type of run. Valid values are "simple", "dfa". Defaults to "simple".'
+    description: 'Type of run. Valid values are "simple" and "dfa". Defaults to "simple".'
     type: string
     default: 'simple'
   category:
@@ -70,12 +79,12 @@ inputs:
     type: string
 
 outputs:
-  artifact-name:
-    description: "Artifact that contains Code Analyzer's results"
-    value: 'SFCA-Results'
-  artifact-path:
-    description: "Path used while uploading the results artifact"
-    value: "./sfca_results.json"
+  # artifact-name:
+  #   description: "Artifact that contains Code Analyzer's results"
+  #   value: 'SFCA-Results'
+  # artifact-path:
+  #   description: "Path used while uploading the results artifact"
+  #   value: "./sfca_results.json"
   exit-code:
     description: "Exit code returned by Code Analyzer run"
     value: ${{ steps.code-analyzer.outputs.ExitCode }}
@@ -92,6 +101,16 @@ runs:
       with:
         script: |
           core.startgroup
+
+    - id: validate-result-render
+      run: |
+        echo "Validating result rendering options. . ."
+        if [[ "${{ inputs.render-results == false }}"]]; then
+          if [[ -z "${{ inputs.outfile-artifact-name }}" || -z "${{ inputs.outfile }}"]]; then
+            echo "If 'render-results' is false, 'outfile-artifact-name' and 'outfile' should be provided."
+            exit 10
+          fi
+        fi
 
     - id: populate-command
       run: |
@@ -404,8 +423,16 @@ runs:
     - if: "${{ steps.code-analyzer.outputs.ExitCode > 0 && steps.code-analyzer.outputs.ExitCode <= inputs.severitythreshold }}"
       uses: actions/upload-artifact@v3
       with:
-        name: SFCA-Results
-        path: ${{inputs.outfile}}
+        name: "${{ inputs.outfile-artifact-name }}"
+        path: "${{ inputs.outfile }}"
+
+    - if: "${{ inputs.render-results == true }}"
+      uses: rmohan20/code-analyzer-translator@readme-draft
+        with:
+          runtype: "${{inputs.runtype}}"
+          outfile-artifact-name: "${{ inputs.outfile-artifact-name }}"
+          outfile-artifact-path: "${{ inputs.outfile }}"
+          code-analyzer-exit-code: "${{ steps.code-analyzer.outputs.ExitCode }}"
 
     - if: "${{ steps.code-analyzer.outputs.ExitCode > 0 }}"
       uses: actions/github-script@v6
