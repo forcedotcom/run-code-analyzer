@@ -145,10 +145,6 @@ Location of tsconfig file while executing eslint-typescript engine. See [scanner
 
 Code Analyzer Action is implemented as a composite GitHub Actions plugin written with mostly bash shell.
 
-## Contributing
-
-We welcome external contributions for features and bug fixes.
-
 ### Publish to a distribution branch
 
 See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md).
