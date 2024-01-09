@@ -1,0 +1,10 @@
+{
+    "productTag": "a1aB0000000c7jnIAA",
+    "defaultBuild": "scanner 3.0",
+    "hideWorkItemUrl": true,
+    "issueTypeLabels": {
+        "feature": "USER STORY",
+        "regression": "BUG P1",
+        "bug": "BUG P3"
+    }
+}

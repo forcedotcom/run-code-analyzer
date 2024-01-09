@@ -1,0 +1,51 @@
+name: 'Run Salesforce Code Analyzer'
+description: 'Scans your code for violations using the Salesforce Code Analyzer, produces a job summary, and uploads the results as an artifact.'
+author: 'Salesforce Code Analyzer Team'
+
+branding:
+  icon: 'play'
+  color: 'gray-dark'
+
+inputs:
+  run-command:
+    description: |-
+      The main command to run with the Salesforce Code Analyzer.
+      The accepted values are: "run" (default) or "run dfa"
+      
+      See also:
+      - [scanner run command reference](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/run)
+      - [scanner run dfa command reference](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/dfa)
+    required: false
+    default: 'run'
+  run-arguments:
+    description: |-
+      The arguments to pass to the run command chosen by the run-command input.
+      Default value: "--normalize-severity"
+      
+      The "--normalize-severity" argument is currently required to be included in your run arguments.
+      
+      If an output file is specified with the --outfile argument, then that file will be uploaded in the results artifact.
+      Otherwise, a "SalesforceCodeAnalyzerResults.json" file will be uploaded in the results artifact.
+      
+      See also:
+      - [scanner run command reference](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/run)
+      - [scanner run dfa command reference](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/dfa)
+    required: false
+    default: '--normalize-severity'
+  results-artifact-name:
+    description: |-
+      The name of the zip archive job artifact where the resulting output file will be uploaded to.
+      Default value: "code-analyzer-results"
+      
+      To control the name and format of the resulting output file use the run-arguments input with "--outfile <filename.ext>".
+    required: false
+    default: 'code-analyzer-results'
+
+outputs:
+  exit-code:
+    description:  |-
+      The exit code from the execution of the Salesforce Code Analyzer.
+
+runs:
+  using: node20
+  main: dist/index.js
