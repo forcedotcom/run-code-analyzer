@@ -2005,7 +2005,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.downloadArtifactInternal = exports.downloadArtifactPublic = void 0;
+exports.downloadArtifactInternal = exports.downloadArtifactPublic = exports.streamExtractExternal = void 0;
 const promises_1 = __importDefault(__nccwpck_require__(3292));
 const github = __importStar(__nccwpck_require__(5438));
 const core = __importStar(__nccwpck_require__(2186));
@@ -2040,19 +2040,56 @@ function exists(path) {
 }
 function streamExtract(url, directory) {
     return __awaiter(this, void 0, void 0, function* () {
+        let retryCount = 0;
+        while (retryCount < 5) {
+            try {
+                yield streamExtractExternal(url, directory);
+                return;
+            }
+            catch (error) {
+                retryCount++;
+                core.debug(`Failed to download artifact after ${retryCount} retries due to ${error.message}. Retrying in 5 seconds...`);
+                // wait 5 seconds before retrying
+                yield new Promise(resolve => setTimeout(resolve, 5000));
+            }
+        }
+        throw new Error(`Artifact download failed after ${retryCount} retries.`);
+    });
+}
+function streamExtractExternal(url, directory) {
+    return __awaiter(this, void 0, void 0, function* () {
         const client = new httpClient.HttpClient((0, user_agent_1.getUserAgentString)());
         const response = yield client.get(url);
         if (response.message.statusCode !== 200) {
             throw new Error(`Unexpected HTTP response from blob storage: ${response.message.statusCode} ${response.message.statusMessage}`);
         }
+        const timeout = 30 * 1000; // 30 seconds
         return new Promise((resolve, reject) => {
+            const timerFn = () => {
+                response.message.destroy(new Error(`Blob storage chunk did not respond in ${timeout}ms`));
+            };
+            const timer = setTimeout(timerFn, timeout);
             response.message
+                .on('data', () => {
+                timer.refresh();
+            })
+                .on('error', (error) => {
+                core.debug(`response.message: Artifact download failed: ${error.message}`);
+                clearTimeout(timer);
+                reject(error);
+            })
                 .pipe(unzip_stream_1.default.Extract({ path: directory }))
-                .on('close', resolve)
-                .on('error', reject);
+                .on('close', () => {
+                clearTimeout(timer);
+                resolve();
+            })
+                .on('error', (error) => {
+                reject(error);
+            });
         });
     });
 }
+exports.streamExtractExternal = streamExtractExternal;
 function downloadArtifactPublic(artifactId, repositoryOwner, repositoryName, token, options) {
     return __awaiter(this, void 0, void 0, function* () {
         const downloadPath = yield resolveOrCreateDirectory(options === null || options === void 0 ? void 0 : options.path);
@@ -99878,7 +99915,7 @@ module.exports = require("zlib");
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@actions/artifact","version":"2.0.0","preview":true,"description":"Actions artifact lib","keywords":["github","actions","artifact"],"homepage":"https://github.com/actions/toolkit/tree/main/packages/artifact","license":"MIT","main":"lib/artifact.js","types":"lib/artifact.d.ts","directories":{"lib":"lib","test":"__tests__"},"files":["lib","!.DS_Store"],"publishConfig":{"access":"public"},"repository":{"type":"git","url":"git+https://github.com/actions/toolkit.git","directory":"packages/artifact"},"scripts":{"audit-moderate":"npm install && npm audit --json --audit-level=moderate > audit.json","test":"cd ../../ && npm run test ./packages/artifact","bootstrap":"cd ../../ && npm run bootstrap","tsc-run":"tsc","tsc":"npm run bootstrap && npm run tsc-run","gen:docs":"typedoc --plugin typedoc-plugin-markdown --out docs/generated src/artifact.ts --githubPages false --readme none"},"bugs":{"url":"https://github.com/actions/toolkit/issues"},"dependencies":{"@actions/core":"^1.10.0","@actions/github":"^5.1.1","@actions/http-client":"^2.1.0","@azure/storage-blob":"^12.15.0","@octokit/core":"^3.5.1","@octokit/plugin-request-log":"^1.0.4","@octokit/plugin-retry":"^3.0.9","@octokit/request-error":"^5.0.0","@protobuf-ts/plugin":"^2.2.3-alpha.1","archiver":"^5.3.1","crypto":"^1.0.1","jwt-decode":"^3.1.2","twirp-ts":"^2.5.0","unzip-stream":"^0.3.1"},"devDependencies":{"@types/archiver":"^5.3.2","@types/unzip-stream":"^0.3.4","typedoc":"^0.25.4","typedoc-plugin-markdown":"^3.17.1","typescript":"^5.2.2"}}');
+module.exports = JSON.parse('{"name":"@actions/artifact","version":"2.0.1","preview":true,"description":"Actions artifact lib","keywords":["github","actions","artifact"],"homepage":"https://github.com/actions/toolkit/tree/main/packages/artifact","license":"MIT","main":"lib/artifact.js","types":"lib/artifact.d.ts","directories":{"lib":"lib","test":"__tests__"},"files":["lib","!.DS_Store"],"publishConfig":{"access":"public"},"repository":{"type":"git","url":"git+https://github.com/actions/toolkit.git","directory":"packages/artifact"},"scripts":{"audit-moderate":"npm install && npm audit --json --audit-level=moderate > audit.json","test":"cd ../../ && npm run test ./packages/artifact","bootstrap":"cd ../../ && npm run bootstrap","tsc-run":"tsc","tsc":"npm run bootstrap && npm run tsc-run","gen:docs":"typedoc --plugin typedoc-plugin-markdown --out docs/generated src/artifact.ts --githubPages false --readme none"},"bugs":{"url":"https://github.com/actions/toolkit/issues"},"dependencies":{"@actions/core":"^1.10.0","@actions/github":"^5.1.1","@actions/http-client":"^2.1.0","@azure/storage-blob":"^12.15.0","@octokit/core":"^3.5.1","@octokit/plugin-request-log":"^1.0.4","@octokit/plugin-retry":"^3.0.9","@octokit/request-error":"^5.0.0","@protobuf-ts/plugin":"^2.2.3-alpha.1","archiver":"^5.3.1","crypto":"^1.0.1","jwt-decode":"^3.1.2","twirp-ts":"^2.5.0","unzip-stream":"^0.3.1"},"devDependencies":{"@types/archiver":"^5.3.2","@types/unzip-stream":"^0.3.4","typedoc":"^0.25.4","typedoc-plugin-markdown":"^3.17.1","typescript":"^5.2.2"}}');
 
 /***/ }),
 
