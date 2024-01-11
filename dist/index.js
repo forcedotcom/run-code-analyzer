@@ -99510,6 +99510,42 @@ utils.walkdir = function(dirpath, base, callback) {
 
 /***/ }),
 
+/***/ 6695:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RuntimeCommandExecutor = void 0;
+class RuntimeCommandExecutor {
+    dependencies;
+    constructor(dependencies) {
+        this.dependencies = dependencies;
+    }
+    async runCodeAnalyzer(runCmd, runArgs, internalOutfile) {
+        const command = `sf scanner ${runCmd} ${runArgs}`;
+        const envVars = {
+            // Without increasing the heap allocation, node often fails. So we increase it to 8gb which should be enough
+            NODE_OPTIONS: '--max-old-space-size=8192',
+            // We always want to control our own internal outfile for reliable processing
+            SCANNER_INTERNAL_OUTFILE: internalOutfile
+        };
+        if (process.env['JAVA_HOME_11_X64']) {
+            // We prefer to run on java 11 if available since the default varies across the different GitHub runners.
+            envVars['JAVA_HOME'] = process.env['JAVA_HOME_11_X64'];
+        }
+        return await this.dependencies.execCommand(command, envVars);
+    }
+    async isSalesforceCliInstalled() {
+        const exitCode = await this.dependencies.execCommand('sf --version');
+        return exitCode === 0;
+    }
+}
+exports.RuntimeCommandExecutor = RuntimeCommandExecutor;
+
+
+/***/ }),
+
 /***/ 7760:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -99593,43 +99629,35 @@ exports.RuntimeDependencies = RuntimeDependencies;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = exports.MESSAGES = void 0;
+exports.run = exports.INTERNAL_OUTFILE = exports.MESSAGES = void 0;
 const utils_1 = __nccwpck_require__(1314);
-const INTERNAL_OUTFILE = 'SalesforceCodeAnalyzerResults.json';
 exports.MESSAGES = {
-    MISSING_NORMALIZE_SEVERITY: 'Missing required --normalize-severity option from run-arguments input.'
+    MISSING_NORMALIZE_SEVERITY: 'Missing required --normalize-severity option from run-arguments input.',
+    SF_NOT_INSTALLED: 'The sf command was not found.\n' +
+        'The Salesforce CLI must be installed in the environment before this GitHub action can run.\n' +
+        'See the README.md of this GitHub action for an example of steps that you can add to your GitHub workflow.'
 };
+exports.INTERNAL_OUTFILE = 'SalesforceCodeAnalyzerResults.json';
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
-async function run(dependencies) {
+async function run(dependencies, commandExecutor) {
     try {
         dependencies.startGroup('Preparing Environment');
-        // TODO: NICE TO HAVES:
-        // * Verify that Salesforce CLI "sf" is installed
-        // * Verify that sfdx-scanner plugin is installed (and if not, then install it as a separate step)
-        // * Echo version of sfdx-scanner in use
         const inputs = dependencies.getInputs();
         validateInputs(inputs);
+        await assertSfIsInstalled(commandExecutor);
+        // TODO: NICE TO HAVES:
+        // * Verify that sfdx-scanner plugin is installed (and if not, then install it as a separate step)
+        // * Echo version of sfdx-scanner in use
         dependencies.endGroup();
         dependencies.startGroup('Running Salesforce Code Analyzer');
-        const command = `sf scanner ${inputs.runCommand} ${inputs.runArgs}`;
-        const envVars = {
-            // Without increasing the heap allocation, node often fails. So we increase it to 8gb which should be enough
-            NODE_OPTIONS: '--max-old-space-size=8192',
-            // We always want to control our own internal outfile for reliable processing
-            SCANNER_INTERNAL_OUTFILE: INTERNAL_OUTFILE
-        };
-        if (process.env['JAVA_HOME_11_X64']) {
-            // We prefer to run on java 11 if available since the default varies across the different GitHub runners.
-            envVars['JAVA_HOME'] = process.env['JAVA_HOME_11_X64'];
-        }
-        const exitCode = await dependencies.execCommand(command, envVars);
+        const codeAnalyzerExitCode = await commandExecutor.runCodeAnalyzer(inputs.runCommand, inputs.runArgs, exports.INTERNAL_OUTFILE);
         dependencies.endGroup();
         dependencies.startGroup('Uploading Artifact');
         const userOutfile = (0, utils_1.extractOutfileFromRunArguments)(inputs.runArgs);
-        const artifactFile = userOutfile.length > 0 ? userOutfile : INTERNAL_OUTFILE;
+        const artifactFile = userOutfile.length > 0 ? userOutfile : exports.INTERNAL_OUTFILE;
         await dependencies.uploadArtifact(inputs.resultsArtifactName, [artifactFile]);
         dependencies.endGroup();
         dependencies.startGroup('Analyzing Results');
@@ -99637,7 +99665,7 @@ async function run(dependencies) {
         dependencies.endGroup();
         dependencies.startGroup('Finalizing Summary and Outputs');
         // TODO: set the summary and remaining outputs
-        dependencies.setOutput('exit-code', exitCode.toString());
+        dependencies.setOutput('exit-code', codeAnalyzerExitCode.toString());
         dependencies.endGroup();
     }
     catch (error) {
@@ -99647,6 +99675,11 @@ async function run(dependencies) {
     }
 }
 exports.run = run;
+async function assertSfIsInstalled(commandExecutor) {
+    if (!(await commandExecutor.isSalesforceCliInstalled())) {
+        throw new Error(exports.MESSAGES.SF_NOT_INSTALLED);
+    }
+}
 function validateInputs(inputs) {
     if (!inputs.runArgs.toLowerCase().includes('--normalize-severity')) {
         throw new Error(exports.MESSAGES.MISSING_NORMALIZE_SEVERITY);
@@ -99982,11 +100015,14 @@ var exports = __webpack_exports__;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const main_1 = __nccwpck_require__(399);
 const dependencies_1 = __nccwpck_require__(7760);
+const commands_1 = __nccwpck_require__(6695);
 /**
  * The entrypoint for the action.
  */
+const runtimeDependencies = new dependencies_1.RuntimeDependencies();
+const commandExecutor = new commands_1.RuntimeCommandExecutor(runtimeDependencies);
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-(0, main_1.run)(new dependencies_1.RuntimeDependencies());
+(0, main_1.run)(runtimeDependencies, commandExecutor);
 
 })();
 

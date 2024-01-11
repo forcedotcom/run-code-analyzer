@@ -49,7 +49,8 @@
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/dist/"
+      "/dist/",
+      "/dist_local/"
     ],
     "transform": {
       "^.+\\.ts$": "ts-jest"

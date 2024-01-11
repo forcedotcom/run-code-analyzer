@@ -1,41 +1,39 @@
 import { extractOutfileFromRunArguments } from './utils'
 import { Dependencies } from './dependencies'
-import { EnvironmentVariables, Inputs } from './types'
-
-const INTERNAL_OUTFILE = 'SalesforceCodeAnalyzerResults.json'
+import { Inputs } from './types'
+import { CommandExecutor } from './commands'
 
 export const MESSAGES = {
-    MISSING_NORMALIZE_SEVERITY: 'Missing required --normalize-severity option from run-arguments input.'
+    MISSING_NORMALIZE_SEVERITY: 'Missing required --normalize-severity option from run-arguments input.',
+    SF_NOT_INSTALLED:
+        'The sf command was not found.\n' +
+        'The Salesforce CLI must be installed in the environment before this GitHub action can run.\n' +
+        'See the README.md of this GitHub action for an example of steps that you can add to your GitHub workflow.'
 }
+
+export const INTERNAL_OUTFILE = 'SalesforceCodeAnalyzerResults.json'
 
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
-export async function run(dependencies: Dependencies): Promise<void> {
+export async function run(dependencies: Dependencies, commandExecutor: CommandExecutor): Promise<void> {
     try {
         dependencies.startGroup('Preparing Environment')
-        // TODO: NICE TO HAVES:
-        // * Verify that Salesforce CLI "sf" is installed
-        // * Verify that sfdx-scanner plugin is installed (and if not, then install it as a separate step)
-        // * Echo version of sfdx-scanner in use
         const inputs: Inputs = dependencies.getInputs()
         validateInputs(inputs)
+        await assertSfIsInstalled(commandExecutor)
+        // TODO: NICE TO HAVES:
+        // * Verify that sfdx-scanner plugin is installed (and if not, then install it as a separate step)
+        // * Echo version of sfdx-scanner in use
         dependencies.endGroup()
 
         dependencies.startGroup('Running Salesforce Code Analyzer')
-        const command = `sf scanner ${inputs.runCommand} ${inputs.runArgs}`
-        const envVars: EnvironmentVariables = {
-            // Without increasing the heap allocation, node often fails. So we increase it to 8gb which should be enough
-            NODE_OPTIONS: '--max-old-space-size=8192',
-            // We always want to control our own internal outfile for reliable processing
-            SCANNER_INTERNAL_OUTFILE: INTERNAL_OUTFILE
-        }
-        if (process.env['JAVA_HOME_11_X64']) {
-            // We prefer to run on java 11 if available since the default varies across the different GitHub runners.
-            envVars['JAVA_HOME'] = process.env['JAVA_HOME_11_X64']
-        }
-        const exitCode: number = await dependencies.execCommand(command, envVars)
+        const codeAnalyzerExitCode: number = await commandExecutor.runCodeAnalyzer(
+            inputs.runCommand,
+            inputs.runArgs,
+            INTERNAL_OUTFILE
+        )
         dependencies.endGroup()
 
         dependencies.startGroup('Uploading Artifact')
@@ -50,12 +48,18 @@ export async function run(dependencies: Dependencies): Promise<void> {
 
         dependencies.startGroup('Finalizing Summary and Outputs')
         // TODO: set the summary and remaining outputs
-        dependencies.setOutput('exit-code', exitCode.toString())
+        dependencies.setOutput('exit-code', codeAnalyzerExitCode.toString())
         dependencies.endGroup()
     } catch (error) {
         if (error instanceof Error) {
             dependencies.fail(error.message)
         }
+    }
+}
+
+async function assertSfIsInstalled(commandExecutor: CommandExecutor): Promise<void> {
+    if (!(await commandExecutor.isSalesforceCliInstalled())) {
+        throw new Error(MESSAGES.SF_NOT_INSTALLED)
     }
 }
 

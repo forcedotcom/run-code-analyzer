@@ -1,5 +1,6 @@
 import { Dependencies } from '../src/dependencies'
 import { EnvironmentVariables, Inputs } from '../src/types'
+import { CommandExecutor } from '../src/commands'
 
 export class FakeDependencies implements Dependencies {
     startGroupCallHistory: { name: string }[] = []
@@ -31,10 +32,7 @@ export class FakeDependencies implements Dependencies {
         return this.getInputsReturnValue
     }
 
-    uploadArtifactCallHistory: {
-        artifactName: string
-        artifactFiles: string[]
-    }[] = []
+    uploadArtifactCallHistory: { artifactName: string; artifactFiles: string[] }[] = []
     async uploadArtifact(artifactName: string, artifactFiles: string[]): Promise<void> {
         this.uploadArtifactCallHistory.push({ artifactName, artifactFiles })
         return Promise.resolve()
@@ -48,5 +46,21 @@ export class FakeDependencies implements Dependencies {
     failCallHistory: { failMessage: string }[] = []
     fail(failMessage: string): void {
         this.failCallHistory.push({ failMessage })
+    }
+}
+
+export class FakeCommandExecutor implements CommandExecutor {
+    isSalesforceCliInstalledCallCount = 0
+    isSalesforceCliInstalledReturnValue = true
+    async isSalesforceCliInstalled(): Promise<boolean> {
+        this.isSalesforceCliInstalledCallCount++
+        return this.isSalesforceCliInstalledReturnValue
+    }
+
+    runCodeAnalyzerReturnValue = 0
+    runCodeAnalyzerCallHistory: { runCmd: string; runArgs: string; internalOutfile: string }[] = []
+    async runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<number> {
+        this.runCodeAnalyzerCallHistory.push({ runCmd, runArgs, internalOutfile })
+        return this.runCodeAnalyzerReturnValue
     }
 }

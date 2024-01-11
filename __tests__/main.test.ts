@@ -1,32 +1,27 @@
 import * as main from '../src/main'
-import { FakeDependencies } from './fakes'
+import { FakeCommandExecutor, FakeDependencies } from './fakes'
 import { Inputs } from '../src/types'
-import * as process from 'process'
-import { MESSAGES } from '../src/main'
+import { INTERNAL_OUTFILE, MESSAGES } from '../src/main'
 
-describe('action', () => {
+describe('main run Tests', () => {
     let dependencies: FakeDependencies
-    const originalJava11HomeValue: string | undefined = process.env['JAVA_HOME_11_X64']
+    let commandExecutor: FakeCommandExecutor
 
     beforeEach(async () => {
         dependencies = new FakeDependencies()
-        delete process.env['JAVA_HOME_11_X64']
-    })
-
-    afterEach(async () => {
-        process.env['JAVA_HOME_11_X64'] = originalJava11HomeValue
+        commandExecutor = new FakeCommandExecutor()
     })
 
     it('Test default values', async () => {
-        await main.run(dependencies)
+        await main.run(dependencies, commandExecutor)
 
-        expect(dependencies.execCommandCallHistory).toHaveLength(1)
-        expect(dependencies.execCommandCallHistory).toContainEqual({
-            command: 'sf scanner run --normalize-severity',
-            envVars: {
-                NODE_OPTIONS: '--max-old-space-size=8192',
-                SCANNER_INTERNAL_OUTFILE: 'SalesforceCodeAnalyzerResults.json'
-            }
+        expect(commandExecutor.isSalesforceCliInstalledCallCount).toEqual(1)
+
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toContainEqual({
+            runCmd: 'run',
+            runArgs: '--normalize-severity',
+            internalOutfile: INTERNAL_OUTFILE
         })
 
         expect(dependencies.uploadArtifactCallHistory).toHaveLength(1)
@@ -44,35 +39,21 @@ describe('action', () => {
         expect(dependencies.failCallHistory).toHaveLength(0)
     })
 
-    it('Test JAVA_HOME_11_X64 is used as JAVA_HOME if available', async () => {
-        process.env['JAVA_HOME_11_X64'] = 'SomeJavaHome11X64Value'
-        await main.run(dependencies)
-        expect(dependencies.execCommandCallHistory).toHaveLength(1)
-        expect(dependencies.execCommandCallHistory).toContainEqual({
-            command: 'sf scanner run --normalize-severity',
-            envVars: {
-                NODE_OPTIONS: '--max-old-space-size=8192',
-                SCANNER_INTERNAL_OUTFILE: 'SalesforceCodeAnalyzerResults.json',
-                JAVA_HOME: 'SomeJavaHome11X64Value'
-            }
-        })
-    })
-
     it('Test user supplied outfile and other non-default inputs', async () => {
         dependencies.getInputsReturnValue = {
             runCommand: 'run dfa',
             runArgs: '-o myFile.html --normalize-severity -t ./src',
             resultsArtifactName: 'customArtifactName'
         }
-        await main.run(dependencies)
+        await main.run(dependencies, commandExecutor)
 
-        expect(dependencies.execCommandCallHistory).toHaveLength(1)
-        expect(dependencies.execCommandCallHistory).toContainEqual({
-            command: 'sf scanner run dfa -o myFile.html --normalize-severity -t ./src',
-            envVars: {
-                NODE_OPTIONS: '--max-old-space-size=8192',
-                SCANNER_INTERNAL_OUTFILE: 'SalesforceCodeAnalyzerResults.json'
-            }
+        expect(commandExecutor.isSalesforceCliInstalledCallCount).toEqual(1)
+
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toContainEqual({
+            runCmd: 'run dfa',
+            runArgs: '-o myFile.html --normalize-severity -t ./src',
+            internalOutfile: INTERNAL_OUTFILE
         })
 
         expect(dependencies.uploadArtifactCallHistory).toHaveLength(1)
@@ -91,10 +72,9 @@ describe('action', () => {
     })
 
     it('Test nonzero exit code from command call', async () => {
-        dependencies.execCommandReturnValue = 987
-        await main.run(dependencies)
+        commandExecutor.runCodeAnalyzerReturnValue = 987
+        await main.run(dependencies, commandExecutor)
 
-        expect(dependencies.setOutputCallHistory).toHaveLength(1)
         expect(dependencies.setOutputCallHistory).toContainEqual({
             name: 'exit-code',
             value: '987'
@@ -110,8 +90,9 @@ describe('action', () => {
             }
         }
         dependencies = new ThrowingDependencies()
-        await main.run(dependencies)
-        expect(dependencies.execCommandCallHistory).toHaveLength(0)
+        await main.run(dependencies, commandExecutor)
+
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
         expect(dependencies.uploadArtifactCallHistory).toHaveLength(0)
         expect(dependencies.failCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory).toContainEqual({
@@ -121,12 +102,24 @@ describe('action', () => {
 
     it('Test missing --normalize-severity from run arguments', async () => {
         dependencies.getInputsReturnValue.runArgs = '--outfile results.xml'
-        await main.run(dependencies)
-        expect(dependencies.execCommandCallHistory).toHaveLength(0)
+        await main.run(dependencies, commandExecutor)
+
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
         expect(dependencies.uploadArtifactCallHistory).toHaveLength(0)
         expect(dependencies.failCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory).toContainEqual({
             failMessage: MESSAGES.MISSING_NORMALIZE_SEVERITY
+        })
+    })
+
+    it('Test when Salesforce CLI is not installed', async () => {
+        commandExecutor.isSalesforceCliInstalledReturnValue = false
+        await main.run(dependencies, commandExecutor)
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
+        expect(dependencies.uploadArtifactCallHistory).toHaveLength(0)
+        expect(dependencies.failCallHistory).toHaveLength(1)
+        expect(dependencies.failCallHistory).toContainEqual({
+            failMessage: MESSAGES.SF_NOT_INSTALLED
         })
     })
 })
