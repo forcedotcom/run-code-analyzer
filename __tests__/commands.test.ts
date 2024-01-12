@@ -79,8 +79,7 @@ describe('RuntimeCommandExecutor Tests', () => {
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
-                command: 'sf --version',
-                envVars: undefined
+                command: 'sf --version'
             })
             expect(tf).toEqual(true)
         })
@@ -91,8 +90,7 @@ describe('RuntimeCommandExecutor Tests', () => {
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
-                command: 'sf --version',
-                envVars: undefined
+                command: 'sf --version'
             })
             expect(tf).toEqual(false)
         })
@@ -104,8 +102,7 @@ describe('RuntimeCommandExecutor Tests', () => {
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
-                command: 'npm install -g @salesforce/cli@latest',
-                envVars: undefined
+                command: 'npm install -g @salesforce/cli@latest'
             })
             expect(success).toEqual(true)
         })
@@ -116,8 +113,7 @@ describe('RuntimeCommandExecutor Tests', () => {
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
-                command: 'npm install -g @salesforce/cli@latest',
-                envVars: undefined
+                command: 'npm install -g @salesforce/cli@latest'
             })
             expect(success).toEqual(false)
         })
@@ -133,38 +129,41 @@ describe('RuntimeCommandExecutor Tests', () => {
             '  }\n' +
             ']'
 
-        it('Check when scanner plugin is installed with at version less than the minimum version', async () => {
+        it('Check when scanner plugin is installed with a version less than the minimum version', async () => {
             dependencies.execCommandReturnValue = { exitCode: 0, stdout: sampleResponseJson, stderr: '' }
             const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.22.0')
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
                 command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
-                envVars: undefined
+                envVars: {},
+                runSilently: true
             })
             expect(tf).toEqual(false)
         })
 
-        it('Check when scanner plugin is installed with at version exactly same as minimum version', async () => {
+        it('Check when scanner plugin is installed with a version exactly same as minimum version', async () => {
             dependencies.execCommandReturnValue = { exitCode: 0, stdout: sampleResponseJson, stderr: '' }
             const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.21.0')
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
                 command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
-                envVars: undefined
+                envVars: {},
+                runSilently: true
             })
             expect(tf).toEqual(true)
         })
 
-        it('Check when scanner plugin is installed with at version greater than the minimum version', async () => {
+        it('Check when scanner plugin is installed with a version greater than the minimum version', async () => {
             dependencies.execCommandReturnValue = { exitCode: 0, stdout: sampleResponseJson, stderr: '' }
             const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.20.0')
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
                 command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
-                envVars: undefined
+                envVars: {},
+                runSilently: true
             })
             expect(tf).toEqual(true)
         })
@@ -176,7 +175,8 @@ describe('RuntimeCommandExecutor Tests', () => {
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
                 command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
-                envVars: undefined
+                envVars: {},
+                runSilently: true
             })
             expect(tf).toEqual(false)
         })
@@ -188,7 +188,8 @@ describe('RuntimeCommandExecutor Tests', () => {
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
                 command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
-                envVars: undefined
+                envVars: {},
+                runSilently: true
             })
             expect(tf).toEqual(false)
         })
@@ -200,7 +201,8 @@ describe('RuntimeCommandExecutor Tests', () => {
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
                 command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
-                envVars: undefined
+                envVars: {},
+                runSilently: true
             })
             expect(tf).toEqual(false)
         })
@@ -212,8 +214,7 @@ describe('RuntimeCommandExecutor Tests', () => {
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
-                command: 'sf plugins install @salesforce/sfdx-scanner@latest',
-                envVars: undefined
+                command: 'sf plugins install @salesforce/sfdx-scanner@latest'
             })
             expect(success).toEqual(true)
         })
@@ -224,8 +225,7 @@ describe('RuntimeCommandExecutor Tests', () => {
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
-                command: 'sf plugins install @salesforce/sfdx-scanner@latest',
-                envVars: undefined
+                command: 'sf plugins install @salesforce/sfdx-scanner@latest'
             })
             expect(success).toEqual(false)
         })

@@ -18,11 +18,13 @@ export interface Dependencies {
 
     getInputs(): Inputs
 
-    execCommand(command: string, envVars?: EnvironmentVariables): Promise<CommandOutput>
+    execCommand(command: string, envVars?: EnvironmentVariables, runSilently?: boolean): Promise<CommandOutput>
 
     uploadArtifact(artifactName: string, artifactFiles: string[]): Promise<void>
 
     setOutput(name: string, value: string): void
+
+    info(infoMessage: string): void
 
     warn(warnMessage: string): void
 
@@ -54,12 +56,13 @@ export class RuntimeDependencies implements Dependencies {
         }
     }
 
-    async execCommand(command: string, envVars: EnvironmentVariables = {}): Promise<CommandOutput> {
+    async execCommand(command: string, envVars: EnvironmentVariables = {}, silent = false): Promise<CommandOutput> {
         try {
             return await exec.getExecOutput(command, [], {
                 env: mergeWithProcessEnvVars(envVars),
                 ignoreReturnCode: true,
-                failOnStdErr: false
+                failOnStdErr: false,
+                silent
             })
         } catch (err) {
             // A try/catch is needed here due to issue: https://github.com/actions/toolkit/issues/1625
@@ -77,6 +80,10 @@ export class RuntimeDependencies implements Dependencies {
 
     setOutput(name: string, value: string): void {
         core.setOutput(name, value)
+    }
+
+    info(infoMessage: string): void {
+        core.info(infoMessage)
     }
 
     warn(warnMessage: string): void {

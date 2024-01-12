@@ -1,7 +1,7 @@
 import * as main from '../src/main'
 import { FakeCommandExecutor, FakeDependencies } from './fakes'
 import { Inputs } from '../src/types'
-import { INTERNAL_OUTFILE, MESSAGES, MIN_SCANNER_VERSION_REQUIRED } from '../src/main'
+import { INTERNAL_OUTFILE, MESSAGES, MIN_SCANNER_VERSION_REQUIRED } from '../src/constants'
 
 describe('main run Tests', () => {
     let dependencies: FakeDependencies

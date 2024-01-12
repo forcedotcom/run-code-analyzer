@@ -29,18 +29,20 @@ export class RuntimeCommandExecutor implements CommandExecutor {
     }
 
     async isMinimumScannerPluginInstalled(minVersion: string): Promise<boolean> {
-        const command = 'sf plugins inspect @salesforce/sfdx-scanner --json'
-        const cmdOut: CommandOutput = await this.dependencies.execCommand(command)
+        const pluginName = '@salesforce/sfdx-scanner'
+        const command = `sf plugins inspect ${pluginName} --json`
+        const runSilently = true
+        const cmdOut: CommandOutput = await this.dependencies.execCommand(command, {}, runSilently)
         if (cmdOut.exitCode !== 0) {
             return false
         }
         try {
-            const pluginMetadataArray: PluginMetadata[] = JSON.parse(cmdOut.stdout) as PluginMetadata[]
-            if (pluginMetadataArray.length !== 1) {
+            const pluginsFound: PluginMetadata[] = JSON.parse(cmdOut.stdout) as PluginMetadata[]
+            if (pluginsFound.length !== 1 || pluginsFound[0].name !== pluginName) {
                 return false
             }
-            const pluginMetadata: PluginMetadata = pluginMetadataArray[0]
-            return semver.gte(pluginMetadata.version, minVersion)
+            this.dependencies.info(`Found version ${pluginsFound[0].version} of the ${pluginName} plugin installed.`)
+            return semver.gte(pluginsFound[0].version, minVersion)
         } catch (_err) {
             return false
         }

@@ -102821,18 +102821,20 @@ class RuntimeCommandExecutor {
         return cmdOut.exitCode === 0;
     }
     async isMinimumScannerPluginInstalled(minVersion) {
-        const command = 'sf plugins inspect @salesforce/sfdx-scanner --json';
-        const cmdOut = await this.dependencies.execCommand(command);
+        const pluginName = '@salesforce/sfdx-scanner';
+        const command = `sf plugins inspect ${pluginName} --json`;
+        const runSilently = true;
+        const cmdOut = await this.dependencies.execCommand(command, {}, runSilently);
         if (cmdOut.exitCode !== 0) {
             return false;
         }
         try {
-            const pluginMetadataArray = JSON.parse(cmdOut.stdout);
-            if (pluginMetadataArray.length !== 1) {
+            const pluginsFound = JSON.parse(cmdOut.stdout);
+            if (pluginsFound.length !== 1 || pluginsFound[0].name !== pluginName) {
                 return false;
             }
-            const pluginMetadata = pluginMetadataArray[0];
-            return semver.gte(pluginMetadata.version, minVersion);
+            this.dependencies.info(`Found version ${pluginsFound[0].version} of the ${pluginName} plugin installed.`);
+            return semver.gte(pluginsFound[0].version, minVersion);
         }
         catch (_err) {
             return false;
@@ -102860,6 +102862,45 @@ class RuntimeCommandExecutor {
     }
 }
 exports.RuntimeCommandExecutor = RuntimeCommandExecutor;
+
+
+/***/ }),
+
+/***/ 9042:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MESSAGES = exports.INTERNAL_OUTFILE = exports.MIN_SCANNER_VERSION_REQUIRED = void 0;
+exports.MIN_SCANNER_VERSION_REQUIRED = '3.20.0';
+exports.INTERNAL_OUTFILE = 'SalesforceCodeAnalyzerResults.json';
+/* eslint-disable prettier/prettier, prefer-template */
+exports.MESSAGES = {
+    STEP_LABELS: {
+        PREPARING_ENVIRONMENT: 'Preparing Environment',
+        RUNNING_CODE_ANALYZER: 'Running the Salesforce Code Analyzer',
+        UPLOADING_ARTIFACT: 'Uploading Artifact',
+        ANALYZING_RESULTS: 'Analyzing Results',
+        FINALIZING_OUTPUT: 'Finalizing Summary and Outputs'
+    },
+    MISSING_NORMALIZE_SEVERITY: `Missing required --normalize-severity option from run-arguments input.`,
+    SF_CLI_NOT_INSTALLED: `The sf command was not found.\n` +
+        `The Salesforce CLI must be installed in the environment to run the Salesforce Code Analyzer.\n` +
+        `We recommend you include a separate step in your GitHub workflow to install it. For example:\n` +
+        `  - name: Install the Salesforce CLI\n` +
+        `    run: npm install -g @salesforce/cli@latest\n` +
+        `We will attempt to install the latest Salesforce CLI on your behalf.`,
+    SF_CLI_INSTALL_FAILED: `Failed to install the Salesforce CLI on your behalf.`,
+    MINIMUM_SCANNER_PLUGIN_NOT_INSTALLED: `The @salesforce/sfdx-scanner plugin of version ${exports.MIN_SCANNER_VERSION_REQUIRED} or greater was not found.\n` +
+        `The Salesforce Code Analyzer plugin of version ${exports.MIN_SCANNER_VERSION_REQUIRED} or greater is required.\n` +
+        `We recommend you include a separate step in your GitHub workflow to install it. For example:\n` +
+        `  - name: Install the Salesforce Code Analyzer plugin\n` +
+        `    run: sf plugins install @salesforce/sfdx-scanner@latest\n` +
+        `We will attempt to install the latest Salesforce Code Analyzer plugin on your behalf.`,
+    SCANNER_PLUGIN_INSTALL_FAILED: `Failed to install the latest Salesforce Code Analyzer plugin on your behalf.`
+};
+/* eslint-enable */
 
 
 /***/ }),
@@ -102919,12 +102960,13 @@ class RuntimeDependencies {
             resultsArtifactName: core.getInput('results-artifact-name')
         };
     }
-    async execCommand(command, envVars = {}) {
+    async execCommand(command, envVars = {}, silent = false) {
         try {
             return await exec.getExecOutput(command, [], {
                 env: (0, utils_1.mergeWithProcessEnvVars)(envVars),
                 ignoreReturnCode: true,
-                failOnStdErr: false
+                failOnStdErr: false,
+                silent
             });
         }
         catch (err) {
@@ -102941,6 +102983,9 @@ class RuntimeDependencies {
     }
     setOutput(name, value) {
         core.setOutput(name, value);
+    }
+    info(infoMessage) {
+        core.info(infoMessage);
     }
     warn(warnMessage) {
         core.warning(warnMessage);
@@ -102960,53 +103005,33 @@ exports.RuntimeDependencies = RuntimeDependencies;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = exports.INTERNAL_OUTFILE = exports.MESSAGES = exports.MIN_SCANNER_VERSION_REQUIRED = void 0;
+exports.run = void 0;
 const utils_1 = __nccwpck_require__(1314);
-exports.MIN_SCANNER_VERSION_REQUIRED = '3.20.0';
-/* eslint-disable prettier/prettier, prefer-template */
-exports.MESSAGES = {
-    MISSING_NORMALIZE_SEVERITY: `Missing required --normalize-severity option from run-arguments input.`,
-    SF_CLI_NOT_INSTALLED: `The sf command was not found.\n` +
-        `The Salesforce CLI must be installed in the environment to run the Salesforce Code Analyzer.\n` +
-        `We recommend you include a separate step in your GitHub workflow to install it. For example:\n` +
-        `  - name: Install the Salesforce CLI\n` +
-        `    run: npm install -g @salesforce/cli@latest\n` +
-        `We will attempt to install the latest Salesforce CLI on your behalf.`,
-    SF_CLI_INSTALL_FAILED: `Failed to install the Salesforce CLI on your behalf.`,
-    MINIMUM_SCANNER_PLUGIN_NOT_INSTALLED: `The @salesforce/sfdx-scanner plugin of version ${exports.MIN_SCANNER_VERSION_REQUIRED} or greater was not found.\n` +
-        `The Salesforce Code Analyzer plugin of version ${exports.MIN_SCANNER_VERSION_REQUIRED} or greater is required.\n` +
-        `We recommend you include a separate step in your GitHub workflow to install it. For example:\n` +
-        `  - name: Install the Salesforce Code Analyzer plugin\n` +
-        `    run: sf plugins install @salesforce/sfdx-scanner@latest\n` +
-        `We will attempt to install the latest Salesforce Code Analyzer plugin on your behalf.`,
-    SCANNER_PLUGIN_INSTALL_FAILED: `Failed to install the latest Salesforce Code Analyzer plugin on your behalf.`
-};
-/* eslint-enable */
-exports.INTERNAL_OUTFILE = 'SalesforceCodeAnalyzerResults.json';
+const constants_1 = __nccwpck_require__(9042);
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 async function run(dependencies, commandExecutor) {
     try {
-        dependencies.startGroup('Preparing Environment');
+        dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT);
         const inputs = dependencies.getInputs();
         validateInputs(inputs);
         await installSalesforceCliIfNeeded(dependencies, commandExecutor);
         await installMinimumScannerPluginVersionIfNeeded(dependencies, commandExecutor);
         dependencies.endGroup();
-        dependencies.startGroup('Running Salesforce Code Analyzer');
-        const codeAnalyzerExitCode = await commandExecutor.runCodeAnalyzer(inputs.runCommand, inputs.runArgs, exports.INTERNAL_OUTFILE);
+        dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.RUNNING_CODE_ANALYZER);
+        const codeAnalyzerExitCode = await commandExecutor.runCodeAnalyzer(inputs.runCommand, inputs.runArgs, constants_1.INTERNAL_OUTFILE);
         dependencies.endGroup();
-        dependencies.startGroup('Uploading Artifact');
+        dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.UPLOADING_ARTIFACT);
         const userOutfile = (0, utils_1.extractOutfileFromRunArguments)(inputs.runArgs);
-        const artifactFile = userOutfile.length > 0 ? userOutfile : exports.INTERNAL_OUTFILE;
+        const artifactFile = userOutfile.length > 0 ? userOutfile : constants_1.INTERNAL_OUTFILE;
         await dependencies.uploadArtifact(inputs.resultsArtifactName, [artifactFile]);
         dependencies.endGroup();
-        dependencies.startGroup('Analyzing Results');
+        dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.ANALYZING_RESULTS);
         // TODO: Process the internal outfile
         dependencies.endGroup();
-        dependencies.startGroup('Finalizing Summary and Outputs');
+        dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.FINALIZING_OUTPUT);
         // TODO: set the summary and remaining outputs
         dependencies.setOutput('exit-code', codeAnalyzerExitCode.toString());
         dependencies.endGroup();
@@ -103020,22 +103045,22 @@ async function run(dependencies, commandExecutor) {
 exports.run = run;
 function validateInputs(inputs) {
     if (!inputs.runArgs.toLowerCase().includes('--normalize-severity')) {
-        throw new Error(exports.MESSAGES.MISSING_NORMALIZE_SEVERITY);
+        throw new Error(constants_1.MESSAGES.MISSING_NORMALIZE_SEVERITY);
     }
 }
 async function installSalesforceCliIfNeeded(dependencies, commandExecutor) {
     if (!(await commandExecutor.isSalesforceCliInstalled())) {
-        dependencies.warn(exports.MESSAGES.SF_CLI_NOT_INSTALLED);
+        dependencies.warn(constants_1.MESSAGES.SF_CLI_NOT_INSTALLED);
         if (!(await commandExecutor.installSalesforceCli())) {
-            throw new Error(exports.MESSAGES.SF_CLI_INSTALL_FAILED);
+            throw new Error(constants_1.MESSAGES.SF_CLI_INSTALL_FAILED);
         }
     }
 }
 async function installMinimumScannerPluginVersionIfNeeded(dependencies, commandExecutor) {
-    if (!(await commandExecutor.isMinimumScannerPluginInstalled(exports.MIN_SCANNER_VERSION_REQUIRED))) {
-        dependencies.warn(exports.MESSAGES.MINIMUM_SCANNER_PLUGIN_NOT_INSTALLED);
+    if (!(await commandExecutor.isMinimumScannerPluginInstalled(constants_1.MIN_SCANNER_VERSION_REQUIRED))) {
+        dependencies.warn(constants_1.MESSAGES.MINIMUM_SCANNER_PLUGIN_NOT_INSTALLED);
         if (!(await commandExecutor.installScannerPlugin())) {
-            throw new Error(exports.MESSAGES.SCANNER_PLUGIN_INSTALL_FAILED);
+            throw new Error(constants_1.MESSAGES.SCANNER_PLUGIN_INSTALL_FAILED);
         }
     }
 }

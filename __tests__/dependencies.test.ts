@@ -94,7 +94,13 @@ describe('RuntimeDependencies Code Coverage', () => {
         expect(setOutputSpy).toHaveBeenCalledWith('someField', 'someValue')
     })
 
-    it('warn Code Coverate', async () => {
+    it('info Code Coverage', async () => {
+        const infoSpy = jest.spyOn(core, 'info').mockImplementation()
+        dependencies.info('someInfoMessage')
+        expect(infoSpy).toHaveBeenCalledWith('someInfoMessage')
+    })
+
+    it('warn Code Coverage', async () => {
         const warningSpy = jest.spyOn(core, 'warning').mockImplementation()
         dependencies.warn('someWarnMessage')
         expect(warningSpy).toHaveBeenCalledWith('someWarnMessage')

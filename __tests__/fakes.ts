@@ -14,9 +14,9 @@ export class FakeDependencies implements Dependencies {
     }
 
     execCommandReturnValue: CommandOutput = { exitCode: 0, stdout: '', stderr: '' }
-    execCommandCallHistory: { command: string; envVars: EnvironmentVariables }[] = []
-    async execCommand(command: string, envVars: EnvironmentVariables): Promise<CommandOutput> {
-        this.execCommandCallHistory.push({ command, envVars })
+    execCommandCallHistory: { command: string; envVars: EnvironmentVariables; runSilently: boolean }[] = []
+    async execCommand(command: string, envVars: EnvironmentVariables, runSilently: boolean): Promise<CommandOutput> {
+        this.execCommandCallHistory.push({ command, envVars, runSilently })
         return this.execCommandReturnValue
     }
 
@@ -41,6 +41,11 @@ export class FakeDependencies implements Dependencies {
     setOutputCallHistory: { name: string; value: string }[] = []
     setOutput(name: string, value: string): void {
         this.setOutputCallHistory.push({ name, value })
+    }
+
+    infoCallHistory: { infoMessage: string }[] = []
+    info(infoMessage: string): void {
+        this.infoCallHistory.push({ infoMessage })
     }
 
     warnCallHistory: { warnMessage: string }[] = []
