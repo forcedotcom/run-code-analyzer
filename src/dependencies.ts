@@ -21,6 +21,8 @@ export interface Dependencies {
 
     setOutput(name: string, value: string): void
 
+    warn(warnMessage: string): void
+
     fail(failMessage: string): void
 }
 
@@ -50,11 +52,16 @@ export class RuntimeDependencies implements Dependencies {
     }
 
     async execCommand(command: string, envVars: EnvironmentVariables = {}): Promise<number> {
-        return exec.exec(command, [], {
-            env: mergeWithProcessEnvVars(envVars),
-            ignoreReturnCode: true,
-            failOnStdErr: false
-        })
+        try {
+            return await exec.exec(command, [], {
+                env: mergeWithProcessEnvVars(envVars),
+                ignoreReturnCode: true,
+                failOnStdErr: false
+            })
+        } catch (err) {
+            // A try/catch is needed here due to issue: https://github.com/actions/toolkit/issues/1625
+            return 127
+        }
     }
 
     async uploadArtifact(artifactName: string, artifactFiles: string[]): Promise<void> {
@@ -63,6 +70,10 @@ export class RuntimeDependencies implements Dependencies {
 
     setOutput(name: string, value: string): void {
         core.setOutput(name, value)
+    }
+
+    warn(warnMessage: string): void {
+        core.warning(warnMessage)
     }
 
     fail(failMessage: string): void {

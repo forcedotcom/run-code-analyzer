@@ -99522,6 +99522,14 @@ class RuntimeCommandExecutor {
     constructor(dependencies) {
         this.dependencies = dependencies;
     }
+    async isSalesforceCliInstalled() {
+        const exitCode = await this.dependencies.execCommand('sf --version');
+        return exitCode === 0;
+    }
+    async installSalesforceCli() {
+        const exitCode = await this.dependencies.execCommand('npm install -g @salesforce/cli@latest');
+        return exitCode === 0;
+    }
     async runCodeAnalyzer(runCmd, runArgs, internalOutfile) {
         const command = `sf scanner ${runCmd} ${runArgs}`;
         const envVars = {
@@ -99535,10 +99543,6 @@ class RuntimeCommandExecutor {
             envVars['JAVA_HOME'] = process.env['JAVA_HOME_11_X64'];
         }
         return await this.dependencies.execCommand(command, envVars);
-    }
-    async isSalesforceCliInstalled() {
-        const exitCode = await this.dependencies.execCommand('sf --version');
-        return exitCode === 0;
     }
 }
 exports.RuntimeCommandExecutor = RuntimeCommandExecutor;
@@ -99602,17 +99606,26 @@ class RuntimeDependencies {
         };
     }
     async execCommand(command, envVars = {}) {
-        return exec.exec(command, [], {
-            env: (0, utils_1.mergeWithProcessEnvVars)(envVars),
-            ignoreReturnCode: true,
-            failOnStdErr: false
-        });
+        try {
+            return await exec.exec(command, [], {
+                env: (0, utils_1.mergeWithProcessEnvVars)(envVars),
+                ignoreReturnCode: true,
+                failOnStdErr: false
+            });
+        }
+        catch (err) {
+            // A try/catch is needed here due to issue: https://github.com/actions/toolkit/issues/1625
+            return 127;
+        }
     }
     async uploadArtifact(artifactName, artifactFiles) {
         await this.artifactClient.uploadArtifact(artifactName, artifactFiles, '.');
     }
     setOutput(name, value) {
         core.setOutput(name, value);
+    }
+    warn(warnMessage) {
+        core.warning(warnMessage);
     }
     fail(failMessage) {
         core.setFailed(failMessage);
@@ -99633,9 +99646,13 @@ exports.run = exports.INTERNAL_OUTFILE = exports.MESSAGES = void 0;
 const utils_1 = __nccwpck_require__(1314);
 exports.MESSAGES = {
     MISSING_NORMALIZE_SEVERITY: 'Missing required --normalize-severity option from run-arguments input.',
-    SF_NOT_INSTALLED: 'The sf command was not found.\n' +
-        'The Salesforce CLI must be installed in the environment before this GitHub action can run.\n' +
-        'See the README.md of this GitHub action for an example of steps that you can add to your GitHub workflow.'
+    SF_CLI_NOT_INSTALLED: 'The sf command was not found.\n' +
+        'The Salesforce CLI must be installed in the environment to run the Salesforce Code Analyzer.\n' +
+        'We recommend you include a step in your GitHub workflow that installs the Salesforce CLI. For example:\n' +
+        '  - name: Install SalesforceCLI\n' +
+        '     run: npm install -g @salesforce/cli@latest\n' +
+        'We will attempt to install the Salesforce CLI on your behalf.',
+    SF_CLI_INSTALL_FAILED: 'Failed to install the Salesforce CLI on your behalf.'
 };
 exports.INTERNAL_OUTFILE = 'SalesforceCodeAnalyzerResults.json';
 /**
@@ -99647,7 +99664,7 @@ async function run(dependencies, commandExecutor) {
         dependencies.startGroup('Preparing Environment');
         const inputs = dependencies.getInputs();
         validateInputs(inputs);
-        await assertSfIsInstalled(commandExecutor);
+        await installSalesforceCliIfNeeded(dependencies, commandExecutor);
         // TODO: NICE TO HAVES:
         // * Verify that sfdx-scanner plugin is installed (and if not, then install it as a separate step)
         // * Echo version of sfdx-scanner in use
@@ -99675,14 +99692,17 @@ async function run(dependencies, commandExecutor) {
     }
 }
 exports.run = run;
-async function assertSfIsInstalled(commandExecutor) {
-    if (!(await commandExecutor.isSalesforceCliInstalled())) {
-        throw new Error(exports.MESSAGES.SF_NOT_INSTALLED);
-    }
-}
 function validateInputs(inputs) {
     if (!inputs.runArgs.toLowerCase().includes('--normalize-severity')) {
         throw new Error(exports.MESSAGES.MISSING_NORMALIZE_SEVERITY);
+    }
+}
+async function installSalesforceCliIfNeeded(dependencies, commandExecutor) {
+    if (!(await commandExecutor.isSalesforceCliInstalled())) {
+        dependencies.warn(exports.MESSAGES.SF_CLI_NOT_INSTALLED);
+        if (!(await commandExecutor.installSalesforceCli())) {
+            throw new Error(exports.MESSAGES.SF_CLI_INSTALL_FAILED);
+        }
     }
 }
 

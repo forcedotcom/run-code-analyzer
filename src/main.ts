@@ -5,10 +5,14 @@ import { CommandExecutor } from './commands'
 
 export const MESSAGES = {
     MISSING_NORMALIZE_SEVERITY: 'Missing required --normalize-severity option from run-arguments input.',
-    SF_NOT_INSTALLED:
+    SF_CLI_NOT_INSTALLED:
         'The sf command was not found.\n' +
-        'The Salesforce CLI must be installed in the environment before this GitHub action can run.\n' +
-        'See the README.md of this GitHub action for an example of steps that you can add to your GitHub workflow.'
+        'The Salesforce CLI must be installed in the environment to run the Salesforce Code Analyzer.\n' +
+        'We recommend you include a step in your GitHub workflow that installs the Salesforce CLI. For example:\n' +
+        '  - name: Install SalesforceCLI\n' +
+        '     run: npm install -g @salesforce/cli@latest\n' +
+        'We will attempt to install the Salesforce CLI on your behalf.',
+    SF_CLI_INSTALL_FAILED: 'Failed to install the Salesforce CLI on your behalf.'
 }
 
 export const INTERNAL_OUTFILE = 'SalesforceCodeAnalyzerResults.json'
@@ -22,7 +26,8 @@ export async function run(dependencies: Dependencies, commandExecutor: CommandEx
         dependencies.startGroup('Preparing Environment')
         const inputs: Inputs = dependencies.getInputs()
         validateInputs(inputs)
-        await assertSfIsInstalled(commandExecutor)
+        await installSalesforceCliIfNeeded(dependencies, commandExecutor)
+
         // TODO: NICE TO HAVES:
         // * Verify that sfdx-scanner plugin is installed (and if not, then install it as a separate step)
         // * Echo version of sfdx-scanner in use
@@ -57,14 +62,20 @@ export async function run(dependencies: Dependencies, commandExecutor: CommandEx
     }
 }
 
-async function assertSfIsInstalled(commandExecutor: CommandExecutor): Promise<void> {
-    if (!(await commandExecutor.isSalesforceCliInstalled())) {
-        throw new Error(MESSAGES.SF_NOT_INSTALLED)
-    }
-}
-
 function validateInputs(inputs: Inputs): void {
     if (!inputs.runArgs.toLowerCase().includes('--normalize-severity')) {
         throw new Error(MESSAGES.MISSING_NORMALIZE_SEVERITY)
+    }
+}
+
+async function installSalesforceCliIfNeeded(
+    dependencies: Dependencies,
+    commandExecutor: CommandExecutor
+): Promise<void> {
+    if (!(await commandExecutor.isSalesforceCliInstalled())) {
+        dependencies.warn(MESSAGES.SF_CLI_NOT_INSTALLED)
+        if (!(await commandExecutor.installSalesforceCli())) {
+            throw new Error(MESSAGES.SF_CLI_INSTALL_FAILED)
+        }
     }
 }

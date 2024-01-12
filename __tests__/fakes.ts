@@ -43,6 +43,11 @@ export class FakeDependencies implements Dependencies {
         this.setOutputCallHistory.push({ name, value })
     }
 
+    warnCallHistory: { warnMessage: string }[] = []
+    warn(warnMessage: string): void {
+        this.warnCallHistory.push({ warnMessage })
+    }
+
     failCallHistory: { failMessage: string }[] = []
     fail(failMessage: string): void {
         this.failCallHistory.push({ failMessage })
@@ -55,6 +60,13 @@ export class FakeCommandExecutor implements CommandExecutor {
     async isSalesforceCliInstalled(): Promise<boolean> {
         this.isSalesforceCliInstalledCallCount++
         return this.isSalesforceCliInstalledReturnValue
+    }
+
+    installSalesforceCliCallCount = 0
+    installSalesforceCliReturnValue = true
+    async installSalesforceCli(): Promise<boolean> {
+        this.installSalesforceCliCallCount++
+        return this.installSalesforceCliReturnValue
     }
 
     runCodeAnalyzerReturnValue = 0

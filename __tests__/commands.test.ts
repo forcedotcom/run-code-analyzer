@@ -97,4 +97,29 @@ describe('RuntimeCommandExecutor Tests', () => {
             expect(tf).toEqual(false)
         })
     })
+
+    describe('installSalesforceCli Tests', () => {
+        it('Check command and output for zero return', async () => {
+            const success: boolean = await commandExecutor.installSalesforceCli()
+
+            expect(dependencies.execCommandCallHistory).toHaveLength(1)
+            expect(dependencies.execCommandCallHistory).toContainEqual({
+                command: 'npm install -g @salesforce/cli@latest',
+                envVars: undefined
+            })
+            expect(success).toEqual(true)
+        })
+
+        it('Check command and output for nonzero return', async () => {
+            dependencies.execCommandReturnValue = 1
+            const success: boolean = await commandExecutor.installSalesforceCli()
+
+            expect(dependencies.execCommandCallHistory).toHaveLength(1)
+            expect(dependencies.execCommandCallHistory).toContainEqual({
+                command: 'npm install -g @salesforce/cli@latest',
+                envVars: undefined
+            })
+            expect(success).toEqual(false)
+        })
+    })
 })

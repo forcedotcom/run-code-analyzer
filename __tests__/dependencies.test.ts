@@ -44,10 +44,13 @@ describe('RuntimeDependencies Code Coverage', () => {
     it('execCommand Code Coverage', async () => {
         jest.spyOn(exec, 'exec').mockImplementation(
             async (
-                _commandLine: string,
+                commandLine: string,
                 _args?: string[] | undefined,
                 _options?: ExecOptions | undefined
             ): Promise<number> => {
+                if (commandLine === 'doesNotExist') {
+                    throw new Error('To help with throwing case')
+                }
                 return 123
             }
         )
@@ -57,6 +60,8 @@ describe('RuntimeDependencies Code Coverage', () => {
         expect(exitCode1).toEqual(123)
         const exitCode2: number = await dependencies.execCommand('command2')
         expect(exitCode2).toEqual(123)
+        const exitCode3: number = await dependencies.execCommand('doesNotExist')
+        expect(exitCode3).toEqual(127)
     })
 
     it('uploadArtifact Code Coverage', async () => {
@@ -87,6 +92,12 @@ describe('RuntimeDependencies Code Coverage', () => {
         const setOutputSpy = jest.spyOn(core, 'setOutput').mockImplementation()
         dependencies.setOutput('someField', 'someValue')
         expect(setOutputSpy).toHaveBeenCalledWith('someField', 'someValue')
+    })
+
+    it('warn Code Coverate', async () => {
+        const warningSpy = jest.spyOn(core, 'warning').mockImplementation()
+        dependencies.warn('someWarnMessage')
+        expect(warningSpy).toHaveBeenCalledWith('someWarnMessage')
     })
 
     it('fail Code Coverage', async () => {

@@ -112,14 +112,31 @@ describe('main run Tests', () => {
         })
     })
 
-    it('Test when Salesforce CLI is not installed', async () => {
+    it('Test when Salesforce CLI is not already installed and we install it successfully', async () => {
         commandExecutor.isSalesforceCliInstalledReturnValue = false
         await main.run(dependencies, commandExecutor)
-        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
-        expect(dependencies.uploadArtifactCallHistory).toHaveLength(0)
-        expect(dependencies.failCallHistory).toHaveLength(1)
-        expect(dependencies.failCallHistory).toContainEqual({
-            failMessage: MESSAGES.SF_NOT_INSTALLED
+
+        expect(dependencies.warnCallHistory).toHaveLength(1)
+        expect(dependencies.warnCallHistory).toContainEqual({
+            warnMessage: MESSAGES.SF_CLI_NOT_INSTALLED
         })
+        expect(commandExecutor.installSalesforceCliCallCount).toEqual(1)
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        expect(dependencies.failCallHistory).toHaveLength(0)
+    })
+
+    it('Test when Salesforce CLI is not already installed and we fail to install it', async () => {
+        commandExecutor.isSalesforceCliInstalledReturnValue = false
+        commandExecutor.installSalesforceCliReturnValue = false
+        await main.run(dependencies, commandExecutor)
+
+        expect(dependencies.warnCallHistory).toHaveLength(1)
+        expect(dependencies.warnCallHistory).toContainEqual({
+            warnMessage: MESSAGES.SF_CLI_NOT_INSTALLED
+        })
+        expect(commandExecutor.installSalesforceCliCallCount).toEqual(1)
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
+        expect(dependencies.failCallHistory).toHaveLength(1)
+        expect(dependencies.failCallHistory).toContainEqual({ failMessage: MESSAGES.SF_CLI_INSTALL_FAILED })
     })
 })

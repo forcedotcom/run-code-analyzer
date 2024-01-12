@@ -2,14 +2,25 @@ import { EnvironmentVariables } from './types'
 import { Dependencies } from './dependencies'
 
 export interface CommandExecutor {
-    runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<number>
     isSalesforceCliInstalled(): Promise<boolean>
+    installSalesforceCli(): Promise<boolean>
+    runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<number>
 }
 
 export class RuntimeCommandExecutor implements CommandExecutor {
     private readonly dependencies: Dependencies
     constructor(dependencies: Dependencies) {
         this.dependencies = dependencies
+    }
+
+    async isSalesforceCliInstalled(): Promise<boolean> {
+        const exitCode: number = await this.dependencies.execCommand('sf --version')
+        return exitCode === 0
+    }
+
+    async installSalesforceCli(): Promise<boolean> {
+        const exitCode: number = await this.dependencies.execCommand('npm install -g @salesforce/cli@latest')
+        return exitCode === 0
     }
 
     async runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<number> {
@@ -25,10 +36,5 @@ export class RuntimeCommandExecutor implements CommandExecutor {
             envVars['JAVA_HOME'] = process.env['JAVA_HOME_11_X64']
         }
         return await this.dependencies.execCommand(command, envVars)
-    }
-
-    async isSalesforceCliInstalled(): Promise<boolean> {
-        const exitCode: number = await this.dependencies.execCommand('sf --version')
-        return exitCode === 0
     }
 }
