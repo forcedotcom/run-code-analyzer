@@ -35,7 +35,7 @@ describe('RuntimeCommandExecutor Tests', () => {
         })
 
         it('Confirm command is build correctly and nonzero exit code', async () => {
-            dependencies.execCommandReturnValue = 123
+            dependencies.execCommandReturnValue = { exitCode: 123, stdout: '', stderr: '' }
             const exitCode: number = await commandExecutor.runCodeAnalyzer(
                 'run dfa',
                 '--normalize-severity',
@@ -86,7 +86,7 @@ describe('RuntimeCommandExecutor Tests', () => {
         })
 
         it('Check command and output for nonzero return', async () => {
-            dependencies.execCommandReturnValue = 123
+            dependencies.execCommandReturnValue = { exitCode: 123, stdout: '', stderr: '' }
             const tf: boolean = await commandExecutor.isSalesforceCliInstalled()
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
@@ -111,12 +111,120 @@ describe('RuntimeCommandExecutor Tests', () => {
         })
 
         it('Check command and output for nonzero return', async () => {
-            dependencies.execCommandReturnValue = 1
+            dependencies.execCommandReturnValue = { exitCode: 1, stdout: '', stderr: '' }
             const success: boolean = await commandExecutor.installSalesforceCli()
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
                 command: 'npm install -g @salesforce/cli@latest',
+                envVars: undefined
+            })
+            expect(success).toEqual(false)
+        })
+    })
+
+    describe('isMinimumScannerPluginInstalled Tests', () => {
+        const sampleResponseJson =
+            '[\n' +
+            '  {\n' +
+            '    "name": "@salesforce/sfdx-scanner",\n' +
+            '    "version": "3.21.0",\n' +
+            '    "aBunchOfOtherFields": "thatWeDon\'tCareAbout"\n' +
+            '  }\n' +
+            ']'
+
+        it('Check when scanner plugin is installed with at version less than the minimum version', async () => {
+            dependencies.execCommandReturnValue = { exitCode: 0, stdout: sampleResponseJson, stderr: '' }
+            const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.22.0')
+
+            expect(dependencies.execCommandCallHistory).toHaveLength(1)
+            expect(dependencies.execCommandCallHistory).toContainEqual({
+                command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
+                envVars: undefined
+            })
+            expect(tf).toEqual(false)
+        })
+
+        it('Check when scanner plugin is installed with at version exactly same as minimum version', async () => {
+            dependencies.execCommandReturnValue = { exitCode: 0, stdout: sampleResponseJson, stderr: '' }
+            const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.21.0')
+
+            expect(dependencies.execCommandCallHistory).toHaveLength(1)
+            expect(dependencies.execCommandCallHistory).toContainEqual({
+                command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
+                envVars: undefined
+            })
+            expect(tf).toEqual(true)
+        })
+
+        it('Check when scanner plugin is installed with at version greater than the minimum version', async () => {
+            dependencies.execCommandReturnValue = { exitCode: 0, stdout: sampleResponseJson, stderr: '' }
+            const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.20.0')
+
+            expect(dependencies.execCommandCallHistory).toHaveLength(1)
+            expect(dependencies.execCommandCallHistory).toContainEqual({
+                command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
+                envVars: undefined
+            })
+            expect(tf).toEqual(true)
+        })
+
+        it('Check when scanner plugin is not installed', async () => {
+            dependencies.execCommandReturnValue = { exitCode: 1, stdout: '', stderr: '{ "error": {} }' }
+            const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.20.0')
+
+            expect(dependencies.execCommandCallHistory).toHaveLength(1)
+            expect(dependencies.execCommandCallHistory).toContainEqual({
+                command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
+                envVars: undefined
+            })
+            expect(tf).toEqual(false)
+        })
+
+        it('When sf command unexpectedly gives invalid json back we should not blow up', async () => {
+            dependencies.execCommandReturnValue = { exitCode: 0, stdout: 'oops: this not valid json', stderr: '' }
+            const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.21.0')
+
+            expect(dependencies.execCommandCallHistory).toHaveLength(1)
+            expect(dependencies.execCommandCallHistory).toContainEqual({
+                command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
+                envVars: undefined
+            })
+            expect(tf).toEqual(false)
+        })
+
+        it('When sf command unexpectedly gives multiple plugin results back we should not blow up', async () => {
+            dependencies.execCommandReturnValue = { exitCode: 0, stdout: '[{},{}]', stderr: '' }
+            const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.21.0')
+
+            expect(dependencies.execCommandCallHistory).toHaveLength(1)
+            expect(dependencies.execCommandCallHistory).toContainEqual({
+                command: 'sf plugins inspect @salesforce/sfdx-scanner --json',
+                envVars: undefined
+            })
+            expect(tf).toEqual(false)
+        })
+    })
+
+    describe('installScannerPlugin', () => {
+        it('Check command and output for zero return', async () => {
+            const success: boolean = await commandExecutor.installScannerPlugin()
+
+            expect(dependencies.execCommandCallHistory).toHaveLength(1)
+            expect(dependencies.execCommandCallHistory).toContainEqual({
+                command: 'sf plugins install @salesforce/sfdx-scanner@latest',
+                envVars: undefined
+            })
+            expect(success).toEqual(true)
+        })
+
+        it('Check command and output for nonzero return', async () => {
+            dependencies.execCommandReturnValue = { exitCode: 1, stdout: '', stderr: '' }
+            const success: boolean = await commandExecutor.installScannerPlugin()
+
+            expect(dependencies.execCommandCallHistory).toHaveLength(1)
+            expect(dependencies.execCommandCallHistory).toContainEqual({
+                command: 'sf plugins install @salesforce/sfdx-scanner@latest',
                 envVars: undefined
             })
             expect(success).toEqual(false)

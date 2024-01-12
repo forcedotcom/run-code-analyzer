@@ -3,9 +3,9 @@
  */
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import { Dependencies, RuntimeDependencies } from '../src/dependencies'
+import { CommandOutput, Dependencies, RuntimeDependencies } from '../src/dependencies'
 import { Inputs } from '../src/types'
-import { ExecOptions } from '@actions/exec'
+import { ExecOptions, ExecOutput } from '@actions/exec'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
 import { DefaultArtifactClient } from '@actions/artifact'
 import { UploadArtifactOptions, UploadArtifactResponse } from '@actions/artifact/lib/internal/shared/interfaces'
@@ -42,26 +42,26 @@ describe('RuntimeDependencies Code Coverage', () => {
     })
 
     it('execCommand Code Coverage', async () => {
-        jest.spyOn(exec, 'exec').mockImplementation(
+        jest.spyOn(exec, 'getExecOutput').mockImplementation(
             async (
                 commandLine: string,
                 _args?: string[] | undefined,
                 _options?: ExecOptions | undefined
-            ): Promise<number> => {
+            ): Promise<ExecOutput> => {
                 if (commandLine === 'doesNotExist') {
-                    throw new Error('To help with throwing case')
+                    throw new Error('dummyErrorMsg')
                 }
-                return 123
+                return { exitCode: 123, stdout: 'stdoutValue', stderr: 'stderrValue' }
             }
         )
-        const exitCode1: number = await dependencies.execCommand('command1', {
+        const cmdOut1: CommandOutput = await dependencies.execCommand('command1', {
             someField: 'someValue'
         })
-        expect(exitCode1).toEqual(123)
-        const exitCode2: number = await dependencies.execCommand('command2')
-        expect(exitCode2).toEqual(123)
-        const exitCode3: number = await dependencies.execCommand('doesNotExist')
-        expect(exitCode3).toEqual(127)
+        expect(cmdOut1).toEqual({ exitCode: 123, stdout: 'stdoutValue', stderr: 'stderrValue' })
+        const cmdOut2: CommandOutput = await dependencies.execCommand('command2')
+        expect(cmdOut2).toEqual({ exitCode: 123, stdout: 'stdoutValue', stderr: 'stderrValue' })
+        const cmdOut3: CommandOutput = await dependencies.execCommand('doesNotExist')
+        expect(cmdOut3).toEqual({ exitCode: 127, stdout: '', stderr: 'dummyErrorMsg' })
     })
 
     it('uploadArtifact Code Coverage', async () => {

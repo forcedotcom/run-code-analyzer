@@ -1,4 +1,4 @@
-import { Dependencies } from '../src/dependencies'
+import { CommandOutput, Dependencies } from '../src/dependencies'
 import { EnvironmentVariables, Inputs } from '../src/types'
 import { CommandExecutor } from '../src/commands'
 
@@ -13,9 +13,9 @@ export class FakeDependencies implements Dependencies {
         this.endGroupCallCount++
     }
 
-    execCommandReturnValue = 0
+    execCommandReturnValue: CommandOutput = { exitCode: 0, stdout: '', stderr: '' }
     execCommandCallHistory: { command: string; envVars: EnvironmentVariables }[] = []
-    async execCommand(command: string, envVars: EnvironmentVariables): Promise<number> {
+    async execCommand(command: string, envVars: EnvironmentVariables): Promise<CommandOutput> {
         this.execCommandCallHistory.push({ command, envVars })
         return this.execCommandReturnValue
     }
@@ -67,6 +67,20 @@ export class FakeCommandExecutor implements CommandExecutor {
     async installSalesforceCli(): Promise<boolean> {
         this.installSalesforceCliCallCount++
         return this.installSalesforceCliReturnValue
+    }
+
+    isMinimumScannerPluginInstalledReturnValue = true
+    isMinimumScannerPluginInstalledCallHistory: { minVersion: string }[] = []
+    async isMinimumScannerPluginInstalled(minVersion: string): Promise<boolean> {
+        this.isMinimumScannerPluginInstalledCallHistory.push({ minVersion })
+        return this.isMinimumScannerPluginInstalledReturnValue
+    }
+
+    installScannerPluginCallCount = 0
+    installScannerPluginReturnValue = true
+    async installScannerPlugin(): Promise<boolean> {
+        this.installScannerPluginCallCount++
+        return this.installScannerPluginReturnValue
     }
 
     runCodeAnalyzerReturnValue = 0

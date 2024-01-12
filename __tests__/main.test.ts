@@ -1,7 +1,7 @@
 import * as main from '../src/main'
 import { FakeCommandExecutor, FakeDependencies } from './fakes'
 import { Inputs } from '../src/types'
-import { INTERNAL_OUTFILE, MESSAGES } from '../src/main'
+import { INTERNAL_OUTFILE, MESSAGES, MIN_SCANNER_VERSION_REQUIRED } from '../src/main'
 
 describe('main run Tests', () => {
     let dependencies: FakeDependencies
@@ -138,5 +138,39 @@ describe('main run Tests', () => {
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
         expect(dependencies.failCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory).toContainEqual({ failMessage: MESSAGES.SF_CLI_INSTALL_FAILED })
+    })
+
+    it('Test when sfdx-scanner plugin is not already installed and we install it successfully', async () => {
+        commandExecutor.isMinimumScannerPluginInstalledReturnValue = false
+        await main.run(dependencies, commandExecutor)
+
+        expect(dependencies.warnCallHistory).toHaveLength(1)
+        expect(dependencies.warnCallHistory).toContainEqual({
+            warnMessage: MESSAGES.MINIMUM_SCANNER_PLUGIN_NOT_INSTALLED
+        })
+        expect(commandExecutor.isMinimumScannerPluginInstalledCallHistory).toHaveLength(1)
+        expect(commandExecutor.isMinimumScannerPluginInstalledCallHistory).toContainEqual({
+            minVersion: MIN_SCANNER_VERSION_REQUIRED
+        })
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        expect(dependencies.failCallHistory).toHaveLength(0)
+    })
+
+    it('Test when sfdx-scanner plugin is not already installed and we fail to install it', async () => {
+        commandExecutor.isMinimumScannerPluginInstalledReturnValue = false
+        commandExecutor.installScannerPluginReturnValue = false
+        await main.run(dependencies, commandExecutor)
+
+        expect(dependencies.warnCallHistory).toHaveLength(1)
+        expect(dependencies.warnCallHistory).toContainEqual({
+            warnMessage: MESSAGES.MINIMUM_SCANNER_PLUGIN_NOT_INSTALLED
+        })
+        expect(commandExecutor.isMinimumScannerPluginInstalledCallHistory).toHaveLength(1)
+        expect(commandExecutor.isMinimumScannerPluginInstalledCallHistory).toContainEqual({
+            minVersion: MIN_SCANNER_VERSION_REQUIRED
+        })
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
+        expect(dependencies.failCallHistory).toHaveLength(1)
+        expect(dependencies.failCallHistory).toContainEqual({ failMessage: MESSAGES.SCANNER_PLUGIN_INSTALL_FAILED })
     })
 })

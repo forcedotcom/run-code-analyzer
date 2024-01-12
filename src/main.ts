@@ -3,17 +3,29 @@ import { Dependencies } from './dependencies'
 import { Inputs } from './types'
 import { CommandExecutor } from './commands'
 
+export const MIN_SCANNER_VERSION_REQUIRED = '3.20.0'
+
+/* eslint-disable prettier/prettier, prefer-template */
 export const MESSAGES = {
-    MISSING_NORMALIZE_SEVERITY: 'Missing required --normalize-severity option from run-arguments input.',
+    MISSING_NORMALIZE_SEVERITY: `Missing required --normalize-severity option from run-arguments input.`,
     SF_CLI_NOT_INSTALLED:
-        'The sf command was not found.\n' +
-        'The Salesforce CLI must be installed in the environment to run the Salesforce Code Analyzer.\n' +
-        'We recommend you include a step in your GitHub workflow that installs the Salesforce CLI. For example:\n' +
-        '  - name: Install SalesforceCLI\n' +
-        '     run: npm install -g @salesforce/cli@latest\n' +
-        'We will attempt to install the Salesforce CLI on your behalf.',
-    SF_CLI_INSTALL_FAILED: 'Failed to install the Salesforce CLI on your behalf.'
+        `The sf command was not found.\n` +
+        `The Salesforce CLI must be installed in the environment to run the Salesforce Code Analyzer.\n` +
+        `We recommend you include a separate step in your GitHub workflow to install it. For example:\n` +
+        `  - name: Install the Salesforce CLI\n` +
+        `    run: npm install -g @salesforce/cli@latest\n` +
+        `We will attempt to install the latest Salesforce CLI on your behalf.`,
+    SF_CLI_INSTALL_FAILED: `Failed to install the Salesforce CLI on your behalf.`,
+    MINIMUM_SCANNER_PLUGIN_NOT_INSTALLED:
+        `The @salesforce/sfdx-scanner plugin of version ${MIN_SCANNER_VERSION_REQUIRED} or greater was not found.\n` +
+        `The Salesforce Code Analyzer plugin of version ${MIN_SCANNER_VERSION_REQUIRED} or greater is required.\n` +
+        `We recommend you include a separate step in your GitHub workflow to install it. For example:\n` +
+        `  - name: Install the Salesforce Code Analyzer plugin\n` +
+        `    run: sf plugins install @salesforce/sfdx-scanner@latest\n` +
+        `We will attempt to install the latest Salesforce Code Analyzer plugin on your behalf.`,
+    SCANNER_PLUGIN_INSTALL_FAILED: `Failed to install the latest Salesforce Code Analyzer plugin on your behalf.`
 }
+/* eslint-enable */
 
 export const INTERNAL_OUTFILE = 'SalesforceCodeAnalyzerResults.json'
 
@@ -27,10 +39,7 @@ export async function run(dependencies: Dependencies, commandExecutor: CommandEx
         const inputs: Inputs = dependencies.getInputs()
         validateInputs(inputs)
         await installSalesforceCliIfNeeded(dependencies, commandExecutor)
-
-        // TODO: NICE TO HAVES:
-        // * Verify that sfdx-scanner plugin is installed (and if not, then install it as a separate step)
-        // * Echo version of sfdx-scanner in use
+        await installMinimumScannerPluginVersionIfNeeded(dependencies, commandExecutor)
         dependencies.endGroup()
 
         dependencies.startGroup('Running Salesforce Code Analyzer')
@@ -76,6 +85,18 @@ async function installSalesforceCliIfNeeded(
         dependencies.warn(MESSAGES.SF_CLI_NOT_INSTALLED)
         if (!(await commandExecutor.installSalesforceCli())) {
             throw new Error(MESSAGES.SF_CLI_INSTALL_FAILED)
+        }
+    }
+}
+
+async function installMinimumScannerPluginVersionIfNeeded(
+    dependencies: Dependencies,
+    commandExecutor: CommandExecutor
+): Promise<void> {
+    if (!(await commandExecutor.isMinimumScannerPluginInstalled(MIN_SCANNER_VERSION_REQUIRED))) {
+        dependencies.warn(MESSAGES.MINIMUM_SCANNER_PLUGIN_NOT_INSTALLED)
+        if (!(await commandExecutor.installScannerPlugin())) {
+            throw new Error(MESSAGES.SCANNER_PLUGIN_INSTALL_FAILED)
         }
     }
 }

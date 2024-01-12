@@ -1,9 +1,14 @@
 import { EnvironmentVariables } from './types'
-import { Dependencies } from './dependencies'
+import { CommandOutput, Dependencies } from './dependencies'
+import * as semver from 'semver'
+
+type PluginMetadata = { name: string; version: string }
 
 export interface CommandExecutor {
     isSalesforceCliInstalled(): Promise<boolean>
     installSalesforceCli(): Promise<boolean>
+    isMinimumScannerPluginInstalled(minVersion: string): Promise<boolean>
+    installScannerPlugin(): Promise<boolean>
     runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<number>
 }
 
@@ -14,13 +19,37 @@ export class RuntimeCommandExecutor implements CommandExecutor {
     }
 
     async isSalesforceCliInstalled(): Promise<boolean> {
-        const exitCode: number = await this.dependencies.execCommand('sf --version')
-        return exitCode === 0
+        const cmdOut: CommandOutput = await this.dependencies.execCommand('sf --version')
+        return cmdOut.exitCode === 0
     }
 
     async installSalesforceCli(): Promise<boolean> {
-        const exitCode: number = await this.dependencies.execCommand('npm install -g @salesforce/cli@latest')
-        return exitCode === 0
+        const cmdOut: CommandOutput = await this.dependencies.execCommand('npm install -g @salesforce/cli@latest')
+        return cmdOut.exitCode === 0
+    }
+
+    async isMinimumScannerPluginInstalled(minVersion: string): Promise<boolean> {
+        const command = 'sf plugins inspect @salesforce/sfdx-scanner --json'
+        const cmdOut: CommandOutput = await this.dependencies.execCommand(command)
+        if (cmdOut.exitCode !== 0) {
+            return false
+        }
+        try {
+            const pluginMetadataArray: PluginMetadata[] = JSON.parse(cmdOut.stdout) as PluginMetadata[]
+            if (pluginMetadataArray.length !== 1) {
+                return false
+            }
+            const pluginMetadata: PluginMetadata = pluginMetadataArray[0]
+            return semver.gte(pluginMetadata.version, minVersion)
+        } catch (_err) {
+            return false
+        }
+    }
+
+    async installScannerPlugin(): Promise<boolean> {
+        const command = 'sf plugins install @salesforce/sfdx-scanner@latest'
+        const cmdOut: CommandOutput = await this.dependencies.execCommand(command)
+        return cmdOut.exitCode === 0
     }
 
     async runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<number> {
@@ -35,6 +64,7 @@ export class RuntimeCommandExecutor implements CommandExecutor {
             // We prefer to run on java 11 if available since the default varies across the different GitHub runners.
             envVars['JAVA_HOME'] = process.env['JAVA_HOME_11_X64']
         }
-        return await this.dependencies.execCommand(command, envVars)
+        const cmdOut: CommandOutput = await this.dependencies.execCommand(command, envVars)
+        return cmdOut.exitCode
     }
 }

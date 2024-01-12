@@ -4,6 +4,9 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import { EnvironmentVariables, Inputs } from './types'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
+import { ExecOutput } from '@actions/exec'
+
+export type CommandOutput = ExecOutput
 
 /**
  * Interface to extract out dependencies used by the action
@@ -15,7 +18,7 @@ export interface Dependencies {
 
     getInputs(): Inputs
 
-    execCommand(command: string, envVars?: EnvironmentVariables): Promise<number>
+    execCommand(command: string, envVars?: EnvironmentVariables): Promise<CommandOutput>
 
     uploadArtifact(artifactName: string, artifactFiles: string[]): Promise<void>
 
@@ -51,16 +54,20 @@ export class RuntimeDependencies implements Dependencies {
         }
     }
 
-    async execCommand(command: string, envVars: EnvironmentVariables = {}): Promise<number> {
+    async execCommand(command: string, envVars: EnvironmentVariables = {}): Promise<CommandOutput> {
         try {
-            return await exec.exec(command, [], {
+            return await exec.getExecOutput(command, [], {
                 env: mergeWithProcessEnvVars(envVars),
                 ignoreReturnCode: true,
                 failOnStdErr: false
             })
         } catch (err) {
             // A try/catch is needed here due to issue: https://github.com/actions/toolkit/issues/1625
-            return 127
+            return {
+                exitCode: 127,
+                stdout: '',
+                stderr: (err as Error).message
+            }
         }
     }
 
