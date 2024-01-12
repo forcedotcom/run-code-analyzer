@@ -5,6 +5,7 @@ import * as exec from '@actions/exec'
 import { EnvironmentVariables, Inputs } from './types'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
 import { ExecOutput } from '@actions/exec'
+import fs from 'fs'
 
 export type CommandOutput = ExecOutput
 
@@ -29,6 +30,8 @@ export interface Dependencies {
     warn(warnMessage: string): void
 
     fail(failMessage: string): void
+
+    fileExists(file: string): boolean
 }
 
 /**
@@ -92,5 +95,9 @@ export class RuntimeDependencies implements Dependencies {
 
     fail(failMessage: string): void {
         core.setFailed(failMessage)
+    }
+
+    fileExists(file: string): boolean {
+        return fs.existsSync(file)
     }
 }

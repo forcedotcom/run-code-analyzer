@@ -102807,6 +102807,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RuntimeCommandExecutor = void 0;
 const semver = __importStar(__nccwpck_require__(1383));
+const constants_1 = __nccwpck_require__(9042);
 class RuntimeCommandExecutor {
     dependencies;
     constructor(dependencies) {
@@ -102833,7 +102834,7 @@ class RuntimeCommandExecutor {
             if (pluginsFound.length !== 1 || pluginsFound[0].name !== pluginName) {
                 return false;
             }
-            this.dependencies.info(`Found version ${pluginsFound[0].version} of the ${pluginName} plugin installed.`);
+            this.dependencies.info(constants_1.MESSAGE_FCNS.PLUGIN_FOUND(pluginName, pluginsFound[0].version));
             return semver.gte(pluginsFound[0].version, minVersion);
         }
         catch (_err) {
@@ -102872,7 +102873,7 @@ exports.RuntimeCommandExecutor = RuntimeCommandExecutor;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MESSAGES = exports.INTERNAL_OUTFILE = exports.MIN_SCANNER_VERSION_REQUIRED = void 0;
+exports.MESSAGE_FCNS = exports.MESSAGES = exports.INTERNAL_OUTFILE = exports.MIN_SCANNER_VERSION_REQUIRED = void 0;
 exports.MIN_SCANNER_VERSION_REQUIRED = '3.20.0';
 exports.INTERNAL_OUTFILE = 'SalesforceCodeAnalyzerResults.json';
 /* eslint-disable prettier/prettier, prefer-template */
@@ -102882,7 +102883,7 @@ exports.MESSAGES = {
         RUNNING_CODE_ANALYZER: 'Running the Salesforce Code Analyzer',
         UPLOADING_ARTIFACT: 'Uploading Artifact',
         ANALYZING_RESULTS: 'Analyzing Results',
-        FINALIZING_OUTPUT: 'Finalizing Summary and Outputs'
+        CREATING_SUMMARY: 'Creating Summary'
     },
     MISSING_NORMALIZE_SEVERITY: `Missing required --normalize-severity option from run-arguments input.`,
     SF_CLI_NOT_INSTALLED: `The sf command was not found.\n` +
@@ -102899,6 +102900,10 @@ exports.MESSAGES = {
         `    run: sf plugins install @salesforce/sfdx-scanner@latest\n` +
         `We will attempt to install the latest Salesforce Code Analyzer plugin on your behalf.`,
     SCANNER_PLUGIN_INSTALL_FAILED: `Failed to install the latest Salesforce Code Analyzer plugin on your behalf.`
+};
+exports.MESSAGE_FCNS = {
+    PLUGIN_FOUND: (pluginName, pluginVersion) => `Found version ${pluginVersion} of the ${pluginName} plugin installed.`,
+    FILE_NOT_FOUND: (fileName) => `The file ${fileName} was not found. Check the logs for an error.`
 };
 /* eslint-enable */
 
@@ -102933,12 +102938,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RuntimeDependencies = void 0;
 const utils_1 = __nccwpck_require__(1314);
 const artifact_1 = __nccwpck_require__(9450);
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
+const fs_1 = __importDefault(__nccwpck_require__(7147));
 /**
  * Class that wires up the runtime dependencies
  */
@@ -102993,6 +103002,9 @@ class RuntimeDependencies {
     fail(failMessage) {
         core.setFailed(failMessage);
     }
+    fileExists(file) {
+        return fs_1.default.existsSync(file);
+    }
 }
 exports.RuntimeDependencies = RuntimeDependencies;
 
@@ -103022,18 +103034,20 @@ async function run(dependencies, commandExecutor) {
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.RUNNING_CODE_ANALYZER);
         const codeAnalyzerExitCode = await commandExecutor.runCodeAnalyzer(inputs.runCommand, inputs.runArgs, constants_1.INTERNAL_OUTFILE);
+        dependencies.setOutput('exit-code', codeAnalyzerExitCode.toString());
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.UPLOADING_ARTIFACT);
         const userOutfile = (0, utils_1.extractOutfileFromRunArguments)(inputs.runArgs);
         const artifactFile = userOutfile.length > 0 ? userOutfile : constants_1.INTERNAL_OUTFILE;
+        assertFileExists(dependencies, artifactFile);
         await dependencies.uploadArtifact(inputs.resultsArtifactName, [artifactFile]);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.ANALYZING_RESULTS);
-        // TODO: Process the internal outfile
+        assertFileExists(dependencies, constants_1.INTERNAL_OUTFILE);
+        // TODO: Process the internal outfile and set the remaining output variables
         dependencies.endGroup();
-        dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.FINALIZING_OUTPUT);
-        // TODO: set the summary and remaining outputs
-        dependencies.setOutput('exit-code', codeAnalyzerExitCode.toString());
+        dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.CREATING_SUMMARY);
+        // TODO: set the summary
         dependencies.endGroup();
     }
     catch (error) {
@@ -103062,6 +103076,11 @@ async function installMinimumScannerPluginVersionIfNeeded(dependencies, commandE
         if (!(await commandExecutor.installScannerPlugin())) {
             throw new Error(constants_1.MESSAGES.SCANNER_PLUGIN_INSTALL_FAILED);
         }
+    }
+}
+function assertFileExists(dependencies, file) {
+    if (!dependencies.fileExists(file)) {
+        throw new Error(constants_1.MESSAGE_FCNS.FILE_NOT_FOUND(file));
     }
 }
 

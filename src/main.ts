@@ -2,7 +2,7 @@ import { extractOutfileFromRunArguments } from './utils'
 import { Dependencies } from './dependencies'
 import { Inputs } from './types'
 import { CommandExecutor } from './commands'
-import { INTERNAL_OUTFILE, MESSAGES, MIN_SCANNER_VERSION_REQUIRED } from './constants'
+import { INTERNAL_OUTFILE, MESSAGE_FCNS, MESSAGES, MIN_SCANNER_VERSION_REQUIRED } from './constants'
 
 /**
  * The main function for the action.
@@ -23,21 +23,23 @@ export async function run(dependencies: Dependencies, commandExecutor: CommandEx
             inputs.runArgs,
             INTERNAL_OUTFILE
         )
+        dependencies.setOutput('exit-code', codeAnalyzerExitCode.toString())
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.UPLOADING_ARTIFACT)
         const userOutfile: string = extractOutfileFromRunArguments(inputs.runArgs)
         const artifactFile: string = userOutfile.length > 0 ? userOutfile : INTERNAL_OUTFILE
+        assertFileExists(dependencies, artifactFile)
         await dependencies.uploadArtifact(inputs.resultsArtifactName, [artifactFile])
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.ANALYZING_RESULTS)
-        // TODO: Process the internal outfile
+        assertFileExists(dependencies, INTERNAL_OUTFILE)
+        // TODO: Process the internal outfile and set the remaining output variables
         dependencies.endGroup()
 
-        dependencies.startGroup(MESSAGES.STEP_LABELS.FINALIZING_OUTPUT)
-        // TODO: set the summary and remaining outputs
-        dependencies.setOutput('exit-code', codeAnalyzerExitCode.toString())
+        dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
+        // TODO: set the summary
         dependencies.endGroup()
     } catch (error) {
         if (error instanceof Error) {
@@ -73,5 +75,11 @@ async function installMinimumScannerPluginVersionIfNeeded(
         if (!(await commandExecutor.installScannerPlugin())) {
             throw new Error(MESSAGES.SCANNER_PLUGIN_INSTALL_FAILED)
         }
+    }
+}
+
+function assertFileExists(dependencies: Dependencies, file: string): void {
+    if (!dependencies.fileExists(file)) {
+        throw new Error(MESSAGE_FCNS.FILE_NOT_FOUND(file))
     }
 }

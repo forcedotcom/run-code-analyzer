@@ -1,6 +1,7 @@
 import { EnvironmentVariables } from './types'
 import { CommandOutput, Dependencies } from './dependencies'
 import * as semver from 'semver'
+import { MESSAGE_FCNS } from './constants'
 
 type PluginMetadata = { name: string; version: string }
 
@@ -41,7 +42,7 @@ export class RuntimeCommandExecutor implements CommandExecutor {
             if (pluginsFound.length !== 1 || pluginsFound[0].name !== pluginName) {
                 return false
             }
-            this.dependencies.info(`Found version ${pluginsFound[0].version} of the ${pluginName} plugin installed.`)
+            this.dependencies.info(MESSAGE_FCNS.PLUGIN_FOUND(pluginName, pluginsFound[0].version))
             return semver.gte(pluginsFound[0].version, minVersion)
         } catch (_err) {
             return false

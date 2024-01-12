@@ -9,7 +9,7 @@ export const MESSAGES = {
         RUNNING_CODE_ANALYZER: 'Running the Salesforce Code Analyzer',
         UPLOADING_ARTIFACT: 'Uploading Artifact',
         ANALYZING_RESULTS: 'Analyzing Results',
-        FINALIZING_OUTPUT: 'Finalizing Summary and Outputs'
+        CREATING_SUMMARY: 'Creating Summary'
     },
     MISSING_NORMALIZE_SEVERITY: `Missing required --normalize-severity option from run-arguments input.`,
     SF_CLI_NOT_INSTALLED:
@@ -28,5 +28,10 @@ export const MESSAGES = {
         `    run: sf plugins install @salesforce/sfdx-scanner@latest\n` +
         `We will attempt to install the latest Salesforce Code Analyzer plugin on your behalf.`,
     SCANNER_PLUGIN_INSTALL_FAILED: `Failed to install the latest Salesforce Code Analyzer plugin on your behalf.`
+}
+export const MESSAGE_FCNS = {
+    PLUGIN_FOUND: (pluginName: string, pluginVersion: string) =>
+        `Found version ${pluginVersion} of the ${pluginName} plugin installed.`,
+    FILE_NOT_FOUND: (fileName: string) => `The file ${fileName} was not found. Check the logs for an error.`
 }
 /* eslint-enable */

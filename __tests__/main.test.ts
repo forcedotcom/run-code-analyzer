@@ -1,7 +1,7 @@
 import * as main from '../src/main'
 import { FakeCommandExecutor, FakeDependencies } from './fakes'
 import { Inputs } from '../src/types'
-import { INTERNAL_OUTFILE, MESSAGES, MIN_SCANNER_VERSION_REQUIRED } from '../src/constants'
+import { INTERNAL_OUTFILE, MESSAGE_FCNS, MESSAGES, MIN_SCANNER_VERSION_REQUIRED } from '../src/constants'
 
 describe('main run Tests', () => {
     let dependencies: FakeDependencies
@@ -172,5 +172,32 @@ describe('main run Tests', () => {
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
         expect(dependencies.failCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory).toContainEqual({ failMessage: MESSAGES.SCANNER_PLUGIN_INSTALL_FAILED })
+    })
+
+    it('Test when the internal outfile file does not exist after run then we fail', async () => {
+        dependencies.fileExistsReturnValue = false
+        await main.run(dependencies, commandExecutor)
+
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        expect(dependencies.failCallHistory).toHaveLength(1)
+        expect(dependencies.failCallHistory).toContainEqual({
+            failMessage: MESSAGE_FCNS.FILE_NOT_FOUND(INTERNAL_OUTFILE)
+        })
+    })
+
+    it('Test when the user outfile file does not exist after run then we fail', async () => {
+        dependencies.getInputsReturnValue = {
+            runCommand: 'run',
+            runArgs: '--normalize-severity -o userResults.xml',
+            resultsArtifactName: 'customArtifactName'
+        }
+        dependencies.fileExistsReturnValue = false
+        await main.run(dependencies, commandExecutor)
+
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        expect(dependencies.failCallHistory).toHaveLength(1)
+        expect(dependencies.failCallHistory).toContainEqual({
+            failMessage: MESSAGE_FCNS.FILE_NOT_FOUND('userResults.xml')
+        })
     })
 })

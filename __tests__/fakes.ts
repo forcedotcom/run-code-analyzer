@@ -57,6 +57,13 @@ export class FakeDependencies implements Dependencies {
     fail(failMessage: string): void {
         this.failCallHistory.push({ failMessage })
     }
+
+    fileExistsReturnValue = true
+    fileExistsCallHistory: { file: string }[] = []
+    fileExists(file: string): boolean {
+        this.fileExistsCallHistory.push({ file })
+        return this.fileExistsReturnValue
+    }
 }
 
 export class FakeCommandExecutor implements CommandExecutor {

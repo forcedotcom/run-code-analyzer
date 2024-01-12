@@ -111,4 +111,9 @@ describe('RuntimeDependencies Code Coverage', () => {
         dependencies.fail('someFailMsg')
         expect(setFailedSpy).toHaveBeenCalledWith('someFailMsg')
     })
+
+    it('fileExists Code Coverage', async () => {
+        expect(dependencies.fileExists('action.yml')).toEqual(true)
+        expect(dependencies.fileExists('thisFileDoesNotExist.html')).toEqual(false)
+    })
 })
