@@ -1,5 +1,6 @@
-import { extractOutfileFromRunArguments, mergeWithProcessEnvVars } from '../src/utils'
+import { extractOutfileFromRunArguments, mergeWithProcessEnvVars, toRelativeFile } from '../src/utils'
 import { EnvironmentVariables } from '../src/types'
+import * as path from 'path'
 
 describe('Tests for mergeWithProcessEnvVars', () => {
     it('Test no new fields', async () => {
@@ -74,5 +75,15 @@ describe('Tests for extractOutfileFromRunArguments', () => {
     it('Test trailing --outfile', async () => {
         const outfile1 = extractOutfileFromRunArguments('--normalize-severity --outfile')
         expect(outfile1).toEqual('')
+    })
+})
+
+describe('Tests for toRelativeFile', () => {
+    it('Relative stays relative', () => {
+        expect(toRelativeFile('some/file.json')).toEqual('some/file.json')
+    })
+
+    it('Absolute converts to relative', () => {
+        expect(toRelativeFile(path.resolve('.', 'action.yml'))).toEqual('action.yml')
     })
 })

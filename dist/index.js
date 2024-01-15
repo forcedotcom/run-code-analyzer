@@ -103024,7 +103024,7 @@ const constants_1 = __nccwpck_require__(9042);
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
-async function run(dependencies, commandExecutor) {
+async function run(dependencies, commandExecutor, resultsFactory) {
     try {
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT);
         const inputs = dependencies.getInputs();
@@ -103044,7 +103044,18 @@ async function run(dependencies, commandExecutor) {
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.ANALYZING_RESULTS);
         assertFileExists(dependencies, constants_1.INTERNAL_OUTFILE);
-        // TODO: Process the internal outfile and set the remaining output variables
+        const isDfa = inputs.runCommand === 'run dfa';
+        const results = resultsFactory.createResults(constants_1.INTERNAL_OUTFILE, isDfa);
+        dependencies.setOutput('num-violations', results.getTotalViolationCount().toString());
+        dependencies.setOutput('num-sev1-violations', results.getSev1ViolationCount().toString());
+        dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString());
+        dependencies.setOutput('num-sev3-violations', results.getSev3ViolationCount().toString());
+        dependencies.info(`outputs:\n` +
+            `  exit-code: ${codeAnalyzerExitCode}\n` +
+            `  num-violations: ${results.getTotalViolationCount()}\n` +
+            `  num-sev1-violations: ${results.getSev1ViolationCount()}\n` +
+            `  num-sev2-violations: ${results.getSev2ViolationCount()}\n` +
+            `  num-sev3-violations: ${results.getSev3ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.CREATING_SUMMARY);
         // TODO: set the summary
@@ -103087,13 +103098,302 @@ function assertFileExists(dependencies, file) {
 
 /***/ }),
 
-/***/ 1314:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 2844:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.extractOutfileFromRunArguments = exports.mergeWithProcessEnvVars = void 0;
+exports.RunDfaViolationLocation = exports.RunViolationLocation = exports.RuntimeViolation = exports.RuntimeResults = exports.RuntimeResultsFactory = void 0;
+const fs = __importStar(__nccwpck_require__(7147));
+const utils_1 = __nccwpck_require__(1314);
+class RuntimeResultsFactory {
+    createResults(resultsFile, isDfa) {
+        const jsonStr = fs.readFileSync(resultsFile, { encoding: 'utf8' });
+        const resultArray = JSON.parse(jsonStr);
+        const violations = [];
+        for (const resultObj of resultArray) {
+            for (const violationObj of resultObj['violations']) {
+                let violationLocation;
+                if (isDfa) {
+                    violationLocation = new RunDfaViolationLocation((0, utils_1.toRelativeFile)(resultObj['fileName']), violationObj['sourceLine'], violationObj['sourceColumn'], (0, utils_1.toRelativeFile)(violationObj['sinkFileName']), violationObj['sinkLine'], violationObj['sinkObj']);
+                }
+                else {
+                    violationLocation = new RunViolationLocation((0, utils_1.toRelativeFile)(resultObj['fileName']), violationObj['line'], violationObj['column']);
+                }
+                violations.push(new RuntimeViolation(violationObj['normalizedSeverity'], resultObj['engine'], violationObj['ruleName'], violationObj['url'], violationObj['message'], violationLocation));
+            }
+        }
+        return new RuntimeResults(violations);
+    }
+}
+exports.RuntimeResultsFactory = RuntimeResultsFactory;
+class RuntimeResults {
+    violations;
+    sorted = false;
+    constructor(violations) {
+        this.violations = violations;
+    }
+    getTotalViolationCount() {
+        return this.violations.length;
+    }
+    getSev1ViolationCount() {
+        return this.violations.filter(v => v.getSeverity() === 1).length;
+    }
+    getSev2ViolationCount() {
+        return this.violations.filter(v => v.getSeverity() === 2).length;
+    }
+    getSev3ViolationCount() {
+        return this.violations.filter(v => v.getSeverity() === 3).length;
+    }
+    getViolationsSortedBySeverity() {
+        if (!this.sorted) {
+            this.violations.sort((v1, v2) => v1.compareTo(v2));
+            this.sorted = true;
+        }
+        return this.violations;
+    }
+}
+exports.RuntimeResults = RuntimeResults;
+class RuntimeViolation {
+    severity;
+    ruleEngine;
+    ruleName;
+    ruleUrl;
+    message;
+    location;
+    constructor(severity, ruleEngine, ruleName, ruleUrl, message, location) {
+        this.severity = severity;
+        this.ruleEngine = ruleEngine;
+        this.ruleName = ruleName;
+        this.ruleUrl = ruleUrl;
+        this.message = message;
+        this.location = location;
+    }
+    getSeverity() {
+        return this.severity;
+    }
+    getLocation() {
+        return this.location;
+    }
+    getRuleEngine() {
+        return this.ruleEngine;
+    }
+    getRuleName() {
+        return this.ruleName;
+    }
+    getRuleUrl() {
+        return this.ruleUrl;
+    }
+    getMessage() {
+        return this.message;
+    }
+    compareTo(other) {
+        if (this.getSeverity() !== other.getSeverity()) {
+            return this.getSeverity() - other.getSeverity();
+        }
+        const locationCompare = this.getLocation().compareTo(other.getLocation());
+        if (locationCompare !== 0) {
+            return locationCompare;
+        }
+        if (this.getRuleEngine() !== other.getRuleEngine()) {
+            return this.getRuleEngine() < other.getRuleEngine() ? -1 : 1;
+        }
+        if (this.getRuleName() !== other.getRuleName()) {
+            return this.getRuleName() < other.getRuleName() ? -1 : 1;
+        }
+        return 0;
+    }
+}
+exports.RuntimeViolation = RuntimeViolation;
+class RunViolationLocation {
+    fileName;
+    line;
+    column;
+    constructor(fileName, line, column) {
+        this.fileName = fileName;
+        this.line = line;
+        this.column = column;
+    }
+    toString() {
+        let locStr = this.fileName;
+        if (this.line !== undefined) {
+            locStr += `:${this.line}`;
+            if (this.column !== undefined) {
+                locStr += `:${this.column}`;
+            }
+        }
+        return locStr;
+    }
+    compareTo(other) {
+        if (!(other instanceof RunViolationLocation)) {
+            return -1;
+        }
+        if (this.fileName !== other.fileName) {
+            return this.fileName < other.fileName ? -1 : 1;
+        }
+        else if (this.line !== other.line) {
+            if (this.line === undefined) {
+                return 1;
+            }
+            else if (other.line === undefined) {
+                return -1;
+            }
+            return this.line < other.line ? -1 : 1;
+        }
+        else if (this.column !== other.column) {
+            if (this.column === undefined) {
+                return 1;
+            }
+            else if (other.column === undefined) {
+                return -1;
+            }
+            return this.column < other.column ? -1 : 1;
+        }
+        return 0;
+    }
+}
+exports.RunViolationLocation = RunViolationLocation;
+class RunDfaViolationLocation {
+    sourceFileName;
+    sourceLine;
+    sourceColumn;
+    sinkFileName;
+    sinkLine;
+    sinkColumn;
+    constructor(sourceFileName, sourceLine, sourceColumn, sinkFileName, sinkLine, sinkColumn) {
+        this.sourceFileName = sourceFileName;
+        this.sourceLine = sourceLine;
+        this.sourceColumn = sourceColumn;
+        this.sinkFileName = sinkFileName;
+        this.sinkLine = sinkLine;
+        this.sinkColumn = sinkColumn;
+    }
+    toString() {
+        let locStr = `Source: ${this.sourceFileName}`;
+        if (this.sourceLine !== undefined) {
+            locStr += `:${this.sourceLine}`;
+            if (this.sourceColumn !== undefined) {
+                locStr += `:${this.sourceColumn}`;
+            }
+        }
+        locStr += `\nSink: ${this.sinkFileName}`;
+        if (this.sinkLine !== undefined) {
+            locStr += `:${this.sinkLine}`;
+            if (this.sinkColumn !== undefined) {
+                locStr += `:${this.sinkColumn}`;
+            }
+        }
+        return locStr;
+    }
+    compareTo(other) {
+        if (!(other instanceof RunDfaViolationLocation)) {
+            return 1;
+        }
+        if (this.sourceFileName !== other.sourceFileName) {
+            return this.sourceFileName < other.sourceFileName ? -1 : 1;
+        }
+        else if (this.sourceLine !== other.sourceLine) {
+            if (this.sourceLine === undefined) {
+                return 1;
+            }
+            else if (other.sourceLine === undefined) {
+                return -1;
+            }
+            return this.sourceLine < other.sourceLine ? -1 : 1;
+        }
+        else if (this.sourceColumn !== other.sourceColumn) {
+            if (this.sourceColumn === undefined) {
+                return 1;
+            }
+            else if (other.sourceColumn === undefined) {
+                return -1;
+            }
+            return this.sourceColumn < other.sourceColumn ? -1 : 1;
+        }
+        else if (this.sinkFileName !== other.sinkFileName) {
+            return this.sinkFileName < other.sinkFileName ? -1 : 1;
+        }
+        else if (this.sinkLine !== other.sinkLine) {
+            if (this.sinkLine === undefined) {
+                return 1;
+            }
+            else if (other.sinkLine === undefined) {
+                return -1;
+            }
+            return this.sinkLine < other.sinkLine ? -1 : 1;
+        }
+        else if (this.sinkColumn !== other.sinkColumn) {
+            if (this.sinkColumn === undefined) {
+                return 1;
+            }
+            else if (other.sinkColumn === undefined) {
+                return -1;
+            }
+            return this.sinkColumn < other.sinkColumn ? -1 : 1;
+        }
+        return 0;
+    }
+}
+exports.RunDfaViolationLocation = RunDfaViolationLocation;
+
+
+/***/ }),
+
+/***/ 1314:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toRelativeFile = exports.extractOutfileFromRunArguments = exports.mergeWithProcessEnvVars = void 0;
+const path = __importStar(__nccwpck_require__(1017));
 /**
  * Returns a copy of the current process environment variables with the supplied environment variables added
  */
@@ -103154,6 +103454,11 @@ function markSpacesBetweenQuotes(value, spaceMarker) {
     }
     return output;
 }
+const pwd = path.resolve('.') + path.sep;
+const toRelativeFile = (file) => {
+    return file.startsWith(pwd) ? file.substring(pwd.length) : file;
+};
+exports.toRelativeFile = toRelativeFile;
 
 
 /***/ }),
@@ -103414,13 +103719,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const main_1 = __nccwpck_require__(399);
 const dependencies_1 = __nccwpck_require__(7760);
 const commands_1 = __nccwpck_require__(6695);
+const results_1 = __nccwpck_require__(2844);
 /**
  * The entrypoint for the action.
  */
 const runtimeDependencies = new dependencies_1.RuntimeDependencies();
 const commandExecutor = new commands_1.RuntimeCommandExecutor(runtimeDependencies);
+const resultsFactory = new results_1.RuntimeResultsFactory();
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-(0, main_1.run)(runtimeDependencies, commandExecutor);
+(0, main_1.run)(runtimeDependencies, commandExecutor, resultsFactory);
 
 })();
 

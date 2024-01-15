@@ -3,12 +3,17 @@ import { Dependencies } from './dependencies'
 import { Inputs } from './types'
 import { CommandExecutor } from './commands'
 import { INTERNAL_OUTFILE, MESSAGE_FCNS, MESSAGES, MIN_SCANNER_VERSION_REQUIRED } from './constants'
+import { Results, ResultsFactory } from './results'
 
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
-export async function run(dependencies: Dependencies, commandExecutor: CommandExecutor): Promise<void> {
+export async function run(
+    dependencies: Dependencies,
+    commandExecutor: CommandExecutor,
+    resultsFactory: ResultsFactory
+): Promise<void> {
     try {
         dependencies.startGroup(MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT)
         const inputs: Inputs = dependencies.getInputs()
@@ -35,7 +40,20 @@ export async function run(dependencies: Dependencies, commandExecutor: CommandEx
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.ANALYZING_RESULTS)
         assertFileExists(dependencies, INTERNAL_OUTFILE)
-        // TODO: Process the internal outfile and set the remaining output variables
+        const isDfa = inputs.runCommand === 'run dfa'
+        const results: Results = resultsFactory.createResults(INTERNAL_OUTFILE, isDfa)
+        dependencies.setOutput('num-violations', results.getTotalViolationCount().toString())
+        dependencies.setOutput('num-sev1-violations', results.getSev1ViolationCount().toString())
+        dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString())
+        dependencies.setOutput('num-sev3-violations', results.getSev3ViolationCount().toString())
+        dependencies.info(
+            `outputs:\n` +
+                `  exit-code: ${codeAnalyzerExitCode}\n` +
+                `  num-violations: ${results.getTotalViolationCount()}\n` +
+                `  num-sev1-violations: ${results.getSev1ViolationCount()}\n` +
+                `  num-sev2-violations: ${results.getSev2ViolationCount()}\n` +
+                `  num-sev3-violations: ${results.getSev3ViolationCount()}`
+        )
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)

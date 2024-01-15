@@ -1,6 +1,7 @@
 import { CommandOutput, Dependencies } from '../src/dependencies'
 import { EnvironmentVariables, Inputs } from '../src/types'
 import { CommandExecutor } from '../src/commands'
+import { Results, ResultsFactory, Violation, ViolationLocation } from '../src/results'
 
 export class FakeDependencies implements Dependencies {
     startGroupCallHistory: { name: string }[] = []
@@ -100,5 +101,60 @@ export class FakeCommandExecutor implements CommandExecutor {
     async runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<number> {
         this.runCodeAnalyzerCallHistory.push({ runCmd, runArgs, internalOutfile })
         return this.runCodeAnalyzerReturnValue
+    }
+}
+
+export class FakeResultsFactory implements ResultsFactory {
+    createResultsReturnValue: Results = new FakeResults()
+    createResultsCallHistory: { resultsFile: string; isDfa: boolean }[] = []
+    createResults(resultsFile: string, isDfa: boolean): Results {
+        this.createResultsCallHistory.push({ resultsFile, isDfa })
+        return this.createResultsReturnValue
+    }
+}
+
+export class FakeResults implements Results {
+    getSev1ViolationCountReturnValue = 1
+    getSev1ViolationCountCallCount = 0
+    getSev1ViolationCount(): number {
+        this.getSev1ViolationCountCallCount++
+        return this.getSev1ViolationCountReturnValue
+    }
+
+    getSev2ViolationCountReturnValue = 2
+    getSev2ViolationCountCallCount = 0
+    getSev2ViolationCount(): number {
+        this.getSev2ViolationCountCallCount++
+        return this.getSev2ViolationCountReturnValue
+    }
+
+    getSev3ViolationCountReturnValue = 3
+    getSev3ViolationCountCallCount = 0
+    getSev3ViolationCount(): number {
+        this.getSev3ViolationCountCallCount++
+        return this.getSev3ViolationCountReturnValue
+    }
+
+    getTotalViolationCountReturnValue = 6
+    getTotalViolationCountCallCount = 0
+    getTotalViolationCount(): number {
+        this.getTotalViolationCountCallCount++
+        return this.getTotalViolationCountReturnValue
+    }
+
+    getViolationsSortedBySeverityReturnValue: Violation[] = []
+    getViolationsSortedBySeverityCallCount = 0
+    getViolationsSortedBySeverity(): Violation[] {
+        this.getViolationsSortedBySeverityCallCount++
+        return this.getViolationsSortedBySeverityReturnValue
+    }
+}
+
+export class FakeViolationLocation implements ViolationLocation {
+    compareToReturnValue = 0
+    compareToCallHistory: { other: ViolationLocation }[] = []
+    compareTo(other: ViolationLocation): number {
+        this.compareToCallHistory.push({ other })
+        return this.compareToReturnValue
     }
 }
