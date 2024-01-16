@@ -39,7 +39,7 @@ inputs:
 
 outputs:
   exit-code:
-    description:  The Salesforce Code Analyzer execution exit code.
+    description: The Salesforce Code Analyzer execution exit code.
   num-violations:
     description: The total number of violations found.
   num-sev1-violations:
