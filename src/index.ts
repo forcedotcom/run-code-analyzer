@@ -2,6 +2,7 @@ import { run } from './main'
 import { Dependencies, RuntimeDependencies } from './dependencies'
 import { CommandExecutor, RuntimeCommandExecutor } from './commands'
 import { ResultsFactory, RuntimeResultsFactory } from './results'
+import { RuntimeSummarizer, Summarizer } from './summary'
 
 /**
  * The entrypoint for the action.
@@ -9,5 +10,6 @@ import { ResultsFactory, RuntimeResultsFactory } from './results'
 const runtimeDependencies: Dependencies = new RuntimeDependencies()
 const commandExecutor: CommandExecutor = new RuntimeCommandExecutor(runtimeDependencies)
 const resultsFactory: ResultsFactory = new RuntimeResultsFactory()
+const summarizer: Summarizer = new RuntimeSummarizer()
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-run(runtimeDependencies, commandExecutor, resultsFactory)
+run(runtimeDependencies, commandExecutor, resultsFactory, summarizer)

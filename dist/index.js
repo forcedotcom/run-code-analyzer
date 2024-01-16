@@ -103005,6 +103005,10 @@ class RuntimeDependencies {
     fileExists(file) {
         return fs_1.default.existsSync(file);
     }
+    async writeSummary(summaryMarkdown) {
+        core.summary.addRaw(summaryMarkdown);
+        await core.summary.write();
+    }
 }
 exports.RuntimeDependencies = RuntimeDependencies;
 
@@ -103024,7 +103028,7 @@ const constants_1 = __nccwpck_require__(9042);
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
-async function run(dependencies, commandExecutor, resultsFactory) {
+async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
     try {
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT);
         const inputs = dependencies.getInputs();
@@ -103058,7 +103062,8 @@ async function run(dependencies, commandExecutor, resultsFactory) {
             `  num-sev3-violations: ${results.getSev3ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.CREATING_SUMMARY);
-        // TODO: set the summary
+        const summaryMarkdown = summarizer.createSummaryMarkdown(results);
+        await dependencies.writeSummary(summaryMarkdown);
         dependencies.endGroup();
     }
     catch (error) {
@@ -103300,11 +103305,13 @@ class RunDfaViolationLocation {
                 locStr += `:${this.sourceColumn}`;
             }
         }
-        locStr += `\nSink: ${this.sinkFileName}`;
-        if (this.sinkLine !== undefined) {
-            locStr += `:${this.sinkLine}`;
-            if (this.sinkColumn !== undefined) {
-                locStr += `:${this.sinkColumn}`;
+        if (this.sinkFileName.length > 0) {
+            locStr += `\nSink: ${this.sinkFileName}`;
+            if (this.sinkLine !== undefined) {
+                locStr += `:${this.sinkLine}`;
+                if (this.sinkColumn !== undefined) {
+                    locStr += `:${this.sinkColumn}`;
+                }
             }
         }
         return locStr;
@@ -103359,6 +103366,89 @@ class RunDfaViolationLocation {
     }
 }
 exports.RunDfaViolationLocation = RunDfaViolationLocation;
+
+
+/***/ }),
+
+/***/ 2553:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RuntimeSummarizer = void 0;
+const os_1 = __nccwpck_require__(2037);
+// We need to keep the overall summary underneath 1mb which is roughly 1024*1024 characters, therefore setting
+// the character limit for the table rows to be roughly to 900000 characters to safely stay roughly around 900kb.
+const TABLE_ROWS_CHAR_LIMIT = 900000;
+const SEVERITY_EMOJIS = new Map([
+    [1, ':red_circle:'],
+    [2, ':orange_circle:'],
+    [3, ':yellow_circle:']
+]);
+class RuntimeSummarizer {
+    createSummaryMarkdown(results) {
+        let summary = `## Salesforce Code Analyzer Results${os_1.EOL}`;
+        if (results.getTotalViolationCount() === 0) {
+            summary += `### :white_check_mark: 0 Violations Found${os_1.EOL}`;
+            return summary;
+        }
+        summary +=
+            `### :warning: ${results.getTotalViolationCount()} Violation(s) Found${os_1.EOL}` +
+                `<blockquote>${os_1.EOL}` +
+                `${SEVERITY_EMOJIS.get(1)} ${results.getSev1ViolationCount()} High severity violation(s)<br/>${os_1.EOL}` +
+                `${SEVERITY_EMOJIS.get(2)} ${results.getSev2ViolationCount()} Medium severity violation(s)<br/>${os_1.EOL}` +
+                `${SEVERITY_EMOJIS.get(3)} ${results.getSev3ViolationCount()} Low severity violation(s)${os_1.EOL}` +
+                `</blockquote>${os_1.EOL}`;
+        let tableRows = '';
+        const violations = results.getViolationsSortedBySeverity();
+        let numViolationsIncluded = 0;
+        for (const violation of violations) {
+            const severityEmoji = SEVERITY_EMOJIS.get(violation.getSeverity());
+            const locationStr = makeSmaller(makeSourceAndSinkBold(trimAndBreakNewlines(violation.getLocation().toString())));
+            const ruleLink = createRuleLink(violation.getRuleName(), violation.getRuleUrl());
+            const engineAndRule = makeSmaller(`${violation.getRuleEngine()}:${ruleLink}`);
+            const message = makeSmaller(trimAndBreakNewlines(escapeHtml(violation.getMessage())));
+            const tableRow = `<tr>` +
+                `<td>${severityEmoji}</td>` +
+                `<td>${locationStr}</td>` +
+                `<td>${engineAndRule}</td>` +
+                `<td>${message}</td>` +
+                `</tr>${os_1.EOL}`;
+            if (tableRows.length + tableRow.length > TABLE_ROWS_CHAR_LIMIT) {
+                break;
+            }
+            tableRows += tableRow;
+            numViolationsIncluded++;
+        }
+        if (numViolationsIncluded < violations.length) {
+            summary += `Showing ${numViolationsIncluded} of ${violations.length} violations:${os_1.EOL}`;
+        }
+        summary +=
+            `<table>` +
+                `<tr><th> </th><th>Location</th><th>Rule</th><th>Message</th></tr>${os_1.EOL}` +
+                `${tableRows}` +
+                `</table>${os_1.EOL}`;
+        return summary;
+    }
+}
+exports.RuntimeSummarizer = RuntimeSummarizer;
+function escapeHtml(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function trimAndBreakNewlines(text) {
+    return text.trim().replaceAll('\n', '<br/>');
+}
+function createRuleLink(ruleName, ruleUrl) {
+    return ruleUrl !== undefined ? `<a href="${ruleUrl}">${ruleName}</a>` : ruleName;
+}
+function makeSmaller(text) {
+    // Unfortunately font-size styles are not supported. We can only make text smaller with sub or sup tags.
+    return `<sup>${text}</sup>`;
+}
+function makeSourceAndSinkBold(text) {
+    return text.replace('Source: ', '<b>Source</b>: ').replace('Sink: ', '<b>Sink</b>: ');
+}
 
 
 /***/ }),
@@ -103720,14 +103810,16 @@ const main_1 = __nccwpck_require__(399);
 const dependencies_1 = __nccwpck_require__(7760);
 const commands_1 = __nccwpck_require__(6695);
 const results_1 = __nccwpck_require__(2844);
+const summary_1 = __nccwpck_require__(2553);
 /**
  * The entrypoint for the action.
  */
 const runtimeDependencies = new dependencies_1.RuntimeDependencies();
 const commandExecutor = new commands_1.RuntimeCommandExecutor(runtimeDependencies);
 const resultsFactory = new results_1.RuntimeResultsFactory();
+const summarizer = new summary_1.RuntimeSummarizer();
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-(0, main_1.run)(runtimeDependencies, commandExecutor, resultsFactory);
+(0, main_1.run)(runtimeDependencies, commandExecutor, resultsFactory, summarizer);
 
 })();
 

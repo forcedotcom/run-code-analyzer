@@ -1,5 +1,5 @@
 import * as main from '../src/main'
-import { FakeCommandExecutor, FakeDependencies, FakeResultsFactory } from './fakes'
+import { FakeCommandExecutor, FakeDependencies, FakeResultsFactory, FakeSummarizer } from './fakes'
 import { Inputs } from '../src/types'
 import { INTERNAL_OUTFILE, MESSAGE_FCNS, MESSAGES, MIN_SCANNER_VERSION_REQUIRED } from '../src/constants'
 
@@ -7,15 +7,17 @@ describe('main run Tests', () => {
     let dependencies: FakeDependencies
     let commandExecutor: FakeCommandExecutor
     let resultsFactory: FakeResultsFactory
+    let summarizer: FakeSummarizer
 
     beforeEach(async () => {
         dependencies = new FakeDependencies()
         commandExecutor = new FakeCommandExecutor()
         resultsFactory = new FakeResultsFactory()
+        summarizer = new FakeSummarizer()
     })
 
     it('Test default values', async () => {
-        await main.run(dependencies, commandExecutor, resultsFactory)
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(commandExecutor.isSalesforceCliInstalledCallCount).toEqual(1)
 
@@ -70,6 +72,14 @@ describe('main run Tests', () => {
                 '  num-sev3-violations: 3'
         })
 
+        expect(summarizer.createSummaryMarkdownCallHistory).toHaveLength(1)
+        expect(summarizer.createSummaryMarkdownCallHistory).toContainEqual({
+            results: resultsFactory.createResultsReturnValue
+        })
+
+        expect(dependencies.writeSummaryCallHistory).toHaveLength(1)
+        expect(dependencies.writeSummaryCallHistory).toContainEqual({ summaryMarkdown: 'someSummaryMarkdown' })
+
         expect(dependencies.failCallHistory).toHaveLength(0)
     })
 
@@ -79,7 +89,7 @@ describe('main run Tests', () => {
             runArgs: '-o myFile.html --normalize-severity -t ./src',
             resultsArtifactName: 'customArtifactName'
         }
-        await main.run(dependencies, commandExecutor, resultsFactory)
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(commandExecutor.isSalesforceCliInstalledCallCount).toEqual(1)
 
@@ -112,7 +122,7 @@ describe('main run Tests', () => {
 
     it('Test nonzero exit code from command call', async () => {
         commandExecutor.runCodeAnalyzerReturnValue = 987
-        await main.run(dependencies, commandExecutor, resultsFactory)
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(dependencies.setOutputCallHistory).toContainEqual({
             name: 'exit-code',
@@ -129,7 +139,7 @@ describe('main run Tests', () => {
             }
         }
         dependencies = new ThrowingDependencies()
-        await main.run(dependencies, commandExecutor, resultsFactory)
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
         expect(dependencies.uploadArtifactCallHistory).toHaveLength(0)
@@ -141,7 +151,7 @@ describe('main run Tests', () => {
 
     it('Test missing --normalize-severity from run arguments', async () => {
         dependencies.getInputsReturnValue.runArgs = '--outfile results.xml'
-        await main.run(dependencies, commandExecutor, resultsFactory)
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
         expect(dependencies.uploadArtifactCallHistory).toHaveLength(0)
@@ -153,7 +163,7 @@ describe('main run Tests', () => {
 
     it('Test when Salesforce CLI is not already installed and we install it successfully', async () => {
         commandExecutor.isSalesforceCliInstalledReturnValue = false
-        await main.run(dependencies, commandExecutor, resultsFactory)
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(dependencies.warnCallHistory).toHaveLength(1)
         expect(dependencies.warnCallHistory).toContainEqual({
@@ -167,7 +177,7 @@ describe('main run Tests', () => {
     it('Test when Salesforce CLI is not already installed and we fail to install it', async () => {
         commandExecutor.isSalesforceCliInstalledReturnValue = false
         commandExecutor.installSalesforceCliReturnValue = false
-        await main.run(dependencies, commandExecutor, resultsFactory)
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(dependencies.warnCallHistory).toHaveLength(1)
         expect(dependencies.warnCallHistory).toContainEqual({
@@ -181,7 +191,7 @@ describe('main run Tests', () => {
 
     it('Test when sfdx-scanner plugin is not already installed and we install it successfully', async () => {
         commandExecutor.isMinimumScannerPluginInstalledReturnValue = false
-        await main.run(dependencies, commandExecutor, resultsFactory)
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(dependencies.warnCallHistory).toHaveLength(1)
         expect(dependencies.warnCallHistory).toContainEqual({
@@ -198,7 +208,7 @@ describe('main run Tests', () => {
     it('Test when sfdx-scanner plugin is not already installed and we fail to install it', async () => {
         commandExecutor.isMinimumScannerPluginInstalledReturnValue = false
         commandExecutor.installScannerPluginReturnValue = false
-        await main.run(dependencies, commandExecutor, resultsFactory)
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(dependencies.warnCallHistory).toHaveLength(1)
         expect(dependencies.warnCallHistory).toContainEqual({
@@ -215,7 +225,7 @@ describe('main run Tests', () => {
 
     it('Test when the internal outfile file does not exist after run then we fail', async () => {
         dependencies.fileExistsReturnValue = false
-        await main.run(dependencies, commandExecutor, resultsFactory)
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory).toHaveLength(1)
@@ -231,7 +241,7 @@ describe('main run Tests', () => {
             resultsArtifactName: 'customArtifactName'
         }
         dependencies.fileExistsReturnValue = false
-        await main.run(dependencies, commandExecutor, resultsFactory)
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory).toHaveLength(1)

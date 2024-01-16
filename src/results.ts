@@ -248,11 +248,13 @@ export class RunDfaViolationLocation implements ViolationLocation {
                 locStr += `:${this.sourceColumn}`
             }
         }
-        locStr += `\nSink: ${this.sinkFileName}`
-        if (this.sinkLine !== undefined) {
-            locStr += `:${this.sinkLine}`
-            if (this.sinkColumn !== undefined) {
-                locStr += `:${this.sinkColumn}`
+        if (this.sinkFileName.length > 0) {
+            locStr += `\nSink: ${this.sinkFileName}`
+            if (this.sinkLine !== undefined) {
+                locStr += `:${this.sinkLine}`
+                if (this.sinkColumn !== undefined) {
+                    locStr += `:${this.sinkColumn}`
+                }
             }
         }
         return locStr

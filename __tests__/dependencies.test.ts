@@ -116,4 +116,12 @@ describe('RuntimeDependencies Code Coverage', () => {
         expect(dependencies.fileExists('action.yml')).toEqual(true)
         expect(dependencies.fileExists('thisFileDoesNotExist.html')).toEqual(false)
     })
+
+    it('writeSummary Code Coverage', async () => {
+        const coreSummaryAddRawSpy = jest.spyOn(core.summary, 'addRaw').mockImplementation()
+        const coreSummaryWriteSpy = jest.spyOn(core.summary, 'write').mockImplementation()
+        await dependencies.writeSummary('someSummaryMarkdown')
+        expect(coreSummaryAddRawSpy).toHaveBeenCalledWith('someSummaryMarkdown')
+        expect(coreSummaryWriteSpy).toHaveBeenCalled()
+    })
 })

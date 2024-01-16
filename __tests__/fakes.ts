@@ -2,6 +2,7 @@ import { CommandOutput, Dependencies } from '../src/dependencies'
 import { EnvironmentVariables, Inputs } from '../src/types'
 import { CommandExecutor } from '../src/commands'
 import { Results, ResultsFactory, Violation, ViolationLocation } from '../src/results'
+import { Summarizer } from '../src/summary'
 
 export class FakeDependencies implements Dependencies {
     startGroupCallHistory: { name: string }[] = []
@@ -64,6 +65,11 @@ export class FakeDependencies implements Dependencies {
     fileExists(file: string): boolean {
         this.fileExistsCallHistory.push({ file })
         return this.fileExistsReturnValue
+    }
+
+    writeSummaryCallHistory: { summaryMarkdown: string }[] = []
+    async writeSummary(summaryMarkdown: string): Promise<void> {
+        this.writeSummaryCallHistory.push({ summaryMarkdown })
     }
 }
 
@@ -156,5 +162,21 @@ export class FakeViolationLocation implements ViolationLocation {
     compareTo(other: ViolationLocation): number {
         this.compareToCallHistory.push({ other })
         return this.compareToReturnValue
+    }
+
+    toStringReturnValue = 'someLocation'
+    toStringCallCount = 0
+    toString(): string {
+        this.toStringCallCount++
+        return this.toStringReturnValue
+    }
+}
+
+export class FakeSummarizer implements Summarizer {
+    createSummaryMarkdownReturnValue = 'someSummaryMarkdown'
+    createSummaryMarkdownCallHistory: { results: Results }[] = []
+    createSummaryMarkdown(results: Results): string {
+        this.createSummaryMarkdownCallHistory.push({ results })
+        return this.createSummaryMarkdownReturnValue
     }
 }

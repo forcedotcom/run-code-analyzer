@@ -32,6 +32,8 @@ export interface Dependencies {
     fail(failMessage: string): void
 
     fileExists(file: string): boolean
+
+    writeSummary(summaryMarkdown: string): Promise<void>
 }
 
 /**
@@ -99,5 +101,10 @@ export class RuntimeDependencies implements Dependencies {
 
     fileExists(file: string): boolean {
         return fs.existsSync(file)
+    }
+
+    async writeSummary(summaryMarkdown: string): Promise<void> {
+        core.summary.addRaw(summaryMarkdown)
+        await core.summary.write()
     }
 }

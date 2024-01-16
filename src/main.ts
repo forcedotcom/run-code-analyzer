@@ -4,6 +4,7 @@ import { Inputs } from './types'
 import { CommandExecutor } from './commands'
 import { INTERNAL_OUTFILE, MESSAGE_FCNS, MESSAGES, MIN_SCANNER_VERSION_REQUIRED } from './constants'
 import { Results, ResultsFactory } from './results'
+import { Summarizer } from './summary'
 
 /**
  * The main function for the action.
@@ -12,7 +13,8 @@ import { Results, ResultsFactory } from './results'
 export async function run(
     dependencies: Dependencies,
     commandExecutor: CommandExecutor,
-    resultsFactory: ResultsFactory
+    resultsFactory: ResultsFactory,
+    summarizer: Summarizer
 ): Promise<void> {
     try {
         dependencies.startGroup(MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT)
@@ -57,7 +59,8 @@ export async function run(
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
-        // TODO: set the summary
+        const summaryMarkdown: string = summarizer.createSummaryMarkdown(results)
+        await dependencies.writeSummary(summaryMarkdown)
         dependencies.endGroup()
     } catch (error) {
         if (error instanceof Error) {
