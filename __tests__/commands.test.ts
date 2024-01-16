@@ -120,17 +120,17 @@ describe('RuntimeCommandExecutor Tests', () => {
     })
 
     describe('isMinimumScannerPluginInstalled Tests', () => {
-        const sampleResponseJson =
+        const createSampleResponse = (versionNumber: string): string =>
             '[\n' +
             '  {\n' +
             '    "name": "@salesforce/sfdx-scanner",\n' +
-            '    "version": "3.21.0",\n' +
+            `    "version": "${versionNumber}",\n` +
             '    "aBunchOfOtherFields": "thatWeDon\'tCareAbout"\n' +
             '  }\n' +
             ']'
 
         it('Check when scanner plugin is installed with a version less than the minimum version', async () => {
-            dependencies.execCommandReturnValue = { exitCode: 0, stdout: sampleResponseJson, stderr: '' }
+            dependencies.execCommandReturnValue = { exitCode: 0, stdout: createSampleResponse('3.9.0'), stderr: '' }
             const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.22.0')
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
@@ -143,8 +143,8 @@ describe('RuntimeCommandExecutor Tests', () => {
         })
 
         it('Check when scanner plugin is installed with a version exactly same as minimum version', async () => {
-            dependencies.execCommandReturnValue = { exitCode: 0, stdout: sampleResponseJson, stderr: '' }
-            const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.21.0')
+            dependencies.execCommandReturnValue = { exitCode: 0, stdout: createSampleResponse('3.20.0'), stderr: '' }
+            const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.20.0')
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
             expect(dependencies.execCommandCallHistory).toContainEqual({
@@ -156,7 +156,7 @@ describe('RuntimeCommandExecutor Tests', () => {
         })
 
         it('Check when scanner plugin is installed with a version greater than the minimum version', async () => {
-            dependencies.execCommandReturnValue = { exitCode: 0, stdout: sampleResponseJson, stderr: '' }
+            dependencies.execCommandReturnValue = { exitCode: 0, stdout: createSampleResponse('3.21.0'), stderr: '' }
             const tf: boolean = await commandExecutor.isMinimumScannerPluginInstalled('3.20.0')
 
             expect(dependencies.execCommandCallHistory).toHaveLength(1)
