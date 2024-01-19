@@ -1,5 +1,5 @@
 name: 'Run Salesforce Code Analyzer'
-description: 'Scans your code for violations using the Salesforce Code Analyzer, produces a job summary, and uploads the results as an artifact.'
+description: 'Scans your code for violations using Salesforce Code Analyzer, uploads the results as an artifact, and displays the results as a job summary.'
 author: 'Salesforce Code Analyzer Team'
 
 branding:
@@ -9,42 +9,45 @@ branding:
 inputs:
   run-command:
     description: |-
-      The main command to run with the Salesforce Code Analyzer.
-      The accepted values are: "run" (default) or "run dfa"
+      Specifies the Salesforce Code Analyzer command to run.
+      Possible values are: "run", "run dfa". Default: "run"
       
-      See also:
-      - [scanner run command reference](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/run)
-      - [scanner run dfa command reference](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/dfa)
+      For more info on Code Analyzer, read our [documentation](https://forcedotcom.github.io/sfdx-scanner).
     required: false
     default: 'run'
   run-arguments:
     description: |-
-      The arguments to pass to the run command chosen by the run-command input.
-      Default value: "--normalize-severity"
+      Specifies arguments passed to the specified run-command value.
+      Default: "--normalize-severity"
       
-      The "--normalize-severity" argument is currently required to be included in your run arguments.
+      The arguments provided must include --normalize-severity.
       
-      If an output file is specified with the --outfile argument, then that file will be uploaded in the results artifact.
-      Otherwise, a "SalesforceCodeAnalyzerResults.json" file will be uploaded in the results artifact.
+      To control the output file included in the uploaded artifact, specify an output file name with the --outfile argument.
+      If an output file isn’t specified, results are written to GitHub workflow run logs and a SalesforceCodeAnalyzerResults.json file is included in the uploaded artifact.
       
-      See also:
-      - [scanner run command reference](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/run)
-      - [scanner run dfa command reference](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/dfa)
+      For a full list of acceptable arguments, read the appropriate Command Reference:
+      - [sf scanner run](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/run)
+      - [sf scanner run dfa](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/dfa)
     required: false
     default: '--normalize-severity'
   results-artifact-name:
     description: |-
-      The name of the zip archive job artifact where the resulting output file will be uploaded to.
-      Default value: "code-analyzer-results"
-      
-      To control the name and format of the resulting output file use the run-arguments input with "--outfile <filename.ext>".
+      Specifies the name of the zip archive job artifact where the results output file is uploaded.
+      Default: "code-analyzer-results"
     required: false
     default: 'code-analyzer-results'
 
 outputs:
   exit-code:
-    description:  |-
-      The exit code from the execution of the Salesforce Code Analyzer.
+    description:  The Salesforce Code Analyzer execution exit code.
+  num-violations:
+    description: The total number of violations found.
+  num-sev1-violations:
+    description: The number of normalized high-severity violations found.
+  num-sev2-violations:
+    description: The number of normalized medium-severity violations found.
+  num-sev3-violations:
+    description: The number of normalized low-severity violations found.
 
 runs:
   using: node20
