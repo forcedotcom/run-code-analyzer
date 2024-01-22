@@ -1,4 +1,5 @@
 import { EnvironmentVariables } from './types'
+import * as path from 'path'
 
 /**
  * Returns a copy of the current process environment variables with the supplied environment variables added
@@ -53,4 +54,9 @@ function markSpacesBetweenQuotes(value: string, spaceMarker: string): string {
         }
     }
     return output
+}
+
+const pwd: string = path.resolve('.') + path.sep
+export const toRelativeFile = (file: string): string => {
+    return file.startsWith(pwd) ? file.substring(pwd.length) : file
 }

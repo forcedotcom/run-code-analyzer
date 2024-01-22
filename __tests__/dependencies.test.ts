@@ -3,9 +3,9 @@
  */
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import { Dependencies, RuntimeDependencies } from '../src/dependencies'
+import { CommandOutput, Dependencies, RuntimeDependencies } from '../src/dependencies'
 import { Inputs } from '../src/types'
-import { ExecOptions } from '@actions/exec'
+import { ExecOptions, ExecOutput } from '@actions/exec'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
 import { DefaultArtifactClient } from '@actions/artifact'
 import { UploadArtifactOptions, UploadArtifactResponse } from '@actions/artifact/lib/internal/shared/interfaces'
@@ -42,21 +42,26 @@ describe('RuntimeDependencies Code Coverage', () => {
     })
 
     it('execCommand Code Coverage', async () => {
-        jest.spyOn(exec, 'exec').mockImplementation(
+        jest.spyOn(exec, 'getExecOutput').mockImplementation(
             async (
-                _commandLine: string,
+                commandLine: string,
                 _args?: string[] | undefined,
                 _options?: ExecOptions | undefined
-            ): Promise<number> => {
-                return 123
+            ): Promise<ExecOutput> => {
+                if (commandLine === 'doesNotExist') {
+                    throw new Error('dummyErrorMsg')
+                }
+                return { exitCode: 123, stdout: 'stdoutValue', stderr: 'stderrValue' }
             }
         )
-        const exitCode1: number = await dependencies.execCommand('command1', {
+        const cmdOut1: CommandOutput = await dependencies.execCommand('command1', {
             someField: 'someValue'
         })
-        expect(exitCode1).toEqual(123)
-        const exitCode2: number = await dependencies.execCommand('command2')
-        expect(exitCode2).toEqual(123)
+        expect(cmdOut1).toEqual({ exitCode: 123, stdout: 'stdoutValue', stderr: 'stderrValue' })
+        const cmdOut2: CommandOutput = await dependencies.execCommand('command2')
+        expect(cmdOut2).toEqual({ exitCode: 123, stdout: 'stdoutValue', stderr: 'stderrValue' })
+        const cmdOut3: CommandOutput = await dependencies.execCommand('doesNotExist')
+        expect(cmdOut3).toEqual({ exitCode: 127, stdout: '', stderr: 'dummyErrorMsg' })
     })
 
     it('uploadArtifact Code Coverage', async () => {
@@ -89,9 +94,34 @@ describe('RuntimeDependencies Code Coverage', () => {
         expect(setOutputSpy).toHaveBeenCalledWith('someField', 'someValue')
     })
 
+    it('info Code Coverage', async () => {
+        const infoSpy = jest.spyOn(core, 'info').mockImplementation()
+        dependencies.info('someInfoMessage')
+        expect(infoSpy).toHaveBeenCalledWith('someInfoMessage')
+    })
+
+    it('warn Code Coverage', async () => {
+        const warningSpy = jest.spyOn(core, 'warning').mockImplementation()
+        dependencies.warn('someWarnMessage')
+        expect(warningSpy).toHaveBeenCalledWith('someWarnMessage')
+    })
+
     it('fail Code Coverage', async () => {
         const setFailedSpy = jest.spyOn(core, 'setFailed').mockImplementation()
         dependencies.fail('someFailMsg')
         expect(setFailedSpy).toHaveBeenCalledWith('someFailMsg')
+    })
+
+    it('fileExists Code Coverage', async () => {
+        expect(dependencies.fileExists('action.yml')).toEqual(true)
+        expect(dependencies.fileExists('thisFileDoesNotExist.html')).toEqual(false)
+    })
+
+    it('writeSummary Code Coverage', async () => {
+        const coreSummaryAddRawSpy = jest.spyOn(core.summary, 'addRaw').mockImplementation()
+        const coreSummaryWriteSpy = jest.spyOn(core.summary, 'write').mockImplementation()
+        await dependencies.writeSummary('someSummaryMarkdown')
+        expect(coreSummaryAddRawSpy).toHaveBeenCalledWith('someSummaryMarkdown')
+        expect(coreSummaryWriteSpy).toHaveBeenCalled()
     })
 })

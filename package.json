@@ -49,7 +49,8 @@
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/dist/"
+      "/dist/",
+      "/dist_local/"
     ],
     "transform": {
       "^.+\\.ts$": "ts-jest"
@@ -67,7 +68,8 @@
   "dependencies": {
     "@actions/artifact": "^2.0.1",
     "@actions/core": "^1.10.1",
-    "@actions/exec": "^1.1.1"
+    "@actions/exec": "^1.1.1",
+    "semver": "^7.5.4"
   },
   "devDependencies": {
     "@types/jest": "^29.5.11",

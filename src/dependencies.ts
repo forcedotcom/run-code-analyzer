@@ -4,6 +4,12 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import { EnvironmentVariables, Inputs } from './types'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
+import { ExecOutput } from '@actions/exec'
+import fs from 'fs'
+
+export type CommandOutput = ExecOutput
+
+const COMMAND_NOT_FOUND_EXIT_CODE = 127
 
 /**
  * Interface to extract out dependencies used by the action
@@ -15,13 +21,21 @@ export interface Dependencies {
 
     getInputs(): Inputs
 
-    execCommand(command: string, envVars?: EnvironmentVariables): Promise<number>
+    execCommand(command: string, envVars?: EnvironmentVariables, runSilently?: boolean): Promise<CommandOutput>
 
     uploadArtifact(artifactName: string, artifactFiles: string[]): Promise<void>
 
     setOutput(name: string, value: string): void
 
+    info(infoMessage: string): void
+
+    warn(warnMessage: string): void
+
     fail(failMessage: string): void
+
+    fileExists(file: string): boolean
+
+    writeSummary(summaryMarkdown: string): Promise<void>
 }
 
 /**
@@ -49,12 +63,22 @@ export class RuntimeDependencies implements Dependencies {
         }
     }
 
-    async execCommand(command: string, envVars: EnvironmentVariables = {}): Promise<number> {
-        return exec.exec(command, [], {
-            env: mergeWithProcessEnvVars(envVars),
-            ignoreReturnCode: true,
-            failOnStdErr: false
-        })
+    async execCommand(command: string, envVars: EnvironmentVariables = {}, silent = false): Promise<CommandOutput> {
+        try {
+            return await exec.getExecOutput(command, [], {
+                env: mergeWithProcessEnvVars(envVars),
+                ignoreReturnCode: true,
+                failOnStdErr: false,
+                silent
+            })
+        } catch (err) {
+            // A try/catch is needed here due to issue: https://github.com/actions/toolkit/issues/1625
+            return {
+                exitCode: COMMAND_NOT_FOUND_EXIT_CODE,
+                stdout: '',
+                stderr: (err as Error).message
+            }
+        }
     }
 
     async uploadArtifact(artifactName: string, artifactFiles: string[]): Promise<void> {
@@ -65,7 +89,24 @@ export class RuntimeDependencies implements Dependencies {
         core.setOutput(name, value)
     }
 
+    info(infoMessage: string): void {
+        core.info(infoMessage)
+    }
+
+    warn(warnMessage: string): void {
+        core.warning(warnMessage)
+    }
+
     fail(failMessage: string): void {
         core.setFailed(failMessage)
+    }
+
+    fileExists(file: string): boolean {
+        return fs.existsSync(file)
+    }
+
+    async writeSummary(summaryMarkdown: string): Promise<void> {
+        core.summary.addRaw(summaryMarkdown)
+        await core.summary.write()
     }
 }
