@@ -9,6 +9,8 @@ import fs from 'fs'
 
 export type CommandOutput = ExecOutput
 
+const COMMAND_NOT_FOUND_EXIT_CODE = 127
+
 /**
  * Interface to extract out dependencies used by the action
  */
@@ -72,7 +74,7 @@ export class RuntimeDependencies implements Dependencies {
         } catch (err) {
             // A try/catch is needed here due to issue: https://github.com/actions/toolkit/issues/1625
             return {
-                exitCode: 127,
+                exitCode: COMMAND_NOT_FOUND_EXIT_CODE,
                 stdout: '',
                 stderr: (err as Error).message
             }

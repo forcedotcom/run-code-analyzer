@@ -102880,26 +102880,25 @@ exports.INTERNAL_OUTFILE = 'SalesforceCodeAnalyzerResults.json';
 exports.MESSAGES = {
     STEP_LABELS: {
         PREPARING_ENVIRONMENT: 'Preparing Environment',
-        RUNNING_CODE_ANALYZER: 'Running the Salesforce Code Analyzer',
+        RUNNING_CODE_ANALYZER: 'Running Salesforce Code Analyzer',
         UPLOADING_ARTIFACT: 'Uploading Artifact',
         ANALYZING_RESULTS: 'Analyzing Results',
         CREATING_SUMMARY: 'Creating Summary'
     },
-    MISSING_NORMALIZE_SEVERITY: `Missing required --normalize-severity option from run-arguments input.`,
+    MISSING_NORMALIZE_SEVERITY: `Missing required --normalize-severity argument from run-arguments input.`,
     SF_CLI_NOT_INSTALLED: `The sf command was not found.\n` +
-        `The Salesforce CLI must be installed in the environment to run the Salesforce Code Analyzer.\n` +
+        `The Salesforce CLI must be installed in the environment to run Salesforce Code Analyzer.\n` +
         `We recommend you include a separate step in your GitHub workflow to install it. For example:\n` +
-        `  - name: Install the Salesforce CLI\n` +
+        `  - name: Install Salesforce CLI\n` +
         `    run: npm install -g @salesforce/cli@latest\n` +
         `We will attempt to install the latest Salesforce CLI on your behalf.`,
-    SF_CLI_INSTALL_FAILED: `Failed to install the Salesforce CLI on your behalf.`,
+    SF_CLI_INSTALL_FAILED: `Failed to install the latest Salesforce CLI on your behalf.`,
     MINIMUM_SCANNER_PLUGIN_NOT_INSTALLED: `The @salesforce/sfdx-scanner plugin of version ${exports.MIN_SCANNER_VERSION_REQUIRED} or greater was not found.\n` +
-        `The Salesforce Code Analyzer plugin of version ${exports.MIN_SCANNER_VERSION_REQUIRED} or greater is required.\n` +
         `We recommend you include a separate step in your GitHub workflow to install it. For example:\n` +
-        `  - name: Install the Salesforce Code Analyzer plugin\n` +
+        `  - name: Install Salesforce Code Analyzer plugin\n` +
         `    run: sf plugins install @salesforce/sfdx-scanner@latest\n` +
-        `We will attempt to install the latest Salesforce Code Analyzer plugin on your behalf.`,
-    SCANNER_PLUGIN_INSTALL_FAILED: `Failed to install the latest Salesforce Code Analyzer plugin on your behalf.`
+        `We will attempt to install the latest @salesforce/sfdx-scanner plugin on your behalf.`,
+    SCANNER_PLUGIN_INSTALL_FAILED: `Failed to install the latest @salesforce/sfdx-scanner plugin on your behalf.`
 };
 exports.MESSAGE_FCNS = {
     PLUGIN_FOUND: (pluginName, pluginVersion) => `Found version ${pluginVersion} of the ${pluginName} plugin installed.`,
@@ -102948,6 +102947,7 @@ const artifact_1 = __nccwpck_require__(9450);
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
+const COMMAND_NOT_FOUND_EXIT_CODE = 127;
 /**
  * Class that wires up the runtime dependencies
  */
@@ -102981,7 +102981,7 @@ class RuntimeDependencies {
         catch (err) {
             // A try/catch is needed here due to issue: https://github.com/actions/toolkit/issues/1625
             return {
-                exitCode: 127,
+                exitCode: COMMAND_NOT_FOUND_EXIT_CODE,
                 stdout: '',
                 stderr: err.message
             };
