@@ -3,8 +3,8 @@
  */
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import { CommandOutput, Dependencies, RuntimeDependencies } from '../src/dependencies'
-import { Inputs } from '../src/types'
+import { Dependencies, RuntimeDependencies } from '../src/dependencies'
+import { CommandOutput, Inputs } from '../src/types'
 import { ExecOptions, ExecOutput } from '@actions/exec'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
 import { DefaultArtifactClient } from '@actions/artifact'

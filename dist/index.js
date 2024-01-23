@@ -103183,8 +103183,7 @@ class RuntimeCommandExecutor {
             // We prefer to run on java 11 if available since the default varies across the different GitHub runners.
             envVars['JAVA_HOME'] = process.env['JAVA_HOME_11_X64'];
         }
-        const cmdOut = await this.dependencies.execCommand(command, envVars);
-        return cmdOut.exitCode;
+        return await this.dependencies.execCommand(command, envVars);
     }
 }
 exports.RuntimeCommandExecutor = RuntimeCommandExecutor;
@@ -103362,8 +103361,8 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         await installMinimumScannerPluginVersionIfNeeded(dependencies, commandExecutor);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.RUNNING_CODE_ANALYZER);
-        const codeAnalyzerExitCode = await commandExecutor.runCodeAnalyzer(inputs.runCommand, inputs.runArgs, constants_1.INTERNAL_OUTFILE);
-        dependencies.setOutput('exit-code', codeAnalyzerExitCode.toString());
+        const codeAnalyzerOutput = await commandExecutor.runCodeAnalyzer(inputs.runCommand, inputs.runArgs, constants_1.INTERNAL_OUTFILE);
+        dependencies.setOutput('exit-code', codeAnalyzerOutput.exitCode.toString());
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.UPLOADING_ARTIFACT);
         const userOutfile = (0, utils_1.extractOutfileFromRunArguments)(inputs.runArgs);
@@ -103380,7 +103379,7 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString());
         dependencies.setOutput('num-sev3-violations', results.getSev3ViolationCount().toString());
         dependencies.info(`outputs:\n` +
-            `  exit-code: ${codeAnalyzerExitCode}\n` +
+            `  exit-code: ${codeAnalyzerOutput.exitCode}\n` +
             `  num-violations: ${results.getTotalViolationCount()}\n` +
             `  num-sev1-violations: ${results.getSev1ViolationCount()}\n` +
             `  num-sev2-violations: ${results.getSev2ViolationCount()}\n` +

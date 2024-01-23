@@ -2,12 +2,9 @@ import { mergeWithProcessEnvVars } from './utils'
 import { DefaultArtifactClient } from '@actions/artifact'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import { EnvironmentVariables, Inputs } from './types'
+import { CommandOutput, EnvironmentVariables, Inputs } from './types'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
-import { ExecOutput } from '@actions/exec'
 import fs from 'fs'
-
-export type CommandOutput = ExecOutput
 
 const COMMAND_NOT_FOUND_EXIT_CODE = 127
 

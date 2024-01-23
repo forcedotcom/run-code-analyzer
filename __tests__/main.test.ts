@@ -121,7 +121,7 @@ describe('main run Tests', () => {
     })
 
     it('Test nonzero exit code from command call', async () => {
-        commandExecutor.runCodeAnalyzerReturnValue = 987
+        commandExecutor.runCodeAnalyzerReturnValue = { exitCode: 987, stdout: '', stderr: '' }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(dependencies.setOutputCallHistory).toContainEqual({
