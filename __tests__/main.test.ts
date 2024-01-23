@@ -120,8 +120,8 @@ describe('main run Tests', () => {
         expect(dependencies.failCallHistory).toHaveLength(0)
     })
 
-    it('Test nonzero exit code from command call', async () => {
-        commandExecutor.runCodeAnalyzerReturnValue = { exitCode: 987, stdout: '', stderr: '' }
+    it('Test nonzero exit code with stderr not containing error from command call', async () => {
+        commandExecutor.runCodeAnalyzerReturnValue = { exitCode: 987, stdout: '', stderr: 'just some warning' }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(dependencies.setOutputCallHistory).toContainEqual({
@@ -129,6 +129,27 @@ describe('main run Tests', () => {
             value: '987'
         })
 
+        expect(dependencies.errorCallHistory).toHaveLength(0)
+        expect(dependencies.failCallHistory).toHaveLength(0)
+    })
+
+    it('Test nonzero exit code with stderr from command call', async () => {
+        commandExecutor.runCodeAnalyzerReturnValue = {
+            exitCode: 2,
+            stdout: '',
+            stderr: 'some warning\nError (2): The following error occurred:\n  someError'
+        }
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'exit-code',
+            value: '2'
+        })
+
+        expect(dependencies.errorCallHistory).toHaveLength(1)
+        expect(dependencies.errorCallHistory).toContainEqual({
+            errorMessage: `${MESSAGES.CODE_ANALYZER_FAILED} \nError (2): The following error occurred:\n  someError`
+        })
         expect(dependencies.failCallHistory).toHaveLength(0)
     })
 

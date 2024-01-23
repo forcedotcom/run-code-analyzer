@@ -106,6 +106,12 @@ describe('RuntimeDependencies Code Coverage', () => {
         expect(warningSpy).toHaveBeenCalledWith('someWarnMessage')
     })
 
+    it('error Code Coverage', async () => {
+        const errorSpy = jest.spyOn(core, 'error').mockImplementation()
+        dependencies.error('someErrorMessage')
+        expect(errorSpy).toHaveBeenCalledWith('someErrorMessage')
+    })
+
     it('fail Code Coverage', async () => {
         const setFailedSpy = jest.spyOn(core, 'setFailed').mockImplementation()
         dependencies.fail('someFailMsg')

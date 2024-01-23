@@ -26,7 +26,8 @@ export const MESSAGES = {
         `  - name: Install Salesforce Code Analyzer plugin\n` +
         `    run: sf plugins install @salesforce/sfdx-scanner@latest\n` +
         `We will attempt to install the latest @salesforce/sfdx-scanner plugin on your behalf.`,
-    SCANNER_PLUGIN_INSTALL_FAILED: `Failed to install the latest @salesforce/sfdx-scanner plugin on your behalf.`
+    SCANNER_PLUGIN_INSTALL_FAILED: `Failed to install the latest @salesforce/sfdx-scanner plugin on your behalf.`,
+    CODE_ANALYZER_FAILED: 'Salesforce Code Analyzer failed.'
 }
 export const MESSAGE_FCNS = {
     PLUGIN_FOUND: (pluginName: string, pluginVersion: string) =>

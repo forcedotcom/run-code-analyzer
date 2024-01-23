@@ -6,6 +6,8 @@ import { INTERNAL_OUTFILE, MESSAGE_FCNS, MESSAGES, MIN_SCANNER_VERSION_REQUIRED 
 import { Results, ResultsFactory } from './results'
 import { Summarizer } from './summary'
 
+const StdErrErrorMarker = 'Error'
+
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -31,6 +33,12 @@ export async function run(
             INTERNAL_OUTFILE
         )
         dependencies.setOutput('exit-code', codeAnalyzerOutput.exitCode.toString())
+        if (codeAnalyzerOutput.exitCode !== 0 && codeAnalyzerOutput.stderr.includes(StdErrErrorMarker)) {
+            const errorText: string = codeAnalyzerOutput.stderr.substring(
+                codeAnalyzerOutput.stderr.indexOf(StdErrErrorMarker)
+            )
+            dependencies.error(`${MESSAGES.CODE_ANALYZER_FAILED} \n${errorText}`)
+        }
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.UPLOADING_ARTIFACT)

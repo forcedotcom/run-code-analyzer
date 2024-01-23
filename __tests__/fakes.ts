@@ -55,6 +55,11 @@ export class FakeDependencies implements Dependencies {
         this.warnCallHistory.push({ warnMessage })
     }
 
+    errorCallHistory: { errorMessage: string }[] = []
+    error(errorMessage: string): void {
+        this.errorCallHistory.push({ errorMessage })
+    }
+
     failCallHistory: { failMessage: string }[] = []
     fail(failMessage: string): void {
         this.failCallHistory.push({ failMessage })

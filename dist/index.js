@@ -103222,7 +103222,8 @@ exports.MESSAGES = {
         `  - name: Install Salesforce Code Analyzer plugin\n` +
         `    run: sf plugins install @salesforce/sfdx-scanner@latest\n` +
         `We will attempt to install the latest @salesforce/sfdx-scanner plugin on your behalf.`,
-    SCANNER_PLUGIN_INSTALL_FAILED: `Failed to install the latest @salesforce/sfdx-scanner plugin on your behalf.`
+    SCANNER_PLUGIN_INSTALL_FAILED: `Failed to install the latest @salesforce/sfdx-scanner plugin on your behalf.`,
+    CODE_ANALYZER_FAILED: 'Salesforce Code Analyzer failed.'
 };
 exports.MESSAGE_FCNS = {
     PLUGIN_FOUND: (pluginName, pluginVersion) => `Found version ${pluginVersion} of the ${pluginName} plugin installed.`,
@@ -103323,6 +103324,9 @@ class RuntimeDependencies {
     warn(warnMessage) {
         core.warning(warnMessage);
     }
+    error(errorMessage) {
+        core.error(errorMessage);
+    }
     fail(failMessage) {
         core.setFailed(failMessage);
     }
@@ -103348,6 +103352,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const utils_1 = __nccwpck_require__(1314);
 const constants_1 = __nccwpck_require__(9042);
+const StdErrErrorMarker = 'Error';
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -103363,6 +103368,10 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.RUNNING_CODE_ANALYZER);
         const codeAnalyzerOutput = await commandExecutor.runCodeAnalyzer(inputs.runCommand, inputs.runArgs, constants_1.INTERNAL_OUTFILE);
         dependencies.setOutput('exit-code', codeAnalyzerOutput.exitCode.toString());
+        if (codeAnalyzerOutput.exitCode !== 0 && codeAnalyzerOutput.stderr.includes(StdErrErrorMarker)) {
+            const errorText = codeAnalyzerOutput.stderr.substring(codeAnalyzerOutput.stderr.indexOf(StdErrErrorMarker));
+            dependencies.error(`${constants_1.MESSAGES.CODE_ANALYZER_FAILED} \n${errorText}`);
+        }
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.UPLOADING_ARTIFACT);
         const userOutfile = (0, utils_1.extractOutfileFromRunArguments)(inputs.runArgs);

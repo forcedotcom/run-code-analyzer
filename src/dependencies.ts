@@ -28,6 +28,8 @@ export interface Dependencies {
 
     warn(warnMessage: string): void
 
+    error(errorMessage: string): void
+
     fail(failMessage: string): void
 
     fileExists(file: string): boolean
@@ -92,6 +94,10 @@ export class RuntimeDependencies implements Dependencies {
 
     warn(warnMessage: string): void {
         core.warning(warnMessage)
+    }
+
+    error(errorMessage: string): void {
+        core.error(errorMessage)
     }
 
     fail(failMessage: string): void {
