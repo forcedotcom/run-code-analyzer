@@ -1,5 +1,5 @@
 name: 'Run Salesforce Code Analyzer'
-description: 'Scans your code for violations using Salesforce Code Analyzer, uploads the results as an artifact, and displays the results as a job summary.'
+description: 'Scans your code for violations using Salesforce Code Analyzer, uploads results as an artifact, and creates a job summary.'
 author: 'Salesforce Code Analyzer Team'
 
 branding:
