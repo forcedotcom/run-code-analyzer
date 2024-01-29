@@ -1,3 +1,5 @@
+import { ExecOutput } from '@actions/exec'
+
 export type Inputs = {
     runCommand: string
     runArgs: string
@@ -5,3 +7,5 @@ export type Inputs = {
 }
 
 export type EnvironmentVariables = { [key: string]: string }
+
+export type CommandOutput = ExecOutput

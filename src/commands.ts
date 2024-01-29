@@ -1,5 +1,5 @@
-import { EnvironmentVariables } from './types'
-import { CommandOutput, Dependencies } from './dependencies'
+import { CommandOutput, EnvironmentVariables } from './types'
+import { Dependencies } from './dependencies'
 import * as semver from 'semver'
 import { MESSAGE_FCNS } from './constants'
 
@@ -10,7 +10,7 @@ export interface CommandExecutor {
     installSalesforceCli(): Promise<boolean>
     isMinimumScannerPluginInstalled(minVersion: string): Promise<boolean>
     installScannerPlugin(): Promise<boolean>
-    runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<number>
+    runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<CommandOutput>
 }
 
 export class RuntimeCommandExecutor implements CommandExecutor {
@@ -55,7 +55,7 @@ export class RuntimeCommandExecutor implements CommandExecutor {
         return cmdOut.exitCode === 0
     }
 
-    async runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<number> {
+    async runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<CommandOutput> {
         const command = `sf scanner ${runCmd} ${runArgs}`
         const envVars: EnvironmentVariables = {
             // Without increasing the heap allocation, node often fails. So we increase it to 8gb which should be enough
@@ -67,7 +67,6 @@ export class RuntimeCommandExecutor implements CommandExecutor {
             // We prefer to run on java 11 if available since the default varies across the different GitHub runners.
             envVars['JAVA_HOME'] = process.env['JAVA_HOME_11_X64']
         }
-        const cmdOut: CommandOutput = await this.dependencies.execCommand(command, envVars)
-        return cmdOut.exitCode
+        return await this.dependencies.execCommand(command, envVars)
     }
 }

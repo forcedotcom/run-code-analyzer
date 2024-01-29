@@ -1,5 +1,6 @@
 import { FakeDependencies } from './fakes'
 import { CommandExecutor, RuntimeCommandExecutor } from '../src/commands'
+import { CommandOutput } from '../src/types'
 
 describe('RuntimeCommandExecutor Tests', () => {
     let dependencies: FakeDependencies
@@ -18,7 +19,7 @@ describe('RuntimeCommandExecutor Tests', () => {
 
     describe('runCodeAnalyzer Tests', () => {
         it('Confirm command is build correctly and zero exit code', async () => {
-            const exitCode: number = await commandExecutor.runCodeAnalyzer(
+            const commandOutput: CommandOutput = await commandExecutor.runCodeAnalyzer(
                 'run',
                 '--normalize-severity',
                 'internalOutfile.json'
@@ -31,12 +32,12 @@ describe('RuntimeCommandExecutor Tests', () => {
                     SCANNER_INTERNAL_OUTFILE: 'internalOutfile.json'
                 }
             })
-            expect(exitCode).toEqual(0)
+            expect(commandOutput.exitCode).toEqual(0)
         })
 
         it('Confirm command is build correctly and nonzero exit code', async () => {
             dependencies.execCommandReturnValue = { exitCode: 123, stdout: '', stderr: '' }
-            const exitCode: number = await commandExecutor.runCodeAnalyzer(
+            const commandOutput: CommandOutput = await commandExecutor.runCodeAnalyzer(
                 'run dfa',
                 '--normalize-severity',
                 'internalOutfile.json'
@@ -49,13 +50,13 @@ describe('RuntimeCommandExecutor Tests', () => {
                     SCANNER_INTERNAL_OUTFILE: 'internalOutfile.json'
                 }
             })
-            expect(exitCode).toEqual(123)
+            expect(commandOutput.exitCode).toEqual(123)
         })
 
         it('Test JAVA_HOME_11_X64 is used as JAVA_HOME if available', async () => {
             process.env['JAVA_HOME_11_X64'] = 'SomeJavaHome11X64Value'
             const ce: CommandExecutor = new RuntimeCommandExecutor(dependencies)
-            const exitCode: number = await ce.runCodeAnalyzer(
+            const commandOutput: CommandOutput = await ce.runCodeAnalyzer(
                 'run',
                 '--normalize-severity -o user.xml',
                 'internal.json'
@@ -69,7 +70,7 @@ describe('RuntimeCommandExecutor Tests', () => {
                     JAVA_HOME: 'SomeJavaHome11X64Value'
                 }
             })
-            expect(exitCode).toEqual(0)
+            expect(commandOutput.exitCode).toEqual(0)
         })
     })
 

@@ -3,8 +3,8 @@
  */
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import { CommandOutput, Dependencies, RuntimeDependencies } from '../src/dependencies'
-import { Inputs } from '../src/types'
+import { Dependencies, RuntimeDependencies } from '../src/dependencies'
+import { CommandOutput, Inputs } from '../src/types'
 import { ExecOptions, ExecOutput } from '@actions/exec'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
 import { DefaultArtifactClient } from '@actions/artifact'
@@ -104,6 +104,12 @@ describe('RuntimeDependencies Code Coverage', () => {
         const warningSpy = jest.spyOn(core, 'warning').mockImplementation()
         dependencies.warn('someWarnMessage')
         expect(warningSpy).toHaveBeenCalledWith('someWarnMessage')
+    })
+
+    it('error Code Coverage', async () => {
+        const errorSpy = jest.spyOn(core, 'error').mockImplementation()
+        dependencies.error('someErrorMessage')
+        expect(errorSpy).toHaveBeenCalledWith('someErrorMessage')
     })
 
     it('fail Code Coverage', async () => {

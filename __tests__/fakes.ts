@@ -1,5 +1,5 @@
-import { CommandOutput, Dependencies } from '../src/dependencies'
-import { EnvironmentVariables, Inputs } from '../src/types'
+import { Dependencies } from '../src/dependencies'
+import { CommandOutput, EnvironmentVariables, Inputs } from '../src/types'
 import { CommandExecutor } from '../src/commands'
 import { Results, ResultsFactory, Violation, ViolationLocation } from '../src/results'
 import { Summarizer } from '../src/summary'
@@ -55,6 +55,11 @@ export class FakeDependencies implements Dependencies {
         this.warnCallHistory.push({ warnMessage })
     }
 
+    errorCallHistory: { errorMessage: string }[] = []
+    error(errorMessage: string): void {
+        this.errorCallHistory.push({ errorMessage })
+    }
+
     failCallHistory: { failMessage: string }[] = []
     fail(failMessage: string): void {
         this.failCallHistory.push({ failMessage })
@@ -102,9 +107,9 @@ export class FakeCommandExecutor implements CommandExecutor {
         return this.installScannerPluginReturnValue
     }
 
-    runCodeAnalyzerReturnValue = 0
+    runCodeAnalyzerReturnValue: CommandOutput = { exitCode: 0, stdout: '', stderr: '' }
     runCodeAnalyzerCallHistory: { runCmd: string; runArgs: string; internalOutfile: string }[] = []
-    async runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<number> {
+    async runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<CommandOutput> {
         this.runCodeAnalyzerCallHistory.push({ runCmd, runArgs, internalOutfile })
         return this.runCodeAnalyzerReturnValue
     }
