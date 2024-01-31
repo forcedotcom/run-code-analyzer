@@ -11,11 +11,11 @@ The `run-code-analyzer` GitHub Action scans your code for violations using
 the results as a job summary.
 
 # Inputs
-* <b>`run-command`</b>  *(Default: `'run'`)*
+* <b>`run-command`</b>  *(Default: `run`)*
   * Specifies the Salesforce Code Analyzer command to run.<br/>
-    Possible values are: *`'run'`, `'run dfa'`*.<br/>
+    Possible values are: *`run`, `run dfa`*.<br/>
   * For more info on Code Analyzer, read our [documentation](https://forcedotcom.github.io/sfdx-scanner).
-* <b>`run-arguments`</b>  *(Default: `'--normalize-severity'`)*
+* <b>`run-arguments`</b>  *(Default: `--normalize-severity`)*
   * Specifies arguments passed to the specified `run-command` value.<br/>
     The arguments provided must include *`--normalize-severity`*.<br/>
     To control the output file included in the uploaded artifact, specify an output file with the *`--outfile`* argument.<br/>
@@ -24,7 +24,7 @@ the results as a job summary.
   * For a full list of acceptable arguments, read the appropriate Command Reference:
     * [sf scanner run](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/run)
     * [sf scanner run dfa](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/dfa)
-* <b>`results-artifact-name`</b>  *(Default: `'code-analyzer-results'`)*
+* <b>`results-artifact-name`</b>  *(Default: `code-analyzer-results`)*
   * Specifies the name of the zip archive job artifact where the results output file is uploaded.
 
 # Outputs
@@ -63,7 +63,7 @@ This `run-code-analyzer` action will not exit your GitHub workflow when violatio
             uses: forcedotcom/run-code-analyzer@v1
             with:
               run-command: run
-              run-arguments: --normalize-severity --outfile results.html
+              run-arguments: --normalize-severity --target . --outfile results.html
               results-artifact-name: salesforce-code-analyzer-results
     
           - name: Check the outputs to determine whether to fail
