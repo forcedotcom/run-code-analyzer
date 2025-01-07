@@ -11,16 +11,16 @@ The `run-code-analyzer` GitHub Action scans your code for violations using
 the results as a job summary.
 
 # Version: v2
-The `forcedotcom/run-code-analyzer@v2` GitHub Action is based off of [Salesforce Code Analyzer v5.x (Beta)](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer.html), that is the new `code-analyzer` Salesforce CLI plugin.
+The `forcedotcom/run-code-analyzer@v2` GitHub Action is based on [Salesforce Code Analyzer v5.x (Beta)](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer.html), which is the new `code-analyzer` Salesforce CLI plugin.
 
 ## v2 Inputs
 * <b>`run-arguments`</b> *(Default: `--view detail --output-file sfca_results.json`)*
-  * Specifies arguments passed to the `run` command.
-    * For a full list of acceptable arguments for the run command, see the [code-analyzer Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_code-analyzer_commands_unified.htm).
+  * Specifies the arguments passed to the `run` command.
+    * For a full list of acceptable arguments for the `run` command, see the [code-analyzer Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_code-analyzer_commands_unified.htm).
   * The stdout text from the `run` command is written to the [GitHub workflow run logs](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/monitoring-workflows/using-workflow-run-logs).
-  * Each output file specified by a `--output-file` (or `-f`) flag is included in the zip archive [GitHub workflow run artifact](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts) for you to download.
+  * Each output file specified by a `--output-file` (or `-f`) flag is included in the ZIP archive [GitHub workflow run artifact](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts) for you to download.
 * <b>`results-artifact-name`</b>  *(Default: `salesforce-code-analyzer-results`)*
-  * Specifies the name of the zip archive [GitHub workflow run artifact](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts) where the results output files are uploaded.
+  * Specifies the name of the ZIP archive [GitHub workflow run artifact](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts) where the results output files are uploaded.
 
 ## v2 Outputs
 * `exit-code`
@@ -38,16 +38,16 @@ The `forcedotcom/run-code-analyzer@v2` GitHub Action is based off of [Salesforce
 * `num-sev5-violations`
   * The number of Info (5) severity violations found.
 
-This `run-code-analyzer@v2` action will not exit your GitHub workflow when violations are found. Instead, we recommended adding a subsequent step to your workflow that uses the available outputs to determine how your workflow should proceed.
+This `run-code-analyzer@v2` action won't exit your GitHub workflow when it finds violations. We recommend that you add a subsequent step to your workflow that uses the available outputs to determine how your workflow should proceed.
 
-## Environment prerequisites
-The [Salesforce Code Analyzer v5.x (Beta)](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer.html) and its bundled engines may each have their own set of requirements in order to run successfully. So we recommend that you set up your GitHub runner(s) with the following software:
+## Environment Prerequisites
+The [Salesforce Code Analyzer v5.x (Beta)](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer.html) and its bundled engines can each have their own set of requirements in order to run successfully. So we recommend that you set up your GitHub runner(s) with this software:
 * `node` version 20 or greater
-  * Required by all engines
+  * Required by all engines.
 * `java` version 11 or greater
-  * Required by some engines, like the `pmd` and `cpd` engines, unless those engines have been disabled in your `code-analyzer.yml` configuration file.
+  * Required by some engines, like the `pmd` and `cpd` engines, unless those engines have been explicitly disabled in your `code-analyzer.yml` configuration file.
 * `python` version 3.10 or greater
-  * Required by some engines, like the `flowtest` engine, unless those engines have been disabled in your `code-analyzer.yml` configuration file.
+  * Required by some engines, such as `flowtest`, unless those engines have been explicitly disabled in your `code-analyzer.yml` configuration file.
 
 ## Example v2 Usage
 
@@ -97,11 +97,11 @@ The [Salesforce Code Analyzer v5.x (Beta)](https://developer.salesforce.com/docs
             run: exit 1
 
 # Version: v1
-The `forcedotcom/run-code-analyzer@v1` GitHub Action is based off of [Salesforce Code Analyzer v4.x](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer-3x.html), that is the original `@salesforce/sfdx-scanner` Salesforce CLI plugin.
+The `forcedotcom/run-code-analyzer@v1` GitHub Action is based on [Salesforce Code Analyzer v4.x](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer-3x.html), which is the original `@salesforce/sfdx-scanner` Salesforce CLI plugin.
 
-Note:
+**Note:**
 > We plan to stop supporting v4.x of Code Analyzer in the coming months. We highly recommend that you start using v5.x, which is currently in Beta. For information on v5.x, see https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer.html.
-> Therefore, we recommend that you use `run-code-analyzer@v2` GitHub Action instead (see above).
+> We highly recommend that you use the `run-code-analyzer@v2` GitHub Action instead (see above).
 
 ## v1 Inputs
 * <b>`run-command`</b>  *(Default: `run`)*
