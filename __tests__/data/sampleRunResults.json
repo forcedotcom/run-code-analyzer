@@ -1,1 +1,4792 @@
-[{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/NameController.cls","violations":[{"line":1,"column":14,"endLine":1,"endColumn":27,"severity":3,"ruleName":"ApexSharingViolations","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_security.html#apexsharingviolations","message":"\nApex classes should declare a sharing model if DML or SOQL/SOSL is used\n","normalizedSeverity":3},{"line":1,"column":14,"endLine":16,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":5,"column":26,"endLine":7,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":10,"column":24,"endLine":15,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":11,"column":12,"endLine":11,"endColumn":17,"severity":1,"ruleName":"VariableNamingConventions","category":"Code Style","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_codestyle.html#variablenamingconventions","message":"\nOnly variables that are final should contain underscores (except for underscores in standard prefix/suffix), 'obj_id' is not final.\n","normalizedSeverity":1},{"line":11,"column":12,"endLine":11,"endColumn":17,"severity":1,"ruleName":"LocalVariableNamingConventions","category":"Code Style","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_codestyle.html#localvariablenamingconventions","message":"\nThe local variable name 'obj_id' doesn't match '[a-z][a-zA-Z0-9]*'\n","normalizedSeverity":1},{"line":14,"column":9,"endLine":14,"endColumn":19,"severity":3,"ruleName":"ApexCRUDViolation","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_security.html#apexcrudviolation","message":"\nValidate CRUD permission before SOQL/DML operation or enforce user mode\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/SafeNoSharing.cls","violations":[{"line":1,"column":30,"endLine":12,"endColumn":1,"severity":3,"ruleName":"AvoidGlobalModifier","category":"Best Practices","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_bestpractices.html#avoidglobalmodifier","message":"\nAvoid using global modifier\n","normalizedSeverity":3},{"line":1,"column":30,"endLine":12,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":3,"column":12,"endLine":5,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":7,"column":19,"endLine":9,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/SampleController.cls","violations":[{"line":1,"column":27,"endLine":34,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":4,"column":39,"endLine":17,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":11,"column":34,"endLine":11,"endColumn":78,"severity":3,"ruleName":"ApexCRUDViolation","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_security.html#apexcrudviolation","message":"\nValidate CRUD permission before SOQL/DML operation or enforce user mode\n","normalizedSeverity":3},{"line":21,"column":36,"endLine":24,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":22,"column":33,"endLine":22,"endColumn":108,"severity":3,"ruleName":"ApexCRUDViolation","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_security.html#apexcrudviolation","message":"\nValidate CRUD permission before SOQL/DML operation or enforce user mode\n","normalizedSeverity":3},{"line":28,"column":33,"endLine":31,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":29,"column":30,"endLine":29,"endColumn":80,"severity":3,"ruleName":"ApexCRUDViolation","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_security.html#apexcrudviolation","message":"\nValidate CRUD permission before SOQL/DML operation or enforce user mode\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/SharingInnerClass.cls","violations":[{"line":1,"column":27,"endLine":17,"endColumn":1,"severity":3,"ruleName":"AvoidGlobalModifier","category":"Best Practices","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_bestpractices.html#avoidglobalmodifier","message":"\nAvoid using global modifier\n","normalizedSeverity":3},{"line":1,"column":27,"endLine":17,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":2,"column":12,"endLine":2,"endColumn":28,"severity":3,"ruleName":"EmptyStatementBlock","category":"Error Prone","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_errorprone.html#emptystatementblock","message":"\nAvoid empty block statements.\n","normalizedSeverity":3},{"line":2,"column":12,"endLine":4,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":6,"column":18,"endLine":6,"endColumn":27,"severity":3,"ruleName":"ApexSharingViolations","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_security.html#apexsharingviolations","message":"\nApex classes should declare a sharing model if DML or SOQL/SOSL is used\n","normalizedSeverity":3},{"line":6,"column":18,"endLine":15,"endColumn":9,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":9,"column":16,"endLine":11,"endColumn":9,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":13,"column":24,"endLine":15,"endColumn":9,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/SimpleAccount.cls","violations":[{"line":1,"column":14,"endLine":17,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":3,"column":32,"endLine":3,"endColumn":33,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":3,"column":32,"endLine":3,"endColumn":33,"severity":1,"ruleName":"PropertyNamingConventions","category":"Code Style","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_codestyle.html#propertynamingconventions","message":"\nThe instance property name 'Id' doesn't match '[a-z][a-zA-Z0-9]*'\n","normalizedSeverity":1},{"line":3,"column":32,"endLine":3,"endColumn":33,"severity":1,"ruleName":"VariableNamingConventions","category":"Code Style","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_codestyle.html#variablenamingconventions","message":"\nVariables should start with a lowercase character, 'Id' starts with uppercase character.\n","normalizedSeverity":1},{"line":4,"column":32,"endLine":4,"endColumn":35,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":4,"column":32,"endLine":4,"endColumn":35,"severity":1,"ruleName":"PropertyNamingConventions","category":"Code Style","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_codestyle.html#propertynamingconventions","message":"\nThe instance property name 'Name' doesn't match '[a-z][a-zA-Z0-9]*'\n","normalizedSeverity":1},{"line":4,"column":32,"endLine":4,"endColumn":35,"severity":1,"ruleName":"VariableNamingConventions","category":"Code Style","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_codestyle.html#variablenamingconventions","message":"\nVariables should start with a lowercase character, 'Name' starts with uppercase character.\n","normalizedSeverity":1},{"line":5,"column":19,"endLine":5,"endColumn":23,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":5,"column":19,"endLine":5,"endColumn":23,"severity":1,"ruleName":"PropertyNamingConventions","category":"Code Style","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_codestyle.html#propertynamingconventions","message":"\nThe instance property name 'Phone' doesn't match '[a-z][a-zA-Z0-9]*'\n","normalizedSeverity":1},{"line":5,"column":19,"endLine":5,"endColumn":23,"severity":1,"ruleName":"VariableNamingConventions","category":"Code Style","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_codestyle.html#variablenamingconventions","message":"\nVariables should start with a lowercase character, 'Phone' starts with uppercase character.\n","normalizedSeverity":1},{"line":8,"column":12,"endLine":12,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":15,"column":12,"endLine":15,"endColumn":24,"severity":3,"ruleName":"EmptyStatementBlock","category":"Error Prone","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_errorprone.html#emptystatementblock","message":"\nAvoid empty block statements.\n","normalizedSeverity":3},{"line":15,"column":12,"endLine":15,"endColumn":29,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/UnsafeGlobal.cls","violations":[{"line":1,"column":14,"endLine":22,"endColumn":1,"severity":3,"ruleName":"AvoidGlobalModifier","category":"Best Practices","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_bestpractices.html#avoidglobalmodifier","message":"\nAvoid using global modifier\n","normalizedSeverity":3},{"line":1,"column":14,"endLine":22,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":5,"column":22,"endLine":7,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":9,"column":22,"endLine":11,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":13,"column":13,"endLine":16,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":19,"column":15,"endLine":21,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/UnsafeNamespaceAccessible.cls","violations":[{"line":2,"column":14,"endLine":26,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":7,"column":22,"endLine":9,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":12,"column":22,"endLine":14,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":17,"column":13,"endLine":20,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":23,"column":15,"endLine":25,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/UnsafeSOQL.cls","violations":[{"line":1,"column":14,"endLine":1,"endColumn":23,"severity":3,"ruleName":"ApexSharingViolations","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_security.html#apexsharingviolations","message":"\nApex classes should declare a sharing model if DML or SOQL/SOSL is used\n","normalizedSeverity":3},{"line":1,"column":14,"endLine":7,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":3,"column":26,"endLine":6,"endColumn":9,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":4,"column":95,"endLine":4,"endColumn":98,"severity":3,"ruleName":"ApexSOQLInjection","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_security.html#apexsoqlinjection","message":"\nAvoid untrusted/unescaped variables in DML query\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/UnsafeWebService.cls","violations":[{"line":1,"column":14,"endLine":7,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":3,"column":26,"endLine":5,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/testCrud1.cls","violations":[{"line":1,"column":27,"endLine":5,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":1,"column":27,"endLine":5,"endColumn":1,"severity":1,"ruleName":"ClassNamingConventions","category":"Code Style","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_codestyle.html#classnamingconventions","message":"\nThe class name 'testCrud1' doesn't match '[A-Z][a-zA-Z0-9_]*'\n","normalizedSeverity":1},{"line":2,"column":9,"endLine":2,"endColumn":17,"severity":3,"ruleName":"EmptyStatementBlock","category":"Error Prone","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_errorprone.html#emptystatementblock","message":"\nAvoid empty block statements.\n","normalizedSeverity":3},{"line":2,"column":9,"endLine":4,"endColumn":2,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/testSELECT.cls","violations":[{"line":1,"column":27,"endLine":22,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":1,"column":27,"endLine":22,"endColumn":1,"severity":1,"ruleName":"ClassNamingConventions","category":"Code Style","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_codestyle.html#classnamingconventions","message":"\nThe class name 'testSELECT' doesn't match '[A-Z][a-zA-Z0-9_]*'\n","normalizedSeverity":1},{"line":3,"column":19,"endLine":3,"endColumn":20,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":5,"column":12,"endLine":12,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":8,"column":18,"endLine":8,"endColumn":34,"severity":3,"ruleName":"AvoidHardcodingId","category":"Error Prone","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_errorprone.html#avoidhardcodingid","message":"\nHardcoding Ids is bound to break when changing environments.\n","normalizedSeverity":3},{"line":10,"column":20,"endLine":10,"endColumn":21,"severity":3,"ruleName":"ApexXSSFromURLParam","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_security.html#apexxssfromurlparam","message":"\nApex classes should escape/sanitize Strings obtained from URL parameters\n","normalizedSeverity":3},{"line":16,"column":19,"endLine":20,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/classes/testSELECT2.cls","violations":[{"line":1,"column":27,"endLine":16,"endColumn":1,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":1,"column":27,"endLine":16,"endColumn":1,"severity":1,"ruleName":"ClassNamingConventions","category":"Code Style","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_codestyle.html#classnamingconventions","message":"\nThe class name 'testSELECT2' doesn't match '[A-Z][a-zA-Z0-9_]*'\n","normalizedSeverity":1},{"line":2,"column":19,"endLine":2,"endColumn":20,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":4,"column":12,"endLine":7,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3},{"line":11,"column":19,"endLine":15,"endColumn":5,"severity":3,"ruleName":"ApexDoc","category":"Documentation","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_apex_documentation.html#apexdoc","message":"\nMissing ApexDoc comment\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/components/child1.component","violations":[{"line":10,"column":7,"endLine":10,"endColumn":10,"severity":3,"ruleName":"VfUnescapeEl","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfunescapeel","message":"\nAvoid unescaped user controlled content in EL\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/pages/testEncoding.page","violations":[{"line":5,"column":6,"endLine":5,"endColumn":12,"severity":3,"ruleName":"VfHtmlStyleTagXss","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfhtmlstyletagxss","message":"\nDynamic EL content in style tag should be appropriately encoded\n","normalizedSeverity":3},{"line":7,"column":20,"endLine":7,"endColumn":26,"severity":3,"ruleName":"VfHtmlStyleTagXss","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfhtmlstyletagxss","message":"\nDynamic EL content within URL in style tag should be URLENCODED or JSINHTMLENCODED as appropriate\n","normalizedSeverity":3},{"line":8,"column":20,"endLine":8,"endColumn":36,"severity":3,"ruleName":"VfHtmlStyleTagXss","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfhtmlstyletagxss","message":"\nDynamic EL content within URL in style tag should be URLENCODED or JSINHTMLENCODED as appropriate\n","normalizedSeverity":3},{"line":9,"column":20,"endLine":9,"endColumn":38,"severity":3,"ruleName":"VfHtmlStyleTagXss","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfhtmlstyletagxss","message":"\nDynamic EL content within URL in style tag should be URLENCODED or JSINHTMLENCODED as appropriate\n","normalizedSeverity":3},{"line":15,"column":56,"endLine":15,"endColumn":62,"severity":3,"ruleName":"VfUnescapeEl","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfunescapeel","message":"\nAvoid unescaped user controlled content in EL\n","normalizedSeverity":3},{"line":19,"column":15,"endLine":19,"endColumn":21,"severity":3,"ruleName":"VfUnescapeEl","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfunescapeel","message":"\nAvoid unescaped user controlled content in EL\n","normalizedSeverity":3},{"line":21,"column":15,"endLine":21,"endColumn":33,"severity":3,"ruleName":"VfUnescapeEl","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfunescapeel","message":"\nAvoid unescaped user controlled content in EL\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/pages/testObjStandard.page","violations":[{"line":6,"column":26,"endLine":6,"endColumn":43,"severity":3,"ruleName":"VfUnescapeEl","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfunescapeel","message":"\nAvoid unescaped user controlled content in EL\n","normalizedSeverity":3},{"line":10,"column":26,"endLine":10,"endColumn":50,"severity":3,"ruleName":"VfUnescapeEl","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfunescapeel","message":"\nAvoid unescaped user controlled content in EL\n","normalizedSeverity":3},{"line":12,"column":26,"endLine":12,"endColumn":50,"severity":3,"ruleName":"VfUnescapeEl","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfunescapeel","message":"\nAvoid unescaped user controlled content in EL\n","normalizedSeverity":3},{"line":14,"column":26,"endLine":14,"endColumn":50,"severity":3,"ruleName":"VfUnescapeEl","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfunescapeel","message":"\nAvoid unescaped user controlled content in EL\n","normalizedSeverity":3},{"line":20,"column":16,"endLine":20,"endColumn":94,"severity":3,"ruleName":"VfUnescapeEl","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfunescapeel","message":"\nAvoid unescaped user controlled content in EL\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/pages/testSELECT.page","violations":[{"line":2,"column":26,"endLine":2,"endColumn":32,"severity":3,"ruleName":"VfUnescapeEl","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfunescapeel","message":"\nAvoid unescaped user controlled content in EL\n","normalizedSeverity":3}]},{"engine":"pmd","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/pages/testSELECT2.page","violations":[{"line":2,"column":27,"endLine":2,"endColumn":33,"severity":3,"ruleName":"VfUnescapeEl","category":"Security","url":"https://pmd.github.io/pmd-6.55.0/pmd_rules_vf_security.html#vfunescapeel","message":"\nAvoid unescaped user controlled content in EL\n","normalizedSeverity":3}]},{"engine":"eslint","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/src/js/src/simpleYetWrong.js","violations":[{"line":14,"column":3,"severity":2,"message":"Unreachable code.","ruleName":"no-unreachable","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unreachable","normalizedSeverity":1}]},{"engine":"eslint","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/aura/AccountRepeat/AccountRepeatController.js","violations":[{"line":10,"column":9,"severity":2,"message":"'$A' is not defined.","ruleName":"no-undef","category":"problem","url":"https://eslint.org/docs/latest/rules/no-undef","normalizedSeverity":1},{"line":20,"column":9,"severity":2,"message":"'$A' is not defined.","ruleName":"no-undef","category":"problem","url":"https://eslint.org/docs/latest/rules/no-undef","normalizedSeverity":1},{"line":30,"column":9,"severity":2,"message":"'$A' is not defined.","ruleName":"no-undef","category":"problem","url":"https://eslint.org/docs/latest/rules/no-undef","normalizedSeverity":1}]},{"engine":"eslint","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/aura/CSPattr/CSPattrController.js","violations":[{"line":2,"column":22,"severity":2,"message":"'component' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":2,"column":33,"severity":2,"message":"'event' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":2,"column":40,"severity":2,"message":"'helper' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1}]},{"engine":"eslint","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/aura/ChildComponent/ChildComponentController.js","violations":[{"line":2,"column":37,"severity":2,"message":"'hlp' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":3,"column":13,"severity":2,"message":"'evt' is already defined.","ruleName":"no-redeclare","category":"suggestion","url":"https://eslint.org/docs/latest/rules/no-redeclare","normalizedSeverity":1},{"line":8,"column":39,"severity":2,"message":"'hlp' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":9,"column":13,"severity":2,"message":"'evt' is already defined.","ruleName":"no-redeclare","category":"suggestion","url":"https://eslint.org/docs/latest/rules/no-redeclare","normalizedSeverity":1}]},{"engine":"eslint","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/aura/ControllerDemo/ControllerDemoController.js","violations":[{"line":2,"column":26,"severity":2,"message":"'evt' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":2,"column":31,"severity":2,"message":"'hlp' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":14,"column":9,"severity":2,"message":"'$A' is not defined.","ruleName":"no-undef","category":"problem","url":"https://eslint.org/docs/latest/rules/no-undef","normalizedSeverity":1},{"line":16,"column":31,"severity":2,"message":"'evt' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":16,"column":36,"severity":2,"message":"'hlp' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":29,"column":9,"severity":2,"message":"'$A' is not defined.","ruleName":"no-undef","category":"problem","url":"https://eslint.org/docs/latest/rules/no-undef","normalizedSeverity":1}]},{"engine":"eslint","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/aura/DOMXSS/DOMXSSController.js","violations":[{"line":2,"column":27,"severity":2,"message":"'evt' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":2,"column":32,"severity":2,"message":"'hlp' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":5,"column":34,"severity":2,"message":"'evt' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":5,"column":39,"severity":2,"message":"'hlp' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":8,"column":32,"severity":2,"message":"'evt' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":8,"column":36,"severity":2,"message":"'hlp' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":12,"column":43,"severity":2,"message":"'evt' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":12,"column":47,"severity":2,"message":"'hlp' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":17,"column":43,"severity":2,"message":"'evt' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":17,"column":47,"severity":2,"message":"'hlp' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":24,"column":37,"severity":2,"message":"'evt' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":24,"column":41,"severity":2,"message":"'hlp' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":28,"column":37,"severity":2,"message":"'hlp' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1}]},{"engine":"eslint","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/aura/VulnTestApp/VulnTestAppController.js","violations":[{"line":2,"column":33,"severity":2,"message":"'event' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":2,"column":40,"severity":2,"message":"'helper' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1}]},{"engine":"eslint","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/aura/VulnTest2/VulnTest2Controller.js","violations":[{"line":2,"column":22,"severity":2,"message":"'component' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":2,"column":33,"severity":2,"message":"'event' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":2,"column":40,"severity":2,"message":"'helper' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1}]},{"engine":"eslint","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/aura/doc_write/doc_writeController.js","violations":[{"line":2,"column":22,"severity":2,"message":"'component' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":2,"column":33,"severity":2,"message":"'event' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":2,"column":40,"severity":2,"message":"'helper' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":3,"column":19,"severity":2,"message":"'$A' is not defined.","ruleName":"no-undef","category":"problem","url":"https://eslint.org/docs/latest/rules/no-undef","normalizedSeverity":1}]},{"engine":"eslint","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/force-app/main/default/aura/dom_parser/dom_parserController.js","violations":[{"line":2,"column":32,"severity":2,"message":"'event' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":2,"column":39,"severity":2,"message":"'helper' is defined but never used.","ruleName":"no-unused-vars","category":"problem","url":"https://eslint.org/docs/latest/rules/no-unused-vars","normalizedSeverity":1},{"line":17,"column":9,"severity":2,"message":"Unexpected 'debugger' statement.","ruleName":"no-debugger","category":"problem","url":"https://eslint.org/docs/latest/rules/no-debugger","normalizedSeverity":1},{"line":20,"column":23,"severity":2,"message":"Empty block statement.","ruleName":"no-empty","category":"suggestion","url":"https://eslint.org/docs/latest/rules/no-empty","normalizedSeverity":1}]},{"engine":"eslint-typescript","fileName":"/Users/runner/work/sample-sf-project/sample-sf-project/src/ts/src/simpleYetWrong.ts","violations":[{"line":0,"column":0,"severity":2,"message":"'/Users/runner/work/sample-sf-project/sample-sf-project/src/ts/src/simpleYetWrong.ts' doesn't reside in a location that is included by your tsconfig.json 'include' attribute.","ruleName":null,"category":"problem","url":"","exception":true,"normalizedSeverity":1}]}]
+{
+  "runDir": "/Users/runner/work/sample-sf-project/sample-sf-project/",
+  "violationCounts": {
+    "total": 202,
+    "sev1": 0,
+    "sev2": 88,
+    "sev3": 49,
+    "sev4": 44,
+    "sev5": 21
+  },
+  "versions": {
+    "code-analyzer": "0.20.2",
+    "eslint": "0.17.0",
+    "retire-js": "0.16.2",
+    "regex": "0.16.2",
+    "cpd": "0.17.1",
+    "pmd": "0.17.1"
+  },
+  "violations": [
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/AccountRepeat/AccountRepeatController.js",
+          "startLine": 3,
+          "startColumn": 9,
+          "endLine": 3,
+          "endColumn": 53
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/AccountRepeat/AccountRepeatController.js",
+          "startLine": 5,
+          "startColumn": 13,
+          "endLine": 5,
+          "endColumn": 45
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/AccountRepeat/AccountRepeatController.js",
+          "startLine": 13,
+          "startColumn": 9,
+          "endLine": 13,
+          "endColumn": 43
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/AccountRepeat/AccountRepeatController.js",
+          "startLine": 15,
+          "startColumn": 13,
+          "endLine": 15,
+          "endColumn": 45
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/AccountRepeat/AccountRepeatController.js",
+          "startLine": 23,
+          "startColumn": 9,
+          "endLine": 23,
+          "endColumn": 44
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/AccountRepeat/AccountRepeatController.js",
+          "startLine": 25,
+          "startColumn": 13,
+          "endLine": 25,
+          "endColumn": 45
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/CSPattr/CSPattrController.js",
+          "startLine": 2,
+          "startColumn": 22,
+          "endLine": 2,
+          "endColumn": 31
+        }
+      ],
+      "message": "'component' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/CSPattr/CSPattrController.js",
+          "startLine": 2,
+          "startColumn": 33,
+          "endLine": 2,
+          "endColumn": 38
+        }
+      ],
+      "message": "'event' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/CSPattr/CSPattrController.js",
+          "startLine": 2,
+          "startColumn": 40,
+          "endLine": 2,
+          "endColumn": 46
+        }
+      ],
+      "message": "'helper' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ChildComponent/ChildComponentController.js",
+          "startLine": 2,
+          "startColumn": 37,
+          "endLine": 2,
+          "endColumn": 40
+        }
+      ],
+      "message": "'hlp' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ChildComponent/ChildComponentController.js",
+          "startLine": 3,
+          "startColumn": 9,
+          "endLine": 3,
+          "endColumn": 45
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-redeclare",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ChildComponent/ChildComponentController.js",
+          "startLine": 3,
+          "startColumn": 13,
+          "endLine": 3,
+          "endColumn": 16
+        }
+      ],
+      "message": "'evt' is already defined.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-redeclare"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ChildComponent/ChildComponentController.js",
+          "startLine": 4,
+          "startColumn": 9,
+          "endLine": 4,
+          "endColumn": 37
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ChildComponent/ChildComponentController.js",
+          "startLine": 8,
+          "startColumn": 39,
+          "endLine": 8,
+          "endColumn": 42
+        }
+      ],
+      "message": "'hlp' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ChildComponent/ChildComponentController.js",
+          "startLine": 9,
+          "startColumn": 9,
+          "endLine": 9,
+          "endColumn": 44
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-redeclare",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ChildComponent/ChildComponentController.js",
+          "startLine": 9,
+          "startColumn": 13,
+          "endLine": 9,
+          "endColumn": 16
+        }
+      ],
+      "message": "'evt' is already defined.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-redeclare"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ChildComponent/ChildComponentController.js",
+          "startLine": 10,
+          "startColumn": 9,
+          "endLine": 10,
+          "endColumn": 37
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ControllerDemo/ControllerDemoController.js",
+          "startLine": 2,
+          "startColumn": 26,
+          "endLine": 2,
+          "endColumn": 29
+        }
+      ],
+      "message": "'evt' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ControllerDemo/ControllerDemoController.js",
+          "startLine": 2,
+          "startColumn": 31,
+          "endLine": 2,
+          "endColumn": 34
+        }
+      ],
+      "message": "'hlp' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ControllerDemo/ControllerDemoController.js",
+          "startLine": 3,
+          "startColumn": 3,
+          "endLine": 3,
+          "endColumn": 35
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ControllerDemo/ControllerDemoController.js",
+          "startLine": 16,
+          "startColumn": 31,
+          "endLine": 16,
+          "endColumn": 34
+        }
+      ],
+      "message": "'evt' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ControllerDemo/ControllerDemoController.js",
+          "startLine": 16,
+          "startColumn": 36,
+          "endLine": 16,
+          "endColumn": 39
+        }
+      ],
+      "message": "'hlp' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ControllerDemo/ControllerDemoController.js",
+          "startLine": 17,
+          "startColumn": 9,
+          "endLine": 17,
+          "endColumn": 43
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 2,
+          "startColumn": 27,
+          "endLine": 2,
+          "endColumn": 30
+        }
+      ],
+      "message": "'evt' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 2,
+          "startColumn": 32,
+          "endLine": 2,
+          "endColumn": 35
+        }
+      ],
+      "message": "'hlp' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 5,
+          "startColumn": 34,
+          "endLine": 5,
+          "endColumn": 37
+        }
+      ],
+      "message": "'evt' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 5,
+          "startColumn": 39,
+          "endLine": 5,
+          "endColumn": 42
+        }
+      ],
+      "message": "'hlp' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 8,
+          "startColumn": 32,
+          "endLine": 8,
+          "endColumn": 35
+        }
+      ],
+      "message": "'evt' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 8,
+          "startColumn": 36,
+          "endLine": 8,
+          "endColumn": 39
+        }
+      ],
+      "message": "'hlp' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 9,
+          "startColumn": 9,
+          "endLine": 9,
+          "endColumn": 40
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 12,
+          "startColumn": 43,
+          "endLine": 12,
+          "endColumn": 46
+        }
+      ],
+      "message": "'evt' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 12,
+          "startColumn": 47,
+          "endLine": 12,
+          "endColumn": 50
+        }
+      ],
+      "message": "'hlp' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 13,
+          "startColumn": 9,
+          "endLine": 13,
+          "endColumn": 40
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 14,
+          "startColumn": 9,
+          "endLine": 14,
+          "endColumn": 54
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 17,
+          "startColumn": 43,
+          "endLine": 17,
+          "endColumn": 46
+        }
+      ],
+      "message": "'evt' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 17,
+          "startColumn": 47,
+          "endLine": 17,
+          "endColumn": 50
+        }
+      ],
+      "message": "'hlp' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 18,
+          "startColumn": 9,
+          "endLine": 18,
+          "endColumn": 40
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 19,
+          "startColumn": 9,
+          "endLine": 19,
+          "endColumn": 54
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 20,
+          "startColumn": 9,
+          "endLine": 20,
+          "endColumn": 52
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 24,
+          "startColumn": 37,
+          "endLine": 24,
+          "endColumn": 40
+        }
+      ],
+      "message": "'evt' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 24,
+          "startColumn": 41,
+          "endLine": 24,
+          "endColumn": 44
+        }
+      ],
+      "message": "'hlp' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 25,
+          "startColumn": 9,
+          "endLine": 25,
+          "endColumn": 35
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSSController.js",
+          "startLine": 28,
+          "startColumn": 37,
+          "endLine": 28,
+          "endColumn": 40
+        }
+      ],
+      "message": "'hlp' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/VulnTest2/VulnTest2Controller.js",
+          "startLine": 2,
+          "startColumn": 22,
+          "endLine": 2,
+          "endColumn": 31
+        }
+      ],
+      "message": "'component' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/VulnTest2/VulnTest2Controller.js",
+          "startLine": 2,
+          "startColumn": 33,
+          "endLine": 2,
+          "endColumn": 38
+        }
+      ],
+      "message": "'event' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/VulnTest2/VulnTest2Controller.js",
+          "startLine": 2,
+          "startColumn": 40,
+          "endLine": 2,
+          "endColumn": 46
+        }
+      ],
+      "message": "'helper' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/VulnTestApp/VulnTestAppController.js",
+          "startLine": 2,
+          "startColumn": 33,
+          "endLine": 2,
+          "endColumn": 38
+        }
+      ],
+      "message": "'event' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/VulnTestApp/VulnTestAppController.js",
+          "startLine": 2,
+          "startColumn": 40,
+          "endLine": 2,
+          "endColumn": 46
+        }
+      ],
+      "message": "'helper' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/VulnTestApp/VulnTestAppController.js",
+          "startLine": 3,
+          "startColumn": 3,
+          "endLine": 3,
+          "endColumn": 50
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/VulnTestApp/VulnTestAppController.js",
+          "startLine": 8,
+          "startColumn": 17,
+          "endLine": 8,
+          "endColumn": 43
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/doc_write/doc_writeController.js",
+          "startLine": 2,
+          "startColumn": 22,
+          "endLine": 2,
+          "endColumn": 31
+        }
+      ],
+      "message": "'component' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/doc_write/doc_writeController.js",
+          "startLine": 2,
+          "startColumn": 33,
+          "endLine": 2,
+          "endColumn": 38
+        }
+      ],
+      "message": "'event' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/doc_write/doc_writeController.js",
+          "startLine": 2,
+          "startColumn": 40,
+          "endLine": 2,
+          "endColumn": 46
+        }
+      ],
+      "message": "'helper' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/doc_write/doc_writeController.js",
+          "startLine": 3,
+          "startColumn": 9,
+          "endLine": 3,
+          "endColumn": 44
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/doc_write/doc_writeController.js",
+          "startLine": 5,
+          "startColumn": 9,
+          "endLine": 5,
+          "endColumn": 40
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/dom_parser/dom_parserController.js",
+          "startLine": 2,
+          "startColumn": 32,
+          "endLine": 2,
+          "endColumn": 37
+        }
+      ],
+      "message": "'event' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-unused-vars",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/dom_parser/dom_parserController.js",
+          "startLine": 2,
+          "startColumn": 39,
+          "endLine": 2,
+          "endColumn": 45
+        }
+      ],
+      "message": "'helper' is defined but never used.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unused-vars"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/dom_parser/dom_parserController.js",
+          "startLine": 3,
+          "startColumn": 9,
+          "endLine": 3,
+          "endColumn": 58
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/dom_parser/dom_parserController.js",
+          "startLine": 5,
+          "startColumn": 9,
+          "endLine": 5,
+          "endColumn": 91
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/dom_parser/dom_parserController.js",
+          "startLine": 7,
+          "startColumn": 9,
+          "endLine": 7,
+          "endColumn": 38
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/dom_parser/dom_parserController.js",
+          "startLine": 8,
+          "startColumn": 9,
+          "endLine": 8,
+          "endColumn": 71
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/dom_parser/dom_parserController.js",
+          "startLine": 9,
+          "startColumn": 9,
+          "endLine": 9,
+          "endColumn": 31
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-var",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/dom_parser/dom_parserController.js",
+          "startLine": 14,
+          "startColumn": 9,
+          "endLine": 14,
+          "endColumn": 43
+        }
+      ],
+      "message": "Unexpected var, use let or const instead.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-var"
+      ]
+    },
+    {
+      "rule": "no-debugger",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/dom_parser/dom_parserController.js",
+          "startLine": 17,
+          "startColumn": 9,
+          "endLine": 17,
+          "endColumn": 18
+        }
+      ],
+      "message": "Unexpected 'debugger' statement.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-debugger"
+      ]
+    },
+    {
+      "rule": "no-empty",
+      "engine": "eslint",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Javascript",
+        "Typescript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/dom_parser/dom_parserController.js",
+          "startLine": 20,
+          "startColumn": 23,
+          "endLine": 20,
+          "endColumn": 25
+        }
+      ],
+      "message": "Empty block statement.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-empty"
+      ]
+    },
+    {
+      "rule": "no-unreachable",
+      "engine": "eslint",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Javascript"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "src/js/src/simpleYetWrong.js",
+          "startLine": 14,
+          "startColumn": 3,
+          "endLine": 21,
+          "endColumn": 4
+        }
+      ],
+      "message": "Unreachable code.",
+      "resources": [
+        "https://eslint.org/docs/latest/rules/no-unreachable"
+      ]
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/AccountRepeat/AccountRepeat.cmp-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/CSPattr/CSPattr.cmp-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ChildComponent/ChildComponent.cmp-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/ControllerDemo/ControllerDemo.cmp-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/DOMXSS/DOMXSS.cmp-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/LightningOutVulnTest/LightningOutVulnTest.app-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/VulnTest2/VulnTest2.app-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/VulnTestApp/VulnTestApp.app-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/appEvent/appEvent.evt-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/compEvent/compEvent.evt-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/doc_write/doc_write.cmp-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/aura/dom_parser/dom_parser.cmp-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/NameController.cls",
+          "startLine": 2,
+          "startColumn": 1,
+          "endLine": 2,
+          "endColumn": 5
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/NameController.cls",
+          "startLine": 8,
+          "startColumn": 1,
+          "endLine": 8,
+          "endColumn": 5
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/NameController.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SafeNoSharing.cls",
+          "startLine": 11,
+          "startColumn": 1,
+          "endLine": 11,
+          "endColumn": 5
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SafeNoSharing.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 2,
+          "startColumn": 1,
+          "endLine": 2,
+          "endColumn": 5
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 7,
+          "startColumn": 1,
+          "endLine": 7,
+          "endColumn": 3
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 15,
+          "startColumn": 1,
+          "endLine": 15,
+          "endColumn": 9
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 18,
+          "startColumn": 1,
+          "endLine": 18,
+          "endColumn": 5
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 25,
+          "startColumn": 1,
+          "endLine": 25,
+          "endColumn": 5
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 32,
+          "startColumn": 1,
+          "endLine": 32,
+          "endColumn": 5
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 33,
+          "startColumn": 1,
+          "endLine": 33,
+          "endColumn": 6
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SharingInnerClass.cls",
+          "startLine": 3,
+          "startColumn": 1,
+          "endLine": 3,
+          "endColumn": 9
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SharingInnerClass.cls",
+          "startLine": 10,
+          "startColumn": 72,
+          "endLine": 10,
+          "endColumn": 74
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SharingInnerClass.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 6,
+          "startColumn": 1,
+          "endLine": 6,
+          "endColumn": 5
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 13,
+          "startColumn": 1,
+          "endLine": 13,
+          "endColumn": 5
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 16,
+          "startColumn": 1,
+          "endLine": 16,
+          "endColumn": 5
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeGlobal.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeNamespaceAccessiblel.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeSOQL.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeWebService.cls",
+          "startLine": 6,
+          "startColumn": 1,
+          "endLine": 6,
+          "endColumn": 5
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeWebService.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testCrud1.cls",
+          "startLine": 3,
+          "startColumn": 1,
+          "endLine": 3,
+          "endColumn": 3
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testCrud1.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT.cls",
+          "startLine": 11,
+          "startColumn": 1,
+          "endLine": 11,
+          "endColumn": 9
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT.cls",
+          "startLine": 18,
+          "startColumn": 41,
+          "endLine": 18,
+          "endColumn": 42
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT2.cls",
+          "startLine": 6,
+          "startColumn": 1,
+          "endLine": 6,
+          "endColumn": 9
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "NoTrailingWhitespace",
+      "engine": "regex",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT2.cls",
+          "startLine": 13,
+          "startColumn": 41,
+          "endLine": 13,
+          "endColumn": 42
+        }
+      ],
+      "message": "Found trailing whitespace at the end of a line of code.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT2.cls-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/components/child1.component-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/Template1.page-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/XSSTest.page-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/child1.page-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testChildComp.page-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testEncoding.page-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testObjStandard.page-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testSELECT.page-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "AvoidOldSalesforceApiVersions",
+      "engine": "regex",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Xml"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testSELECT2.page-meta.xml",
+          "startLine": 3,
+          "startColumn": 17,
+          "endLine": 3,
+          "endColumn": 21
+        }
+      ],
+      "message": "Found the use of a Salesforce API version that is 3 or more years old. Avoid using an API version that is <= 56.0.",
+      "resources": []
+    },
+    {
+      "rule": "ApexSharingViolations",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/NameController.cls",
+          "startLine": 1,
+          "startColumn": 1,
+          "endLine": 1,
+          "endColumn": 7
+        }
+      ],
+      "message": "Apex classes should declare a sharing model if DML or SOQL/SOSL is used",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_security.html#apexsharingviolations"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/NameController.cls",
+          "startLine": 1,
+          "startColumn": 8,
+          "endLine": 16,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/NameController.cls",
+          "startLine": 5,
+          "startColumn": 19,
+          "endLine": 7,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/NameController.cls",
+          "startLine": 10,
+          "startColumn": 19,
+          "endLine": 15,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "LocalVariableNamingConventions",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/NameController.cls",
+          "startLine": 11,
+          "startColumn": 12,
+          "endLine": 11,
+          "endColumn": 27
+        }
+      ],
+      "message": "The local variable name 'obj_id' doesn't match '[a-z][a-zA-Z0-9]*'",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_codestyle.html#localvariablenamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/NameController.cls",
+          "startLine": 14,
+          "startColumn": 9,
+          "endLine": 14,
+          "endColumn": 20
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "AvoidGlobalModifier",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SafeNoSharing.cls",
+          "startLine": 1,
+          "startColumn": 24,
+          "endLine": 12,
+          "endColumn": 2
+        }
+      ],
+      "message": "Avoid using global modifier",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_bestpractices.html#avoidglobalmodifier"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SafeNoSharing.cls",
+          "startLine": 1,
+          "startColumn": 24,
+          "endLine": 12,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SafeNoSharing.cls",
+          "startLine": 3,
+          "startColumn": 12,
+          "endLine": 5,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SafeNoSharing.cls",
+          "startLine": 7,
+          "startColumn": 12,
+          "endLine": 9,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 1,
+          "startColumn": 21,
+          "endLine": 34,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 4,
+          "startColumn": 19,
+          "endLine": 17,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 11,
+          "startColumn": 34,
+          "endLine": 11,
+          "endColumn": 79
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 21,
+          "startColumn": 19,
+          "endLine": 24,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 22,
+          "startColumn": 33,
+          "endLine": 22,
+          "endColumn": 109
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 28,
+          "startColumn": 19,
+          "endLine": 31,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SampleController.cls",
+          "startLine": 29,
+          "startColumn": 30,
+          "endLine": 29,
+          "endColumn": 81
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "AvoidGlobalModifier",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SharingInnerClass.cls",
+          "startLine": 1,
+          "startColumn": 21,
+          "endLine": 17,
+          "endColumn": 2
+        }
+      ],
+      "message": "Avoid using global modifier",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_bestpractices.html#avoidglobalmodifier"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SharingInnerClass.cls",
+          "startLine": 1,
+          "startColumn": 21,
+          "endLine": 17,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "EmptyStatementBlock",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SharingInnerClass.cls",
+          "startLine": 2,
+          "startColumn": 5,
+          "endLine": 2,
+          "endColumn": 11
+        }
+      ],
+      "message": "Avoid empty block statements.",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_errorprone.html#emptystatementblock"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SharingInnerClass.cls",
+          "startLine": 2,
+          "startColumn": 12,
+          "endLine": 4,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexSharingViolations",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SharingInnerClass.cls",
+          "startLine": 6,
+          "startColumn": 5,
+          "endLine": 6,
+          "endColumn": 11
+        }
+      ],
+      "message": "Apex classes should declare a sharing model if DML or SOQL/SOSL is used",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_security.html#apexsharingviolations"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SharingInnerClass.cls",
+          "startLine": 6,
+          "startColumn": 12,
+          "endLine": 16,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SharingInnerClass.cls",
+          "startLine": 9,
+          "startColumn": 16,
+          "endLine": 11,
+          "endColumn": 10
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SharingInnerClass.cls",
+          "startLine": 13,
+          "startColumn": 16,
+          "endLine": 15,
+          "endColumn": 10
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 1,
+          "startColumn": 8,
+          "endLine": 17,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 3,
+          "startColumn": 25,
+          "endLine": 3,
+          "endColumn": 48
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "PropertyNamingConventions",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 3,
+          "startColumn": 32,
+          "endLine": 3,
+          "endColumn": 34
+        }
+      ],
+      "message": "The instance property name 'Id' doesn't match '[a-z][a-zA-Z0-9]*'",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_codestyle.html#propertynamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 4,
+          "startColumn": 25,
+          "endLine": 4,
+          "endColumn": 50
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "PropertyNamingConventions",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 4,
+          "startColumn": 32,
+          "endLine": 4,
+          "endColumn": 36
+        }
+      ],
+      "message": "The instance property name 'Name' doesn't match '[a-z][a-zA-Z0-9]*'",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_codestyle.html#propertynamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 5,
+          "startColumn": 12,
+          "endLine": 5,
+          "endColumn": 38
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "PropertyNamingConventions",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 5,
+          "startColumn": 19,
+          "endLine": 5,
+          "endColumn": 24
+        }
+      ],
+      "message": "The instance property name 'Phone' doesn't match '[a-z][a-zA-Z0-9]*'",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_codestyle.html#propertynamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 8,
+          "startColumn": 12,
+          "endLine": 12,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "EmptyStatementBlock",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 15,
+          "startColumn": 5,
+          "endLine": 15,
+          "endColumn": 11
+        }
+      ],
+      "message": "Avoid empty block statements.",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_errorprone.html#emptystatementblock"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/SimpleAccount.cls",
+          "startLine": 15,
+          "startColumn": 12,
+          "endLine": 15,
+          "endColumn": 30
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "AvoidGlobalModifier",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeGlobal.cls",
+          "startLine": 1,
+          "startColumn": 8,
+          "endLine": 22,
+          "endColumn": 2
+        }
+      ],
+      "message": "Avoid using global modifier",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_bestpractices.html#avoidglobalmodifier"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeGlobal.cls",
+          "startLine": 1,
+          "startColumn": 8,
+          "endLine": 22,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeGlobal.cls",
+          "startLine": 5,
+          "startColumn": 19,
+          "endLine": 7,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeGlobal.cls",
+          "startLine": 9,
+          "startColumn": 19,
+          "endLine": 11,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeGlobal.cls",
+          "startLine": 13,
+          "startColumn": 13,
+          "endLine": 16,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeGlobal.cls",
+          "startLine": 19,
+          "startColumn": 12,
+          "endLine": 21,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeNamespaceAccessible.cls",
+          "startLine": 2,
+          "startColumn": 8,
+          "endLine": 26,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeNamespaceAccessible.cls",
+          "startLine": 7,
+          "startColumn": 19,
+          "endLine": 9,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeNamespaceAccessible.cls",
+          "startLine": 12,
+          "startColumn": 19,
+          "endLine": 14,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeNamespaceAccessible.cls",
+          "startLine": 17,
+          "startColumn": 13,
+          "endLine": 20,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeNamespaceAccessible.cls",
+          "startLine": 23,
+          "startColumn": 12,
+          "endLine": 25,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexSharingViolations",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeSOQL.cls",
+          "startLine": 1,
+          "startColumn": 1,
+          "endLine": 1,
+          "endColumn": 7
+        }
+      ],
+      "message": "Apex classes should declare a sharing model if DML or SOQL/SOSL is used",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_security.html#apexsharingviolations"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeSOQL.cls",
+          "startLine": 1,
+          "startColumn": 8,
+          "endLine": 7,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeSOQL.cls",
+          "startLine": 3,
+          "startColumn": 23,
+          "endLine": 6,
+          "endColumn": 10
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexSOQLInjection",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeSOQL.cls",
+          "startLine": 4,
+          "startColumn": 95,
+          "endLine": 4,
+          "endColumn": 99
+        }
+      ],
+      "message": "Avoid untrusted/unescaped variables in DML query",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_security.html#apexsoqlinjection"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/UnsafeWebService.cls",
+          "startLine": 1,
+          "startColumn": 8,
+          "endLine": 7,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testCrud1.cls",
+          "startLine": 1,
+          "startColumn": 21,
+          "endLine": 5,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ClassNamingConventions",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testCrud1.cls",
+          "startLine": 1,
+          "startColumn": 21,
+          "endLine": 5,
+          "endColumn": 2
+        }
+      ],
+      "message": "The class name 'testCrud1' doesn't match '[A-Z][a-zA-Z0-9_]*'",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_codestyle.html#classnamingconventions"
+      ]
+    },
+    {
+      "rule": "EmptyStatementBlock",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testCrud1.cls",
+          "startLine": 2,
+          "startColumn": 2,
+          "endLine": 2,
+          "endColumn": 8
+        }
+      ],
+      "message": "Avoid empty block statements.",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_errorprone.html#emptystatementblock"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testCrud1.cls",
+          "startLine": 2,
+          "startColumn": 9,
+          "endLine": 4,
+          "endColumn": 3
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT.cls",
+          "startLine": 1,
+          "startColumn": 21,
+          "endLine": 22,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ClassNamingConventions",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT.cls",
+          "startLine": 1,
+          "startColumn": 21,
+          "endLine": 22,
+          "endColumn": 2
+        }
+      ],
+      "message": "The class name 'testSELECT' doesn't match '[A-Z][a-zA-Z0-9_]*'",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_codestyle.html#classnamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT.cls",
+          "startLine": 3,
+          "startColumn": 12,
+          "endLine": 3,
+          "endColumn": 35
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT.cls",
+          "startLine": 5,
+          "startColumn": 12,
+          "endLine": 12,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "AvoidHardcodingId",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "ErrorProne",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT.cls",
+          "startLine": 8,
+          "startColumn": 18,
+          "endLine": 8,
+          "endColumn": 35
+        }
+      ],
+      "message": "Hardcoding Ids is bound to break when changing environments.",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_errorprone.html#avoidhardcodingid"
+      ]
+    },
+    {
+      "rule": "ApexXSSFromURLParam",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT.cls",
+          "startLine": 10,
+          "startColumn": 20,
+          "endLine": 10,
+          "endColumn": 22
+        }
+      ],
+      "message": "Apex classes should escape/sanitize Strings obtained from URL parameters",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_security.html#apexxssfromurlparam"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT.cls",
+          "startLine": 16,
+          "startColumn": 12,
+          "endLine": 20,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT2.cls",
+          "startLine": 1,
+          "startColumn": 21,
+          "endLine": 16,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ClassNamingConventions",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT2.cls",
+          "startLine": 1,
+          "startColumn": 21,
+          "endLine": 16,
+          "endColumn": 2
+        }
+      ],
+      "message": "The class name 'testSELECT2' doesn't match '[A-Z][a-zA-Z0-9_]*'",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_codestyle.html#classnamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT2.cls",
+          "startLine": 2,
+          "startColumn": 12,
+          "endLine": 2,
+          "endColumn": 35
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT2.cls",
+          "startLine": 4,
+          "startColumn": 12,
+          "endLine": 7,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/testSELECT2.cls",
+          "startLine": 11,
+          "startColumn": 12,
+          "endLine": 15,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "VfUnescapeEl",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/components/child1.component",
+          "startLine": 10,
+          "startColumn": 7,
+          "endLine": 10,
+          "endColumn": 11
+        }
+      ],
+      "message": "Avoid unescaped user controlled content in EL",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"
+      ]
+    },
+    {
+      "rule": "VfHtmlStyleTagXss",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testEncoding.page",
+          "startLine": 5,
+          "startColumn": 6,
+          "endLine": 5,
+          "endColumn": 13
+        }
+      ],
+      "message": "Dynamic EL content in style tag should be appropriately encoded",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfhtmlstyletagxss"
+      ]
+    },
+    {
+      "rule": "VfHtmlStyleTagXss",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testEncoding.page",
+          "startLine": 7,
+          "startColumn": 20,
+          "endLine": 7,
+          "endColumn": 27
+        }
+      ],
+      "message": "Dynamic EL content within URL in style tag should be URLENCODED or JSINHTMLENCODED as appropriate",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfhtmlstyletagxss"
+      ]
+    },
+    {
+      "rule": "VfHtmlStyleTagXss",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testEncoding.page",
+          "startLine": 8,
+          "startColumn": 20,
+          "endLine": 8,
+          "endColumn": 37
+        }
+      ],
+      "message": "Dynamic EL content within URL in style tag should be URLENCODED or JSINHTMLENCODED as appropriate",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfhtmlstyletagxss"
+      ]
+    },
+    {
+      "rule": "VfHtmlStyleTagXss",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testEncoding.page",
+          "startLine": 9,
+          "startColumn": 20,
+          "endLine": 9,
+          "endColumn": 39
+        }
+      ],
+      "message": "Dynamic EL content within URL in style tag should be URLENCODED or JSINHTMLENCODED as appropriate",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfhtmlstyletagxss"
+      ]
+    },
+    {
+      "rule": "VfUnescapeEl",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testEncoding.page",
+          "startLine": 15,
+          "startColumn": 56,
+          "endLine": 15,
+          "endColumn": 63
+        }
+      ],
+      "message": "Avoid unescaped user controlled content in EL",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"
+      ]
+    },
+    {
+      "rule": "VfUnescapeEl",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testEncoding.page",
+          "startLine": 19,
+          "startColumn": 15,
+          "endLine": 19,
+          "endColumn": 22
+        }
+      ],
+      "message": "Avoid unescaped user controlled content in EL",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"
+      ]
+    },
+    {
+      "rule": "VfUnescapeEl",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testEncoding.page",
+          "startLine": 21,
+          "startColumn": 15,
+          "endLine": 21,
+          "endColumn": 34
+        }
+      ],
+      "message": "Avoid unescaped user controlled content in EL",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"
+      ]
+    },
+    {
+      "rule": "VfUnescapeEl",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testObjStandard.page",
+          "startLine": 6,
+          "startColumn": 26,
+          "endLine": 6,
+          "endColumn": 44
+        }
+      ],
+      "message": "Avoid unescaped user controlled content in EL",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"
+      ]
+    },
+    {
+      "rule": "VfUnescapeEl",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testObjStandard.page",
+          "startLine": 10,
+          "startColumn": 26,
+          "endLine": 10,
+          "endColumn": 51
+        }
+      ],
+      "message": "Avoid unescaped user controlled content in EL",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"
+      ]
+    },
+    {
+      "rule": "VfUnescapeEl",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testObjStandard.page",
+          "startLine": 12,
+          "startColumn": 26,
+          "endLine": 12,
+          "endColumn": 51
+        }
+      ],
+      "message": "Avoid unescaped user controlled content in EL",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"
+      ]
+    },
+    {
+      "rule": "VfUnescapeEl",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testObjStandard.page",
+          "startLine": 14,
+          "startColumn": 26,
+          "endLine": 14,
+          "endColumn": 51
+        }
+      ],
+      "message": "Avoid unescaped user controlled content in EL",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"
+      ]
+    },
+    {
+      "rule": "VfUnescapeEl",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testObjStandard.page",
+          "startLine": 20,
+          "startColumn": 16,
+          "endLine": 20,
+          "endColumn": 95
+        }
+      ],
+      "message": "Avoid unescaped user controlled content in EL",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"
+      ]
+    },
+    {
+      "rule": "VfUnescapeEl",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testSELECT.page",
+          "startLine": 2,
+          "startColumn": 26,
+          "endLine": 2,
+          "endColumn": 33
+        }
+      ],
+      "message": "Avoid unescaped user controlled content in EL",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"
+      ]
+    },
+    {
+      "rule": "VfUnescapeEl",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Visualforce"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/pages/testSELECT2.page",
+          "startLine": 2,
+          "startColumn": 27,
+          "endLine": 2,
+          "endColumn": 34
+        }
+      ],
+      "message": "Avoid unescaped user controlled content in EL",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"
+      ]
+    }
+  ]
+}

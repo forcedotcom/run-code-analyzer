@@ -10,27 +10,12 @@ describe('RuntimeSummarizer Tests', () => {
 
     it('Test createSummaryMarkdown with sample run results', () => {
         const results: Results = resultsFactory.createResults(
-            path.join('.', '__tests__', 'data', 'sampleRunResults.json'),
-            false
+            path.join('.', '__tests__', 'data', 'sampleRunResults.json')
         )
         const summaryMarkdown = summarizer.createSummaryMarkdown(results)
 
         const expectedSummaryMarkdown = fs.readFileSync(
             path.join('.', '__tests__', 'data', 'sampleRunResults_expectedSummary.md'),
-            { encoding: 'utf8' }
-        )
-        expect(summaryMarkdown).toEqual(expectedSummaryMarkdown)
-    })
-
-    it('Test createSummaryMarkdown with sample run dfa results', () => {
-        const results: Results = resultsFactory.createResults(
-            path.join('.', '__tests__', 'data', 'sampleRunDfaResults.json'),
-            true
-        )
-        const summaryMarkdown = summarizer.createSummaryMarkdown(results)
-
-        const expectedSummaryMarkdown = fs.readFileSync(
-            path.join('.', '__tests__', 'data', 'sampleRunDfaResults_expectedSummary.md'),
             { encoding: 'utf8' }
         )
         expect(summaryMarkdown).toEqual(expectedSummaryMarkdown)
@@ -57,14 +42,16 @@ describe('RuntimeSummarizer Tests', () => {
         const results: FakeResults = new FakeResults()
         results.getTotalViolationCountReturnValue = numViolations
         results.getSev1ViolationCountReturnValue = 0
-        results.getSev2ViolationCountReturnValue = numViolations
-        results.getSev3ViolationCountReturnValue = 0
+        results.getSev2ViolationCountReturnValue = 0
+        results.getSev3ViolationCountReturnValue = numViolations
+        results.getSev4ViolationCountReturnValue = 0
+        results.getSev5ViolationCountReturnValue = 0
         results.getViolationsSortedBySeverityReturnValue = []
         for (let i = 0; i < numViolations; i++) {
             const dummyLocation: FakeViolationLocation = new FakeViolationLocation()
             dummyLocation.toStringReturnValue = `/some/file.ts:${i + 1}:0`
             const dummyViolation: Violation = new RuntimeViolation(
-                2,
+                3,
                 'someEngine',
                 'someRule',
                 undefined,

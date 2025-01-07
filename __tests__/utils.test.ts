@@ -1,6 +1,5 @@
-import { extractOutfileFromRunArguments, mergeWithProcessEnvVars, toRelativeFile } from '../src/utils'
+import { InputArguments, mergeWithProcessEnvVars } from '../src/utils'
 import { EnvironmentVariables } from '../src/types'
-import * as path from 'path'
 
 describe('Tests for mergeWithProcessEnvVars', () => {
     it('Test no new fields', async () => {
@@ -22,68 +21,71 @@ describe('Tests for mergeWithProcessEnvVars', () => {
     })
 })
 
-describe('Tests for extractOutfileFromRunArguments', () => {
-    it('Test no outfile specified', async () => {
-        const outfile = extractOutfileFromRunArguments('--target . --normalize-severity')
-        expect(outfile).toEqual('')
+describe('Tests for InputArguments', () => {
+    describe('Tests for getValuesFor', () => {
+        it('Test no outfile specified', async () => {
+            const inputArguments = new InputArguments('--workspace . --view detail')
+            expect(inputArguments.getValuesFor('--output-file', '-f')).toHaveLength(0)
+        })
+
+        it('Test --output-file specified once', async () => {
+            const inputArguments = new InputArguments('--output-file=someFile.txt --bogus')
+            expect(inputArguments.getValuesFor('--output-file', '-f')).toEqual(['someFile.txt'])
+        })
+
+        it('Test -f specified once', async () => {
+            const inputArguments = new InputArguments('--workspace . -f  someFile.html --view detail')
+            expect(inputArguments.getValuesFor('--output-file', '-f')).toEqual(['someFile.html'])
+        })
+
+        it('Test single and double quotes wrapping', async () => {
+            const inputArguments = new InputArguments(
+                '--workspace . -f \'someFile.json\' --miscFlag --output-file="some file with space.xml" -view table'
+            )
+            expect(inputArguments.getValuesFor('--output-file', '-f')).toEqual([
+                'someFile.json',
+                'some file with space.xml'
+            ])
+        })
+
+        it('Test equal sign in file name', async () => {
+            const inputArguments = new InputArguments('--miscFlag -f     some=file.json    -f=some==other=file.json')
+            expect(inputArguments.getValuesFor('--output-file', '-f')).toEqual([
+                'some=file.json',
+                'some==other=file.json'
+            ])
+        })
+
+        it('Test quote in file name', async () => {
+            const inputArguments = new InputArguments('-f "some\'file.json"')
+            expect(inputArguments.getValuesFor('--output-file', '-f')).toEqual(["some'file.json"])
+        })
+
+        it('Test trailing -f', async () => {
+            const inputArguments = new InputArguments('--view detail -f  ')
+            expect(inputArguments.getValuesFor('--output-file', '-f')).toHaveLength(0)
+        })
+
+        it('Test trailing --output-file', async () => {
+            const inputArguments = new InputArguments('--view detail --output-file')
+            expect(inputArguments.getValuesFor('--output-file')).toHaveLength(0)
+        })
     })
 
-    it('Test --outfile specified', async () => {
-        const outfile = extractOutfileFromRunArguments('--outfile=someFile.txt --normalize-severity')
-        expect(outfile).toEqual('someFile.txt')
-    })
+    describe('Tests for containsFlag', () => {
+        it('Test when user supplies --view flag', async () => {
+            const inputArguments = new InputArguments('--view detail')
+            expect(inputArguments.containsFlag('--view')).toEqual(true)
+        })
 
-    it('Test -o specified', async () => {
-        const outfile = extractOutfileFromRunArguments('--target . -o  someFile.html --normalize-severity')
-        expect(outfile).toEqual('someFile.html')
-    })
+        it('Test when user supplies -v flag', async () => {
+            const inputArguments = new InputArguments('--output-file someFile.xml -v detail')
+            expect(inputArguments.containsFlag('--view', '-v')).toEqual(true)
+        })
 
-    it('Test single quotes wraps name', async () => {
-        const outfile = extractOutfileFromRunArguments("--target . -o 'someFile.json' --normalize-severity")
-        expect(outfile).toEqual('someFile.json')
-    })
-
-    it('Test double quotes wraps name', async () => {
-        const outfile = extractOutfileFromRunArguments('-t . --normalize-severity -o "someFile.xml"')
-        expect(outfile).toEqual('someFile.xml')
-    })
-
-    it('Test space in file name with quotes', async () => {
-        const outfile = extractOutfileFromRunArguments(
-            '-o "some file  with spaces.and.multiple.ext" --normalize-severity'
-        )
-        expect(outfile).toEqual('some file  with spaces.and.multiple.ext')
-    })
-
-    it('Test equal sign in file name', async () => {
-        const outfile1 = extractOutfileFromRunArguments('--normalize-severity -o     some=file.json')
-        expect(outfile1).toEqual('some=file.json')
-        const outfile2 = extractOutfileFromRunArguments('-o=some==other=file.json')
-        expect(outfile2).toEqual('some==other=file.json')
-    })
-
-    it('Test quote in file name', async () => {
-        const outfile1 = extractOutfileFromRunArguments('--outfile "some\'file.json"')
-        expect(outfile1).toEqual("some'file.json")
-    })
-
-    it('Test trailing -o', async () => {
-        const outfile1 = extractOutfileFromRunArguments('--normalize-severity -o  ')
-        expect(outfile1).toEqual('')
-    })
-
-    it('Test trailing --outfile', async () => {
-        const outfile1 = extractOutfileFromRunArguments('--normalize-severity --outfile')
-        expect(outfile1).toEqual('')
-    })
-})
-
-describe('Tests for toRelativeFile', () => {
-    it('Relative stays relative', () => {
-        expect(toRelativeFile('some/file.json')).toEqual('some/file.json')
-    })
-
-    it('Absolute converts to relative', () => {
-        expect(toRelativeFile(path.resolve('.', 'action.yml'))).toEqual('action.yml')
+        it('Test when user does not supply either --view or -v flag', async () => {
+            const inputArguments = new InputArguments('--output-file someFile.xml --severity-threshold 3')
+            expect(inputArguments.containsFlag('--view', '-v')).toEqual(false)
+        })
     })
 })

@@ -1,15 +1,16 @@
 import * as fs from 'fs'
-import { toRelativeFile } from './utils'
 
 export interface ResultsFactory {
-    createResults(resultsFile: string, isDfa: boolean): Results
+    createResults(resultsFile: string): Results
 }
 
 export interface Results {
-    getTotalViolationCount(): number
     getSev1ViolationCount(): number
     getSev2ViolationCount(): number
     getSev3ViolationCount(): number
+    getSev4ViolationCount(): number
+    getSev5ViolationCount(): number
+    getTotalViolationCount(): number
     getViolationsSortedBySeverity(): Violation[]
 }
 
@@ -29,42 +30,30 @@ export interface ViolationLocation {
 }
 
 export class RuntimeResultsFactory implements ResultsFactory {
-    createResults(resultsFile: string, isDfa: boolean): Results {
+    createResults(resultsFile: string): Results {
         const jsonStr: string = fs.readFileSync(resultsFile, { encoding: 'utf8' })
-        const resultArray = JSON.parse(jsonStr)
+        const resultObj = JSON.parse(jsonStr)
 
         const violations: Violation[] = []
-        for (const resultObj of resultArray) {
-            for (const violationObj of resultObj['violations']) {
-                let violationLocation: ViolationLocation
-                if (isDfa) {
-                    violationLocation = new RunDfaViolationLocation(
-                        toRelativeFile(resultObj['fileName']),
-                        violationObj['sourceLine'],
-                        violationObj['sourceColumn'],
-                        toRelativeFile(violationObj['sinkFileName']),
-                        violationObj['sinkLine'],
-                        violationObj['sinkObj']
-                    )
-                } else {
-                    violationLocation = new RunViolationLocation(
-                        toRelativeFile(resultObj['fileName']),
-                        violationObj['line'],
-                        violationObj['column']
-                    )
-                }
+        for (const violationObj of resultObj['violations']) {
+            const primaryLocationIndex: number = violationObj['primaryLocationIndex']
+            const primaryLocation = violationObj['locations'][primaryLocationIndex]
+            const violationLocation: ViolationLocation = new RunViolationLocation(
+                primaryLocation['file'],
+                primaryLocation['startLine'],
+                primaryLocation['startColumn']
+            )
 
-                violations.push(
-                    new RuntimeViolation(
-                        violationObj['normalizedSeverity'],
-                        resultObj['engine'],
-                        violationObj['ruleName'],
-                        violationObj['url'],
-                        violationObj['message'],
-                        violationLocation
-                    )
+            violations.push(
+                new RuntimeViolation(
+                    violationObj['severity'],
+                    violationObj['engine'],
+                    violationObj['rule'],
+                    violationObj['resources'][0],
+                    violationObj['message'],
+                    violationLocation
                 )
-            }
+            )
         }
         return new RuntimeResults(violations)
     }
@@ -78,10 +67,6 @@ export class RuntimeResults implements Results {
         this.violations = violations
     }
 
-    getTotalViolationCount(): number {
-        return this.violations.length
-    }
-
     getSev1ViolationCount(): number {
         return this.violations.filter(v => v.getSeverity() === 1).length
     }
@@ -92,6 +77,18 @@ export class RuntimeResults implements Results {
 
     getSev3ViolationCount(): number {
         return this.violations.filter(v => v.getSeverity() === 3).length
+    }
+
+    getSev4ViolationCount(): number {
+        return this.violations.filter(v => v.getSeverity() === 4).length
+    }
+
+    getSev5ViolationCount(): number {
+        return this.violations.filter(v => v.getSeverity() === 5).length
+    }
+
+    getTotalViolationCount(): number {
+        return this.violations.length
     }
 
     getViolationsSortedBySeverity(): Violation[] {
@@ -211,91 +208,6 @@ export class RunViolationLocation implements ViolationLocation {
                 return -1
             }
             return this.column < other.column ? -1 : 1
-        }
-        return 0
-    }
-}
-
-export class RunDfaViolationLocation implements ViolationLocation {
-    private readonly sourceFileName: string
-    private readonly sourceLine: number | undefined
-    private readonly sourceColumn: number | undefined
-    private readonly sinkFileName: string
-    private readonly sinkLine: number | undefined
-    private readonly sinkColumn: number | undefined
-
-    constructor(
-        sourceFileName: string,
-        sourceLine: number | undefined,
-        sourceColumn: number | undefined,
-        sinkFileName: string,
-        sinkLine: number | undefined,
-        sinkColumn: number | undefined
-    ) {
-        this.sourceFileName = sourceFileName
-        this.sourceLine = sourceLine
-        this.sourceColumn = sourceColumn
-        this.sinkFileName = sinkFileName
-        this.sinkLine = sinkLine
-        this.sinkColumn = sinkColumn
-    }
-
-    toString(): string {
-        let locStr = `Source: ${this.sourceFileName}`
-        if (this.sourceLine !== undefined) {
-            locStr += `:${this.sourceLine}`
-            if (this.sourceColumn !== undefined) {
-                locStr += `:${this.sourceColumn}`
-            }
-        }
-        if (this.sinkFileName.length > 0) {
-            locStr += `\nSink: ${this.sinkFileName}`
-            if (this.sinkLine !== undefined) {
-                locStr += `:${this.sinkLine}`
-                if (this.sinkColumn !== undefined) {
-                    locStr += `:${this.sinkColumn}`
-                }
-            }
-        }
-        return locStr
-    }
-
-    compareTo(other: ViolationLocation): number {
-        if (!(other instanceof RunDfaViolationLocation)) {
-            return 1
-        }
-        if (this.sourceFileName !== other.sourceFileName) {
-            return this.sourceFileName < other.sourceFileName ? -1 : 1
-        } else if (this.sourceLine !== other.sourceLine) {
-            if (this.sourceLine === undefined) {
-                return 1
-            } else if (other.sourceLine === undefined) {
-                return -1
-            }
-            return this.sourceLine < other.sourceLine ? -1 : 1
-        } else if (this.sourceColumn !== other.sourceColumn) {
-            if (this.sourceColumn === undefined) {
-                return 1
-            } else if (other.sourceColumn === undefined) {
-                return -1
-            }
-            return this.sourceColumn < other.sourceColumn ? -1 : 1
-        } else if (this.sinkFileName !== other.sinkFileName) {
-            return this.sinkFileName < other.sinkFileName ? -1 : 1
-        } else if (this.sinkLine !== other.sinkLine) {
-            if (this.sinkLine === undefined) {
-                return 1
-            } else if (other.sinkLine === undefined) {
-                return -1
-            }
-            return this.sinkLine < other.sinkLine ? -1 : 1
-        } else if (this.sinkColumn !== other.sinkColumn) {
-            if (this.sinkColumn === undefined) {
-                return 1
-            } else if (other.sinkColumn === undefined) {
-                return -1
-            }
-            return this.sinkColumn < other.sinkColumn ? -1 : 1
         }
         return 0
     }

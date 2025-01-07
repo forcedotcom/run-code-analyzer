@@ -8,9 +8,9 @@ type PluginMetadata = { name: string; version: string }
 export interface CommandExecutor {
     isSalesforceCliInstalled(): Promise<boolean>
     installSalesforceCli(): Promise<boolean>
-    isMinimumScannerPluginInstalled(minVersion: string): Promise<boolean>
-    installScannerPlugin(): Promise<boolean>
-    runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<CommandOutput>
+    isMinimumCodeAnalyzerPluginInstalled(minVersion: string): Promise<boolean>
+    installCodeAnalyzerPlugin(): Promise<boolean>
+    runCodeAnalyzer(runArgs: string): Promise<CommandOutput>
 }
 
 export class RuntimeCommandExecutor implements CommandExecutor {
@@ -29,8 +29,8 @@ export class RuntimeCommandExecutor implements CommandExecutor {
         return cmdOut.exitCode === 0
     }
 
-    async isMinimumScannerPluginInstalled(minVersion: string): Promise<boolean> {
-        const pluginName = '@salesforce/sfdx-scanner'
+    async isMinimumCodeAnalyzerPluginInstalled(minVersion: string): Promise<boolean> {
+        const pluginName = '@salesforce/plugin-code-analyzer'
         const command = `sf plugins inspect ${pluginName} --json`
         const runSilently = true
         const cmdOut: CommandOutput = await this.dependencies.execCommand(command, {}, runSilently)
@@ -49,19 +49,20 @@ export class RuntimeCommandExecutor implements CommandExecutor {
         }
     }
 
-    async installScannerPlugin(): Promise<boolean> {
-        const command = 'sf plugins install @salesforce/sfdx-scanner@latest'
+    async installCodeAnalyzerPlugin(): Promise<boolean> {
+        const command = 'sf plugins install code-analyzer@latest'
         const cmdOut: CommandOutput = await this.dependencies.execCommand(command)
         return cmdOut.exitCode === 0
     }
 
-    async runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<CommandOutput> {
-        const command = `sf scanner ${runCmd} ${runArgs}`
+    async runCodeAnalyzer(runArgs: string): Promise<CommandOutput> {
+        const command = `sf code-analyzer run ${runArgs}`
+
+        // Note that setting environment variables here is safe because any variables that already exist in process.env
+        // will be used instead of the ones we set here when we do our mergeWithProcessEnvVars step.
         const envVars: EnvironmentVariables = {
             // Without increasing the heap allocation, node often fails. So we increase it to 8gb which should be enough
-            NODE_OPTIONS: '--max-old-space-size=8192',
-            // We always want to control our own internal outfile for reliable processing
-            SCANNER_INTERNAL_OUTFILE: internalOutfile
+            NODE_OPTIONS: '--max-old-space-size=8192'
         }
         if (process.env['JAVA_HOME_11_X64']) {
             // We prefer to run on java 11 if available since the default varies across the different GitHub runners.
