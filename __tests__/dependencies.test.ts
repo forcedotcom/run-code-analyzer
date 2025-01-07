@@ -35,8 +35,7 @@ describe('RuntimeDependencies Code Coverage', () => {
         })
         const inputs: Inputs = dependencies.getInputs()
         expect(inputs).toEqual({
-            runCommand: 'run-command Value',
-            runArgs: 'run-arguments Value',
+            runArguments: 'run-arguments Value',
             resultsArtifactName: 'results-artifact-name Value'
         })
     })

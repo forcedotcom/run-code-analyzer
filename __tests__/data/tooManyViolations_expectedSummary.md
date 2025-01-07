@@ -1,9 +1,11 @@
 ## Salesforce Code Analyzer Results
 ### :warning: 12345 Violation(s) Found
 <blockquote>
+:black_circle: 0 Critical severity violation(s)<br/>
 :red_circle: 0 High severity violation(s)<br/>
 :orange_circle: 12345 Medium severity violation(s)<br/>
-:yellow_circle: 0 Low severity violation(s)
+:yellow_circle: 0 Low severity violation(s)<br/>
+:white_circle: 0 Info severity violation(s)
 </blockquote>
 Showing 6014 of 12345 violations:
 <table><tr><th> </th><th>Location</th><th>Rule</th><th>Message</th></tr>

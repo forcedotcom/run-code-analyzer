@@ -1,7 +1,7 @@
 {
   "name": "run-code-analyzer",
   "description": "GitHub Action to run the Salesforce Code Analyzer",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "author": "The Salesforce Code Analyzer Team",
   "private": true,
   "homepage": "https://github.com/forcedotcom/run-code-analyzer",

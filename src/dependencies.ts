@@ -56,8 +56,7 @@ export class RuntimeDependencies implements Dependencies {
 
     getInputs(): Inputs {
         return {
-            runCommand: core.getInput('run-command'),
-            runArgs: core.getInput('run-arguments'),
+            runArguments: core.getInput('run-arguments'),
             resultsArtifactName: core.getInput('results-artifact-name')
         }
     }

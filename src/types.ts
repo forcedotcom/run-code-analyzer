@@ -1,8 +1,7 @@
 import { ExecOutput } from '@actions/exec'
 
 export type Inputs = {
-    runCommand: string
-    runArgs: string
+    runArguments: string
     resultsArtifactName: string
 }
 

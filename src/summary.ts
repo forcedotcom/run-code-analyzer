@@ -6,9 +6,11 @@ import { EOL } from 'os'
 const TABLE_ROWS_CHAR_LIMIT = 900000
 
 const SEVERITY_EMOJIS: Map<number, string> = new Map<number, string>([
-    [1, ':red_circle:'],
-    [2, ':orange_circle:'],
-    [3, ':yellow_circle:']
+    [1, ':black_circle:'],
+    [2, ':red_circle:'],
+    [3, ':orange_circle:'],
+    [4, ':yellow_circle:'],
+    [5, ':white_circle:']
 ])
 
 export interface Summarizer {
@@ -26,9 +28,11 @@ export class RuntimeSummarizer implements Summarizer {
         summary +=
             `### :warning: ${results.getTotalViolationCount()} Violation(s) Found${EOL}` +
             `<blockquote>${EOL}` +
-            `${SEVERITY_EMOJIS.get(1)} ${results.getSev1ViolationCount()} High severity violation(s)<br/>${EOL}` +
-            `${SEVERITY_EMOJIS.get(2)} ${results.getSev2ViolationCount()} Medium severity violation(s)<br/>${EOL}` +
-            `${SEVERITY_EMOJIS.get(3)} ${results.getSev3ViolationCount()} Low severity violation(s)${EOL}` +
+            `${SEVERITY_EMOJIS.get(1)} ${results.getSev1ViolationCount()} Critical severity violation(s)<br/>${EOL}` +
+            `${SEVERITY_EMOJIS.get(2)} ${results.getSev2ViolationCount()} High severity violation(s)<br/>${EOL}` +
+            `${SEVERITY_EMOJIS.get(3)} ${results.getSev3ViolationCount()} Medium severity violation(s)<br/>${EOL}` +
+            `${SEVERITY_EMOJIS.get(4)} ${results.getSev4ViolationCount()} Low severity violation(s)<br/>${EOL}` +
+            `${SEVERITY_EMOJIS.get(5)} ${results.getSev5ViolationCount()} Info severity violation(s)${EOL}` +
             `</blockquote>${EOL}`
 
         let tableRows = ''

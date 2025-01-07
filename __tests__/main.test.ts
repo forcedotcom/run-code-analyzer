@@ -1,7 +1,7 @@
 import * as main from '../src/main'
 import { FakeCommandExecutor, FakeDependencies, FakeResultsFactory, FakeSummarizer } from './fakes'
 import { Inputs } from '../src/types'
-import { INTERNAL_OUTFILE, MESSAGE_FCNS, MESSAGES, MIN_SCANNER_VERSION_REQUIRED } from '../src/constants'
+import { MESSAGE_FCNS, MESSAGES, MIN_CODE_ANALYZER_VERSION_REQUIRED } from '../src/constants'
 
 describe('main run Tests', () => {
     let dependencies: FakeDependencies
@@ -23,31 +23,28 @@ describe('main run Tests', () => {
 
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
         expect(commandExecutor.runCodeAnalyzerCallHistory).toContainEqual({
-            runCmd: 'run',
-            runArgs: '--normalize-severity',
-            internalOutfile: INTERNAL_OUTFILE
+            runArguments: '--view detail --output-file sfca_results.json'
         })
 
         expect(dependencies.uploadArtifactCallHistory).toHaveLength(1)
         expect(dependencies.uploadArtifactCallHistory).toContainEqual({
-            artifactName: 'code-analyzer-results',
-            artifactFiles: [INTERNAL_OUTFILE]
+            artifactName: 'salesforce-code-analyzer-results',
+            artifactFiles: ['sfca_results.json']
         })
 
         expect(resultsFactory.createResultsCallHistory).toHaveLength(1)
         expect(resultsFactory.createResultsCallHistory).toContainEqual({
-            resultsFile: INTERNAL_OUTFILE,
-            isDfa: false
+            resultsFile: 'sfca_results.json'
         })
 
-        expect(dependencies.setOutputCallHistory).toHaveLength(5)
+        expect(dependencies.setOutputCallHistory).toHaveLength(7)
         expect(dependencies.setOutputCallHistory).toContainEqual({
             name: 'exit-code',
             value: '0'
         })
         expect(dependencies.setOutputCallHistory).toContainEqual({
             name: 'num-violations',
-            value: '6'
+            value: '15'
         })
         expect(dependencies.setOutputCallHistory).toContainEqual({
             name: 'num-sev1-violations',
@@ -61,15 +58,25 @@ describe('main run Tests', () => {
             name: 'num-sev3-violations',
             value: '3'
         })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev4-violations',
+            value: '4'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev5-violations',
+            value: '5'
+        })
 
         expect(dependencies.infoCallHistory).toContainEqual({
             infoMessage:
                 'outputs:\n' +
                 '  exit-code: 0\n' +
-                '  num-violations: 6\n' +
+                '  num-violations: 15\n' +
                 '  num-sev1-violations: 1\n' +
                 '  num-sev2-violations: 2\n' +
-                '  num-sev3-violations: 3'
+                '  num-sev3-violations: 3\n' +
+                '  num-sev4-violations: 4\n' +
+                '  num-sev5-violations: 5'
         })
 
         expect(summarizer.createSummaryMarkdownCallHistory).toHaveLength(1)
@@ -83,10 +90,9 @@ describe('main run Tests', () => {
         expect(dependencies.failCallHistory).toHaveLength(0)
     })
 
-    it('Test user supplied outfile and other non-default inputs', async () => {
+    it('Test user supplies non-default inputs with various output files including json', async () => {
         dependencies.getInputsReturnValue = {
-            runCommand: 'run dfa',
-            runArgs: '-o myFile.html --normalize-severity -t ./src',
+            runArguments: '-f myFile.html --output-file=another.xml -f=great.json --output-file  cool.sarif -w ./src',
             resultsArtifactName: 'customArtifactName'
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
@@ -95,21 +101,18 @@ describe('main run Tests', () => {
 
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
         expect(commandExecutor.runCodeAnalyzerCallHistory).toContainEqual({
-            runCmd: 'run dfa',
-            runArgs: '-o myFile.html --normalize-severity -t ./src',
-            internalOutfile: INTERNAL_OUTFILE
+            runArguments: '-f myFile.html --output-file=another.xml -f=great.json --output-file  cool.sarif -w ./src'
         })
 
         expect(dependencies.uploadArtifactCallHistory).toHaveLength(1)
         expect(dependencies.uploadArtifactCallHistory).toContainEqual({
             artifactName: 'customArtifactName',
-            artifactFiles: ['myFile.html']
+            artifactFiles: ['myFile.html', 'another.xml', 'great.json', 'cool.sarif']
         })
 
         expect(resultsFactory.createResultsCallHistory).toHaveLength(1)
         expect(resultsFactory.createResultsCallHistory).toContainEqual({
-            resultsFile: INTERNAL_OUTFILE,
-            isDfa: true
+            resultsFile: 'great.json' // We reuse the json file that the user supplied instead of supplying our own
         })
 
         expect(dependencies.setOutputCallHistory).toContainEqual({
@@ -118,6 +121,84 @@ describe('main run Tests', () => {
         })
 
         expect(dependencies.failCallHistory).toHaveLength(0)
+    })
+
+    it('Test user supplies non-default inputs with non-json output file', async () => {
+        dependencies.getInputsReturnValue = {
+            runArguments: '-f myFile.html --view table',
+            resultsArtifactName: 'salesforce-code-analyzer-results'
+        }
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        expect(commandExecutor.isSalesforceCliInstalledCallCount).toEqual(1)
+
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toContainEqual({
+            runArguments: '-f myFile.html --view table --output-file sfca_results.json' // We add in at least one json file
+        })
+
+        expect(dependencies.uploadArtifactCallHistory).toHaveLength(1)
+        expect(dependencies.uploadArtifactCallHistory).toContainEqual({
+            artifactName: 'salesforce-code-analyzer-results',
+            artifactFiles: ['myFile.html'] // Our json file doesn't get included since the user didn't specify it
+        })
+
+        expect(resultsFactory.createResultsCallHistory).toHaveLength(1)
+        expect(resultsFactory.createResultsCallHistory).toContainEqual({
+            resultsFile: 'sfca_results.json' // We have our added json file to parse
+        })
+    })
+
+    it('Test user supplies non-default inputs with zero output files and no view', async () => {
+        dependencies.getInputsReturnValue = {
+            runArguments: '',
+            resultsArtifactName: 'salesforce-code-analyzer-results'
+        }
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        expect(commandExecutor.isSalesforceCliInstalledCallCount).toEqual(1)
+
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toContainEqual({
+            runArguments: ' --output-file sfca_results.json --view table' // We add in at least one json file and restore the view
+        })
+
+        expect(dependencies.uploadArtifactCallHistory).toHaveLength(1)
+        expect(dependencies.uploadArtifactCallHistory).toContainEqual({
+            artifactName: 'salesforce-code-analyzer-results',
+            artifactFiles: ['sfca_results.json'] // Since the user didn't specify anything, we add in the json file that we specified on their behalf
+        })
+
+        expect(resultsFactory.createResultsCallHistory).toHaveLength(1)
+        expect(resultsFactory.createResultsCallHistory).toContainEqual({
+            resultsFile: 'sfca_results.json' // We have our added json file to parse
+        })
+    })
+
+    it('Test user supplies non-default inputs with zero output files but supplies a view', async () => {
+        dependencies.getInputsReturnValue = {
+            runArguments: '-c someConfig.yml --view detail',
+            resultsArtifactName: 'salesforce-code-analyzer-results'
+        }
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        expect(commandExecutor.isSalesforceCliInstalledCallCount).toEqual(1)
+
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toContainEqual({
+            runArguments: '-c someConfig.yml --view detail --output-file sfca_results.json'
+        })
+
+        expect(dependencies.uploadArtifactCallHistory).toHaveLength(1)
+        expect(dependencies.uploadArtifactCallHistory).toContainEqual({
+            artifactName: 'salesforce-code-analyzer-results',
+            artifactFiles: ['sfca_results.json'] // Since the user didn't specify anything, we add in the json file that we specified on their behalf
+        })
+
+        expect(resultsFactory.createResultsCallHistory).toHaveLength(1)
+        expect(resultsFactory.createResultsCallHistory).toContainEqual({
+            resultsFile: 'sfca_results.json' // We have our added json file to parse
+        })
     })
 
     it('Test nonzero exit code with stderr not containing error from command call', async () => {
@@ -165,21 +246,7 @@ describe('main run Tests', () => {
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
         expect(dependencies.uploadArtifactCallHistory).toHaveLength(0)
         expect(dependencies.failCallHistory).toHaveLength(1)
-        expect(dependencies.failCallHistory).toContainEqual({
-            failMessage: 'bang'
-        })
-    })
-
-    it('Test missing --normalize-severity from run arguments', async () => {
-        dependencies.getInputsReturnValue.runArgs = '--outfile results.xml'
-        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
-
-        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
-        expect(dependencies.uploadArtifactCallHistory).toHaveLength(0)
-        expect(dependencies.failCallHistory).toHaveLength(1)
-        expect(dependencies.failCallHistory).toContainEqual({
-            failMessage: MESSAGES.MISSING_NORMALIZE_SEVERITY
-        })
+        expect(dependencies.failCallHistory[0].failMessage).toContain('bang')
     })
 
     it('Test when Salesforce CLI is not already installed and we install it successfully', async () => {
@@ -207,41 +274,41 @@ describe('main run Tests', () => {
         expect(commandExecutor.installSalesforceCliCallCount).toEqual(1)
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
         expect(dependencies.failCallHistory).toHaveLength(1)
-        expect(dependencies.failCallHistory).toContainEqual({ failMessage: MESSAGES.SF_CLI_INSTALL_FAILED })
+        expect(dependencies.failCallHistory[0].failMessage).toContain(MESSAGES.SF_CLI_INSTALL_FAILED)
     })
 
     it('Test when sfdx-scanner plugin is not already installed and we install it successfully', async () => {
-        commandExecutor.isMinimumScannerPluginInstalledReturnValue = false
+        commandExecutor.isMinimumCodeAnalyzerPluginInstalledReturnValue = false
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(dependencies.warnCallHistory).toHaveLength(1)
         expect(dependencies.warnCallHistory).toContainEqual({
-            warnMessage: MESSAGES.MINIMUM_SCANNER_PLUGIN_NOT_INSTALLED
+            warnMessage: MESSAGES.MINIMUM_CODE_ANALYZER_PLUGIN_NOT_INSTALLED
         })
-        expect(commandExecutor.isMinimumScannerPluginInstalledCallHistory).toHaveLength(1)
-        expect(commandExecutor.isMinimumScannerPluginInstalledCallHistory).toContainEqual({
-            minVersion: MIN_SCANNER_VERSION_REQUIRED
+        expect(commandExecutor.isMinimumCodeAnalyzerPluginInstalledCallHistory).toHaveLength(1)
+        expect(commandExecutor.isMinimumCodeAnalyzerPluginInstalledCallHistory).toContainEqual({
+            minVersion: MIN_CODE_ANALYZER_VERSION_REQUIRED
         })
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory).toHaveLength(0)
     })
 
     it('Test when sfdx-scanner plugin is not already installed and we fail to install it', async () => {
-        commandExecutor.isMinimumScannerPluginInstalledReturnValue = false
-        commandExecutor.installScannerPluginReturnValue = false
+        commandExecutor.isMinimumCodeAnalyzerPluginInstalledReturnValue = false
+        commandExecutor.installCodeAnalyzerPluginReturnValue = false
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
         expect(dependencies.warnCallHistory).toHaveLength(1)
         expect(dependencies.warnCallHistory).toContainEqual({
-            warnMessage: MESSAGES.MINIMUM_SCANNER_PLUGIN_NOT_INSTALLED
+            warnMessage: MESSAGES.MINIMUM_CODE_ANALYZER_PLUGIN_NOT_INSTALLED
         })
-        expect(commandExecutor.isMinimumScannerPluginInstalledCallHistory).toHaveLength(1)
-        expect(commandExecutor.isMinimumScannerPluginInstalledCallHistory).toContainEqual({
-            minVersion: MIN_SCANNER_VERSION_REQUIRED
+        expect(commandExecutor.isMinimumCodeAnalyzerPluginInstalledCallHistory).toHaveLength(1)
+        expect(commandExecutor.isMinimumCodeAnalyzerPluginInstalledCallHistory).toContainEqual({
+            minVersion: MIN_CODE_ANALYZER_VERSION_REQUIRED
         })
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(0)
         expect(dependencies.failCallHistory).toHaveLength(1)
-        expect(dependencies.failCallHistory).toContainEqual({ failMessage: MESSAGES.SCANNER_PLUGIN_INSTALL_FAILED })
+        expect(dependencies.failCallHistory[0].failMessage).toContain(MESSAGES.CODE_ANALYZER_PLUGIN_INSTALL_FAILED)
     })
 
     it('Test when the internal outfile file does not exist after run then we fail', async () => {
@@ -250,15 +317,12 @@ describe('main run Tests', () => {
 
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory).toHaveLength(1)
-        expect(dependencies.failCallHistory).toContainEqual({
-            failMessage: MESSAGE_FCNS.FILE_NOT_FOUND(INTERNAL_OUTFILE)
-        })
+        expect(dependencies.failCallHistory[0].failMessage).toContain(MESSAGE_FCNS.FILE_NOT_FOUND('sfca_results.json'))
     })
 
-    it('Test when the user outfile file does not exist after run then we fail', async () => {
+    it('Test when the user output file does not exist after run then we fail', async () => {
         dependencies.getInputsReturnValue = {
-            runCommand: 'run',
-            runArgs: '--normalize-severity -o userResults.xml',
+            runArguments: '-f userResults.xml',
             resultsArtifactName: 'customArtifactName'
         }
         dependencies.fileExistsReturnValue = false
@@ -266,8 +330,6 @@ describe('main run Tests', () => {
 
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory).toHaveLength(1)
-        expect(dependencies.failCallHistory).toContainEqual({
-            failMessage: MESSAGE_FCNS.FILE_NOT_FOUND('userResults.xml')
-        })
+        expect(dependencies.failCallHistory[0].failMessage).toContain(MESSAGE_FCNS.FILE_NOT_FOUND('userResults.xml'))
     })
 })
