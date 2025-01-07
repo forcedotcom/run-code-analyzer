@@ -44,8 +44,8 @@ This `run-code-analyzer@v2` action won't exit your GitHub workflow when it finds
 The [Salesforce Code Analyzer v5.x (Beta)](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer.html) and its bundled engines can each have their own set of requirements in order to run successfully. So we recommend that you set up your GitHub runner(s) with this software:
 * `node` version 20 or greater
   * Required by all engines.
-* `java` version 11 or greater
-  * Required by some engines, like the `pmd` and `cpd` engines, unless those engines have been explicitly disabled in your `code-analyzer.yml` configuration file.
+* `java` version 11 or greaterlike
+  * Required by some engines, such as `pmd` and `cpd`, unless those engines have been explicitly disabled in your `code-analyzer.yml` configuration file.
 * `python` version 3.10 or greater
   * Required by some engines, such as `flowtest`, unless those engines have been explicitly disabled in your `code-analyzer.yml` configuration file.
 
@@ -101,9 +101,9 @@ The `forcedotcom/run-code-analyzer@v1` GitHub Action is based on [Salesforce Cod
 
 **Note:**
 > We plan to stop supporting v4.x of Code Analyzer in the coming months. We highly recommend that you start using v5.x, which is currently in Beta. For information on v5.x, see https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer.html.
-> We highly recommend that you use the `run-code-analyzer@v2` GitHub Action instead (see above).
+>
+> Because we'll soon stop supporting v4.x, we also recommend that you use the `run-code-analyzer@v2` GitHub Action, because it's based on v5.x. (see [above](./README.md#run-salesforce-code-analyzer---github-action))
 
-## v1 Inputs
 * <b>`run-command`</b>  *(Default: `run`)*
   * Specifies the Salesforce Code Analyzer command to run.<br/>
     Possible values are: *`run`, `run dfa`*.<br/>
