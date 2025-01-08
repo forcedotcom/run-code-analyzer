@@ -44,7 +44,7 @@ This `run-code-analyzer@v2` action won't exit your GitHub workflow when it finds
 The [Salesforce Code Analyzer v5.x (Beta)](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer.html) and its bundled engines can each have their own set of requirements in order to run successfully. So we recommend that you set up your GitHub runner(s) with this software:
 * `node` version 20 or greater
   * Required by all engines.
-* `java` version 11 or greaterlike
+* `java` version 11 or greater
   * Required by some engines, such as `pmd` and `cpd`, unless those engines have been explicitly disabled in your `code-analyzer.yml` configuration file.
 * `python` version 3.10 or greater
   * Required by some engines, such as `flowtest`, unless those engines have been explicitly disabled in your `code-analyzer.yml` configuration file.
