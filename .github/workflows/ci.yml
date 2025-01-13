@@ -51,19 +51,31 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
+      - name: Ensure node v20 or greater
+        uses: actions/setup-node@v4
+        with:
+          node-version: '>=20'
+      - name: Ensure java v11 or greater
+        uses: actions/setup-java@v4
+        with:
+          java-version: '>=11'
+          distribution: 'zulu'
+      - name: Ensure python v3.10 or greater
+        uses: actions/setup-python@v5
+        with:
+          python-version: '>=3.10'
+
       - name: Install Salesforce CLI
         run: npm install -g @salesforce/cli@latest
 
-
-      - name: Install the Salesforce Code Analyzer Plugin
-        run: sf plugins install @salesforce/sfdx-scanner@latest
+      - name: Install Latest Salesforce Code Analyzer Plugin
+        run: sf plugins install code-analyzer@latest
 
       - name: Test Local Action
         id: test-action
         uses: ./
         with:
-          run-command: run
-          run-arguments: --normalize-severity --target "./src,./__tests__" --outfile results.json --verbose
+          run-arguments: --view detail --workspace "./src,./__tests__" --output-file results.json
 
       - name: Print Output
         id: output

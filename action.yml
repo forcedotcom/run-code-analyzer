@@ -7,35 +7,24 @@ branding:
   color: 'gray-dark'
 
 inputs:
-  run-command:
-    description: |-
-      Specifies the Salesforce Code Analyzer command to run.
-      Possible values are: "run", "run dfa". Default: "run"
-      
-      For more info on Code Analyzer, read our [documentation](https://forcedotcom.github.io/sfdx-scanner).
-    required: false
-    default: 'run'
   run-arguments:
     description: |-
-      Specifies arguments passed to the specified run-command value.
-      Default: "--normalize-severity"
+      Specifies arguments passed to the `run` command.
+      Default: "--view detail --output-file sfca_results.json"
       
-      The arguments provided must include --normalize-severity.
+      For a full list of acceptable arguments for the run command, see the [code-analyzer Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_code-analyzer_commands_unified.htm).
       
-      To control the output file included in the uploaded artifact, specify an output file name with the --outfile argument.
-      If an output file isn’t specified, results are written to GitHub workflow run logs and a SalesforceCodeAnalyzerResults.json file is included in the uploaded artifact.
+      The stdout text from the `run` command is written to the GitHub workflow run logs.
       
-      For a full list of acceptable arguments, read the appropriate Command Reference:
-      - [sf scanner run](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/run)
-      - [sf scanner run dfa](https://forcedotcom.github.io/sfdx-scanner/en/v3.x/scanner-commands/dfa)
+      Each output file specified by a `--output-file` (or `-f`) flag is included in the zip archive GitHub workflow run artifact for you to download.
     required: false
-    default: '--normalize-severity'
+    default: '--view detail --output-file sfca_results.json'
   results-artifact-name:
     description: |-
-      Specifies the name of the zip archive job artifact where the results output file is uploaded.
-      Default: "code-analyzer-results"
+      Specifies the name of the zip archive GitHub workflow run artifact where the results output file is uploaded.
+      Default: "salesforce-code-analyzer-results"
     required: false
-    default: 'code-analyzer-results'
+    default: 'salesforce-code-analyzer-results'
 
 outputs:
   exit-code:
@@ -43,11 +32,15 @@ outputs:
   num-violations:
     description: The total number of violations found.
   num-sev1-violations:
-    description: The number of normalized high-severity violations found.
+    description: The number of Critical (1) severity violations found.
   num-sev2-violations:
-    description: The number of normalized medium-severity violations found.
+    description: The number of High (2) severity violations found.
   num-sev3-violations:
-    description: The number of normalized low-severity violations found.
+    description: The number of Medium (3) severity violations found.
+  num-sev4-violations:
+    description: The number of Low (4) severity violations found.
+  num-sev5-violations:
+    description: The number of Info (5) severity violations found.
 
 runs:
   using: node20

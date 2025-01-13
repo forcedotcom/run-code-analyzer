@@ -24,9 +24,8 @@ export class FakeDependencies implements Dependencies {
 
     // We should match the default input values from action.yml here:
     getInputsReturnValue: Inputs = {
-        runCommand: 'run',
-        runArgs: '--normalize-severity',
-        resultsArtifactName: 'code-analyzer-results'
+        runArguments: '--view detail --output-file sfca_results.json',
+        resultsArtifactName: 'salesforce-code-analyzer-results'
     }
     getInputsCallCount = 0
     getInputs(): Inputs {
@@ -93,33 +92,33 @@ export class FakeCommandExecutor implements CommandExecutor {
         return this.installSalesforceCliReturnValue
     }
 
-    isMinimumScannerPluginInstalledReturnValue = true
-    isMinimumScannerPluginInstalledCallHistory: { minVersion: string }[] = []
-    async isMinimumScannerPluginInstalled(minVersion: string): Promise<boolean> {
-        this.isMinimumScannerPluginInstalledCallHistory.push({ minVersion })
-        return this.isMinimumScannerPluginInstalledReturnValue
+    isMinimumCodeAnalyzerPluginInstalledReturnValue = true
+    isMinimumCodeAnalyzerPluginInstalledCallHistory: { minVersion: string }[] = []
+    async isMinimumCodeAnalyzerPluginInstalled(minVersion: string): Promise<boolean> {
+        this.isMinimumCodeAnalyzerPluginInstalledCallHistory.push({ minVersion })
+        return this.isMinimumCodeAnalyzerPluginInstalledReturnValue
     }
 
-    installScannerPluginCallCount = 0
-    installScannerPluginReturnValue = true
-    async installScannerPlugin(): Promise<boolean> {
-        this.installScannerPluginCallCount++
-        return this.installScannerPluginReturnValue
+    installCodeAnalyzerPluginCallCount = 0
+    installCodeAnalyzerPluginReturnValue = true
+    async installCodeAnalyzerPlugin(): Promise<boolean> {
+        this.installCodeAnalyzerPluginCallCount++
+        return this.installCodeAnalyzerPluginReturnValue
     }
 
     runCodeAnalyzerReturnValue: CommandOutput = { exitCode: 0, stdout: '', stderr: '' }
-    runCodeAnalyzerCallHistory: { runCmd: string; runArgs: string; internalOutfile: string }[] = []
-    async runCodeAnalyzer(runCmd: string, runArgs: string, internalOutfile: string): Promise<CommandOutput> {
-        this.runCodeAnalyzerCallHistory.push({ runCmd, runArgs, internalOutfile })
+    runCodeAnalyzerCallHistory: { runArguments: string }[] = []
+    async runCodeAnalyzer(runArguments: string): Promise<CommandOutput> {
+        this.runCodeAnalyzerCallHistory.push({ runArguments })
         return this.runCodeAnalyzerReturnValue
     }
 }
 
 export class FakeResultsFactory implements ResultsFactory {
     createResultsReturnValue: Results = new FakeResults()
-    createResultsCallHistory: { resultsFile: string; isDfa: boolean }[] = []
-    createResults(resultsFile: string, isDfa: boolean): Results {
-        this.createResultsCallHistory.push({ resultsFile, isDfa })
+    createResultsCallHistory: { resultsFile: string }[] = []
+    createResults(resultsFile: string): Results {
+        this.createResultsCallHistory.push({ resultsFile })
         return this.createResultsReturnValue
     }
 }
@@ -146,7 +145,21 @@ export class FakeResults implements Results {
         return this.getSev3ViolationCountReturnValue
     }
 
-    getTotalViolationCountReturnValue = 6
+    getSev4ViolationCountReturnValue = 4
+    getSev4ViolationCountCallCount = 0
+    getSev4ViolationCount(): number {
+        this.getSev4ViolationCountCallCount++
+        return this.getSev4ViolationCountReturnValue
+    }
+
+    getSev5ViolationCountReturnValue = 5
+    getSev5ViolationCountCallCount = 0
+    getSev5ViolationCount(): number {
+        this.getSev5ViolationCountCallCount++
+        return this.getSev5ViolationCountReturnValue
+    }
+
+    getTotalViolationCountReturnValue = 15
     getTotalViolationCountCallCount = 0
     getTotalViolationCount(): number {
         this.getTotalViolationCountCallCount++

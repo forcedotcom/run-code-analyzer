@@ -1,16 +1,15 @@
 #!/bin/bash
 
 # About:
-# This is a helper script to tag and push a new release.
-# GitHub Actions use release tags to allow users to select a specific version of the action to use.
-# This script will do the following:
-# 1. Get the latest release tag
-# 2. Prompt the user for a new release tag (while displaying the latest release tag, and a regex to validate the new tag)
-# 3. Tag the new release
-# 4. Push the new tag to the remote
-
+#   This is a helper script to echo the commands needed to tag and push a new release.
+#   GitHub Actions use release tags to allow users to select a specific version of the action to use.
+#   This script will do the following:
+#   1. Get the latest release tag
+#   2. Prompt the user for a new release tag (while displaying the latest release tag, and a regex to validate the new tag)
+#   3. Show the commands to create/push the new release vX.Y.Z tag and to update the vX tags
+#
 # Usage:
-# script/release
+# ./script/release
 
 # COLORS
 OFF='\033[0m'
@@ -18,7 +17,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 
-latest_tag=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+# Get the latest vX.Y.Z tag
+latest_tag=$(git tag -l | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
 
 # if the latest_tag is empty, then there are no tags - let the user know
 if [[ -z "$latest_tag" ]]; then
@@ -27,21 +27,32 @@ if [[ -z "$latest_tag" ]]; then
 fi
 
 echo -e "The latest release tag is: ${BLUE}${latest_tag}${OFF}"
-read -r -p 'New Release Tag (vX.X.X format): ' new_tag
+read -r -p 'New Release Tag (vX.Y.Z format): ' new_tag
 
+# Ensure the new tag is in the proper format (vX.Y.Z)
 tag_regex='v[0-9]+\.[0-9]+\.[0-9]+$'
 if echo "$new_tag" | grep -q -E "$tag_regex"; then
     echo -e "Tag: ${BLUE}$new_tag${OFF} is valid"
 else
-    echo -e "Tag: ${BLUE}$new_tag${OFF} is ${RED}not valid${OFF} (must be in vX.X.X format)"
+    echo -e "Tag: ${BLUE}$new_tag${OFF} is ${RED}not valid${OFF} (must be in vX.Y.Z format)"
     exit 1
 fi
 
-git tag -a "$new_tag" -m "$new_tag Release"
+# Extract major version from the new tag (e.g., v1.3.0 -> v1)
+major_version=$(echo "$new_tag" | sed -E 's/^v([0-9]+)\..*/v\1/')
 
-echo -e "${GREEN}OK${OFF} - Tagged: $new_tag"
+# Show the command to create the new vX.Y.Z tag
+echo -e "${GREEN}Command to create the new tag:${OFF}"
+echo "git tag -a \"$new_tag\" -m \"$new_tag Release\""
 
-git push --tags
+# Show the command to force update the vX tag
+echo -e "${GREEN}Command to force update the vX tag:${OFF}"
+echo "git tag -f \"$major_version\" \"$new_tag\""
 
-echo -e "${GREEN}OK${OFF} - Tags pushed to remote!"
-echo -e "${GREEN}DONE${OFF}"
+# Show the command to push both tags to the remote
+echo -e "${GREEN}Command to push the tags to the remote:${OFF}"
+echo "git push --tags --force"
+
+echo "After running these commands, you then must go to"
+echo "   https://github.com/forcedotcom/run-code-analyzer/releases/tag/$new_tag"
+echo "and click the 'Create release from tag' button and mark the release as the latest."
