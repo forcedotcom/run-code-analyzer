@@ -2,3 +2,4 @@ dist/
 dist_local/
 node_modules/
 coverage/
+*.md

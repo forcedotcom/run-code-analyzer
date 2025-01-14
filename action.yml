@@ -1,5 +1,7 @@
 name: 'Run Salesforce Code Analyzer'
-description: 'Scans your code for violations using Salesforce Code Analyzer, uploads results as an artifact, and creates a job summary.'
+description:
+  'Scans your code for violations using Salesforce Code Analyzer, uploads results as an artifact, and creates a job
+  summary.'
 author: 'Salesforce Code Analyzer Team'
 
 branding:
@@ -11,11 +13,11 @@ inputs:
     description: |-
       Specifies arguments passed to the `run` command.
       Default: "--view detail --output-file sfca_results.json"
-      
+
       For a full list of acceptable arguments for the run command, see the [code-analyzer Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_code-analyzer_commands_unified.htm).
-      
+
       The stdout text from the `run` command is written to the GitHub workflow run logs.
-      
+
       Each output file specified by a `--output-file` (or `-f`) flag is included in the zip archive GitHub workflow run artifact for you to download.
     required: false
     default: '--view detail --output-file sfca_results.json'
