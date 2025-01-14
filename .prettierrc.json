@@ -1,16 +1,24 @@
 {
-  "printWidth": 120,
-  "tabWidth": 4,
-  "useTabs": false,
-  "semi": false,
-  "singleQuote": true,
-  "quoteProps": "as-needed",
-  "jsxSingleQuote": false,
-  "trailingComma": "none",
-  "bracketSpacing": true,
-  "bracketSameLine": true,
-  "arrowParens": "avoid",
-  "proseWrap": "always",
-  "htmlWhitespaceSensitivity": "css",
-  "endOfLine": "lf"
+    "printWidth": 120,
+    "tabWidth": 4,
+    "useTabs": false,
+    "semi": false,
+    "singleQuote": true,
+    "quoteProps": "as-needed",
+    "jsxSingleQuote": false,
+    "trailingComma": "none",
+    "bracketSpacing": true,
+    "bracketSameLine": true,
+    "arrowParens": "avoid",
+    "proseWrap": "always",
+    "htmlWhitespaceSensitivity": "css",
+    "endOfLine": "lf",
+    "overrides": [
+        {
+            "files": "*.yml",
+            "options": {
+                "tabWidth": 2
+            }
+        }
+    ]
 }

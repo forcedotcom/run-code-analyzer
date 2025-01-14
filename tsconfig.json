@@ -1,19 +1,19 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "compilerOptions": {
-    "rootDir": ".",
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "baseUrl": "./",
-    "sourceMap": true,
-    "outDir": "./dist_local",
-    "noImplicitAny": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "newLine": "lf"
-  },
-  "exclude": ["./dist", "./dist_local", "./node_modules", "./coverage"]
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "rootDir": ".",
+        "target": "ES2022",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "baseUrl": "./",
+        "sourceMap": true,
+        "outDir": "./dist_local",
+        "noImplicitAny": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "newLine": "lf"
+    },
+    "exclude": ["./dist", "./dist_local", "./node_modules", "./coverage"]
 }
