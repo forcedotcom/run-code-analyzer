@@ -61,13 +61,14 @@ export async function run(
         dependencies.startGroup(MESSAGES.STEP_LABELS.ANALYZING_RESULTS)
         assertFileExists(dependencies, jsonOutputFile)
         const results: Results = resultsFactory.createResults(jsonOutputFile)
-        const violation: Violation = results.getViolationsSortedBySeverity()[0]
-        dependencies.errorWithAnnotation(violation.getMessage(), {
-            file: violation.getLocation().getFile(),
-            title: 'asdfasdf',
-            startLine: violation.getLocation().getLine() ?? 0,
-            startColumn: violation.getLocation().getColumn() ?? 0
-        })
+        for (const violation of results.getViolationsSortedBySeverity()) {
+            dependencies.errorWithAnnotation(violation.getMessage(), {
+                file: violation.getLocation().getFile(),
+                title: 'asdfasdf',
+                startLine: violation.getLocation().getLine() ?? 0,
+                startColumn: violation.getLocation().getColumn() ?? 0
+            })
+        }
         dependencies.setOutput('num-violations', results.getTotalViolationCount().toString())
         dependencies.setOutput('num-sev1-violations', results.getSev1ViolationCount().toString())
         dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString())
