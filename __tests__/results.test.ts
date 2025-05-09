@@ -50,6 +50,14 @@ describe('RuntimeResultsFactory Tests', () => {
             'force-app/main/default/aura/AccountRepeat/AccountRepeatController.js:5:13'
         )
     })
+
+    it('abasdf', () => {
+        const results: Results = resultsFactory.createResults(
+            path.join(__dirname, '..', '..', 'sfdx-scanner-2', 'beep.json')
+        )
+
+        expect(results.getTotalViolationCount()).toEqual(73)
+    })
 })
 
 describe('RuntimeViolation Tests', () => {

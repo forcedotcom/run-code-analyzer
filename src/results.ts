@@ -26,6 +26,9 @@ export interface Violation {
 
 export interface ViolationLocation {
     toString(): string
+    getFile(): string | undefined
+    getLine(): number | undefined
+    getColumn(): number | undefined
     compareTo(other: ViolationLocation): number
 }
 
@@ -167,25 +170,40 @@ export class RuntimeViolation implements Violation {
 }
 
 export class RunViolationLocation implements ViolationLocation {
-    private readonly fileName: string
+    private readonly fileName: string | undefined
     private readonly line: number | undefined
     private readonly column: number | undefined
 
-    constructor(fileName: string, line: number | undefined, column: number | undefined) {
+    constructor(fileName: string | undefined, line: number | undefined, column: number | undefined) {
         this.fileName = fileName
         this.line = line
         this.column = column
     }
 
     toString(): string {
-        let locStr = this.fileName
-        if (this.line !== undefined) {
-            locStr += `:${this.line}`
-            if (this.column !== undefined) {
-                locStr += `:${this.column}`
+        let locStr: string = ''
+        if (this.fileName !== undefined) {
+            locStr = this.fileName
+            if (this.line !== undefined) {
+                locStr += `:${this.line}`
+                if (this.column !== undefined) {
+                    locStr += `:${this.column}`
+                }
             }
         }
         return locStr
+    }
+
+    getFile(): string | undefined {
+        return this.fileName
+    }
+
+    getLine(): number | undefined {
+        return this.line
+    }
+
+    getColumn(): number | undefined {
+        return this.column
     }
 
     compareTo(other: ViolationLocation): number {
@@ -193,6 +211,11 @@ export class RunViolationLocation implements ViolationLocation {
             return -1
         }
         if (this.fileName !== other.fileName) {
+            if (this.fileName === undefined) {
+                return 1
+            } else if (other.fileName === undefined) {
+                return -1
+            }
             return this.fileName < other.fileName ? -1 : 1
         } else if (this.line !== other.line) {
             if (this.line === undefined) {

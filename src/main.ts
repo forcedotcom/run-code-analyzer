@@ -3,7 +3,7 @@ import { Dependencies } from './dependencies'
 import { CommandOutput, Inputs } from './types'
 import { CommandExecutor } from './commands'
 import { MESSAGE_FCNS, MESSAGES, MIN_CODE_ANALYZER_VERSION_REQUIRED } from './constants'
-import { Results, ResultsFactory } from './results'
+import { Results, ResultsFactory, Violation } from './results'
 import { Summarizer } from './summary'
 
 const STDERR_ERROR_MARKER = 'Error'
@@ -61,6 +61,13 @@ export async function run(
         dependencies.startGroup(MESSAGES.STEP_LABELS.ANALYZING_RESULTS)
         assertFileExists(dependencies, jsonOutputFile)
         const results: Results = resultsFactory.createResults(jsonOutputFile)
+        const violation: Violation = results.getViolationsSortedBySeverity()[0]
+        dependencies.errorWithAnnotation(violation.getMessage(), {
+            file: violation.getLocation().getFile(),
+            title: 'asdfasdf',
+            startLine: violation.getLocation().getLine() ?? 0,
+            startColumn: violation.getLocation().getColumn() ?? 0
+        })
         dependencies.setOutput('num-violations', results.getTotalViolationCount().toString())
         dependencies.setOutput('num-sev1-violations', results.getSev1ViolationCount().toString())
         dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString())

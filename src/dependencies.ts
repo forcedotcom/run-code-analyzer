@@ -30,6 +30,8 @@ export interface Dependencies {
 
     error(errorMessage: string): void
 
+    errorWithAnnotation(errorMessage: string, annotation: core.AnnotationProperties): void
+
     fail(failMessage: string): void
 
     fileExists(file: string): boolean
@@ -97,6 +99,10 @@ export class RuntimeDependencies implements Dependencies {
 
     error(errorMessage: string): void {
         core.error(errorMessage)
+    }
+
+    errorWithAnnotation(errorMessage: string, annotation: core.AnnotationProperties): void {
+        core.error(errorMessage, annotation)
     }
 
     fail(failMessage: string): void {

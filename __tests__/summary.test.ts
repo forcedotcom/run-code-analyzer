@@ -8,6 +8,14 @@ describe('RuntimeSummarizer Tests', () => {
     const resultsFactory: ResultsFactory = new RuntimeResultsFactory()
     const summarizer: Summarizer = new RuntimeSummarizer()
 
+    it('asdfasdfasdf', () => {
+        const results: Results = resultsFactory.createResults(
+            path.join(__dirname, '..', '..', 'sfdx-scanner-2', 'beep.json')
+        )
+
+        const summaryMarkdown = summarizer.createSummaryMarkdown(results)
+    })
+
     it('Test createSummaryMarkdown with sample run results', () => {
         const results: Results = resultsFactory.createResults(
             path.join('.', '__tests__', 'data', 'sampleRunResults.json')

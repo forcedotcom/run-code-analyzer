@@ -108984,6 +108984,9 @@ class RuntimeDependencies {
     error(errorMessage) {
         core.error(errorMessage);
     }
+    errorWithAnnotation(errorMessage, annotation) {
+        core.error(errorMessage, annotation);
+    }
     fail(failMessage) {
         core.setFailed(failMessage);
     }
@@ -109050,6 +109053,13 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.ANALYZING_RESULTS);
         assertFileExists(dependencies, jsonOutputFile);
         const results = resultsFactory.createResults(jsonOutputFile);
+        const violation = results.getViolationsSortedBySeverity()[0];
+        dependencies.errorWithAnnotation(violation.getMessage(), {
+            file: violation.getLocation().getFile(),
+            title: 'asdfasdf',
+            startLine: violation.getLocation().getLine() ?? 0,
+            startColumn: violation.getLocation().getColumn() ?? 0
+        });
         dependencies.setOutput('num-violations', results.getTotalViolationCount().toString());
         dependencies.setOutput('num-sev1-violations', results.getSev1ViolationCount().toString());
         dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString());
@@ -109251,20 +109261,38 @@ class RunViolationLocation {
         this.column = column;
     }
     toString() {
-        let locStr = this.fileName;
-        if (this.line !== undefined) {
-            locStr += `:${this.line}`;
-            if (this.column !== undefined) {
-                locStr += `:${this.column}`;
+        let locStr = '';
+        if (this.fileName !== undefined) {
+            locStr = this.fileName;
+            if (this.line !== undefined) {
+                locStr += `:${this.line}`;
+                if (this.column !== undefined) {
+                    locStr += `:${this.column}`;
+                }
             }
         }
         return locStr;
+    }
+    getFile() {
+        return this.fileName;
+    }
+    getLine() {
+        return this.line;
+    }
+    getColumn() {
+        return this.column;
     }
     compareTo(other) {
         if (!(other instanceof RunViolationLocation)) {
             return -1;
         }
         if (this.fileName !== other.fileName) {
+            if (this.fileName === undefined) {
+                return 1;
+            }
+            else if (other.fileName === undefined) {
+                return -1;
+            }
             return this.fileName < other.fileName ? -1 : 1;
         }
         else if (this.line !== other.line) {

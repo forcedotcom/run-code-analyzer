@@ -1,6 +1,7 @@
 import { Dependencies } from '../src/dependencies'
 import { CommandOutput, EnvironmentVariables, Inputs } from '../src/types'
 import { CommandExecutor } from '../src/commands'
+import * as core from '@actions/core'
 import { Results, ResultsFactory, Violation, ViolationLocation } from '../src/results'
 import { Summarizer } from '../src/summary'
 
@@ -57,6 +58,11 @@ export class FakeDependencies implements Dependencies {
     errorCallHistory: { errorMessage: string }[] = []
     error(errorMessage: string): void {
         this.errorCallHistory.push({ errorMessage })
+    }
+
+    errrorWithAnnotationCallHistory: { errorMessage: string; annotation: core.AnnotationProperties }[] = []
+    errorWithAnnotation(errorMessage: string, annotation: core.AnnotationProperties): void {
+        this.errrorWithAnnotationCallHistory.push({ errorMessage, annotation })
     }
 
     failCallHistory: { failMessage: string }[] = []
@@ -187,6 +193,18 @@ export class FakeViolationLocation implements ViolationLocation {
     toString(): string {
         this.toStringCallCount++
         return this.toStringReturnValue
+    }
+
+    getFile(): string | undefined {
+        return undefined
+    }
+
+    getLine(): number | undefined {
+        return undefined
+    }
+
+    getColumn(): number | undefined {
+        return undefined
     }
 }
 
