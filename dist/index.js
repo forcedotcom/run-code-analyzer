@@ -159128,6 +159128,7 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         review.owner = github.context.payload.pull_request.base.repo.owner.login;
         review.pullNumber = github.context.payload.pull_request.number;
         review.commitId = github.context.payload.pull_request.head.sha;
+        process.env.GITHUB_TOKEN = inputs.githubToken;
         const octokit = new dist_bundle_Octokit();
         const { data: { id } } = await octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
             owner: review.owner,
