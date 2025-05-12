@@ -4,7 +4,9 @@ import { CommandOutput, Inputs } from './types'
 import { CommandExecutor } from './commands'
 import { MESSAGE_FCNS, MESSAGES, MIN_CODE_ANALYZER_VERSION_REQUIRED } from './constants'
 import { Results, ResultsFactory, Violation } from './results'
+import * as github from '@actions/github'
 import { Summarizer } from './summary'
+import { Octokit } from '@octokit/action'
 
 const STDERR_ERROR_MARKER = 'Error'
 
@@ -64,7 +66,11 @@ export async function run(
         const allViolations = results.getViolationsSortedBySeverity()
         dependencies.info(`There are ${allViolations.length} violations`)
         let i = 0
+        let displayFilePath = ''
         for (const violation of results.getViolationsSortedBySeverity()) {
+            if ((violation.getLocation().getFile() ?? '').endsWith('Display.ts')) {
+                displayFilePath = violation.getLocation().getFile()!
+            }
             i += 1
             dependencies.errorWithAnnotation(violation.getMessage(), {
                 file: violation.getLocation().getFile(),
@@ -73,6 +79,27 @@ export async function run(
                 startColumn: violation.getLocation().getColumn() ?? 0
             })
         }
+        const review: any = {
+            event: 'COMMENT',
+            body: 'SFCA found violations'
+        }
+        review.repo = github.context.payload.pull_request!.base.repo.name
+        review.owner = github.context.payload.pull_request!.base.repo.owner.login
+        review.pullNumber = github.context.payload.pull_request!.number
+        review.commitId = github.context.payload.pull_request!.head.sha
+        const octokit = new Octokit()
+
+        const {
+            data: { id }
+        } = await octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
+            owner: review.owner,
+            repo: review.repo,
+            pull_number: review.pullNumber,
+            body: review.body,
+            comments: review.comments,
+            event: review.event
+        })
+
         dependencies.setOutput('num-violations', results.getTotalViolationCount().toString())
         dependencies.setOutput('num-sev1-violations', results.getSev1ViolationCount().toString())
         dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString())

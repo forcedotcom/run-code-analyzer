@@ -3,8 +3,8 @@
     "compilerOptions": {
         "rootDir": ".",
         "target": "ES2022",
-        "module": "NodeNext",
-        "moduleResolution": "NodeNext",
+        "module": "ES2022",
+        "moduleResolution": "Bundler",
         "baseUrl": "./",
         "sourceMap": true,
         "outDir": "./dist_local",

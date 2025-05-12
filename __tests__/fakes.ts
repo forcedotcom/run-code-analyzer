@@ -26,7 +26,8 @@ export class FakeDependencies implements Dependencies {
     // We should match the default input values from action.yml here:
     getInputsReturnValue: Inputs = {
         runArguments: '--view detail --output-file sfca_results.json',
-        resultsArtifactName: 'salesforce-code-analyzer-results'
+        resultsArtifactName: 'salesforce-code-analyzer-results',
+        githubToken: ''
     }
     getInputsCallCount = 0
     getInputs(): Inputs {

@@ -93,7 +93,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with various output files including json', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f myFile.html --output-file=another.xml -f=great.json --output-file  cool.sarif -w ./src',
-            resultsArtifactName: 'customArtifactName'
+            resultsArtifactName: 'customArtifactName',
+            githubToken: ''
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -126,7 +127,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with non-json output file', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f myFile.html --view table',
-            resultsArtifactName: 'salesforce-code-analyzer-results'
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            githubToken: ''
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -140,7 +142,8 @@ describe('main run Tests', () => {
         expect(dependencies.uploadArtifactCallHistory).toHaveLength(1)
         expect(dependencies.uploadArtifactCallHistory).toContainEqual({
             artifactName: 'salesforce-code-analyzer-results',
-            artifactFiles: ['myFile.html'] // Our json file doesn't get included since the user didn't specify it
+            artifactFiles: ['myFile.html'], // Our json file doesn't get included since the user didn't specify it
+            githubToken: ''
         })
 
         expect(resultsFactory.createResultsCallHistory).toHaveLength(1)
@@ -152,7 +155,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with zero output files and no view', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '',
-            resultsArtifactName: 'salesforce-code-analyzer-results'
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            githubToken: ''
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -178,7 +182,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with zero output files but supplies a view', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-c someConfig.yml --view detail',
-            resultsArtifactName: 'salesforce-code-analyzer-results'
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            githubToken: ''
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -323,7 +328,8 @@ describe('main run Tests', () => {
     it('Test when the user output file does not exist after run then we fail', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f userResults.xml',
-            resultsArtifactName: 'customArtifactName'
+            resultsArtifactName: 'customArtifactName',
+            githubToken: ''
         }
         dependencies.fileExistsReturnValue = false
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)

@@ -9,6 +9,10 @@ branding:
   color: 'gray-dark'
 
 inputs:
+  github-token:
+    description: |
+      asdfasdfasdfasdf
+    required: true
   run-arguments:
     description: |-
       Specifies arguments passed to the `run` command.
