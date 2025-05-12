@@ -49,5 +49,10 @@ outputs:
     description: The number of Info (5) severity violations found.
 
 runs:
-  using: node20
-  main: dist/index.js
+  using: composite
+  steps:
+    - name: Run action
+      shell: bash
+      run: node ${{ github.action_path }}/dist/index.js
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token}}
