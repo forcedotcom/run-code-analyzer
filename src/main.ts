@@ -119,6 +119,7 @@ export async function run(
             comments: review.comments,
             event: review.event
         })
+        dependencies.info(`Created review with ID ${id}`)
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
