@@ -107,6 +107,12 @@ export async function run(
         review.owner = github.context.payload.pull_request!.base.repo.owner.login
         review.pullNumber = github.context.payload.pull_request!.number
         review.commitId = github.context.payload.pull_request!.head.sha
+        review.comments = [
+            {
+                path: displayFilePath,
+                body: 'asdfasdfasdfasdf'
+            }
+        ]
         process.env.GITHUB_TOKEN = inputs.githubToken
         const octokit = new Octokit()
 
