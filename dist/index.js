@@ -159104,6 +159104,22 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
                 startColumn: violation.getLocation().getColumn() ?? 0
             });
         }
+        dependencies.setOutput('num-violations', results.getTotalViolationCount().toString());
+        dependencies.setOutput('num-sev1-violations', results.getSev1ViolationCount().toString());
+        dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString());
+        dependencies.setOutput('num-sev3-violations', results.getSev3ViolationCount().toString());
+        dependencies.setOutput('num-sev4-violations', results.getSev4ViolationCount().toString());
+        dependencies.setOutput('num-sev5-violations', results.getSev5ViolationCount().toString());
+        dependencies.info(`outputs:\n` +
+            `  exit-code: ${codeAnalyzerOutput.exitCode}\n` +
+            `  num-violations: ${results.getTotalViolationCount()}\n` +
+            `  num-sev1-violations: ${results.getSev1ViolationCount()}\n` +
+            `  num-sev2-violations: ${results.getSev2ViolationCount()}\n` +
+            `  num-sev3-violations: ${results.getSev3ViolationCount()}\n` +
+            `  num-sev4-violations: ${results.getSev4ViolationCount()}\n` +
+            `  num-sev5-violations: ${results.getSev5ViolationCount()}`);
+        dependencies.endGroup();
+        dependencies.startGroup('CREATING REVIEW');
         const review = {
             event: 'COMMENT',
             body: 'SFCA found violations'
@@ -159121,20 +159137,6 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             comments: review.comments,
             event: review.event
         });
-        dependencies.setOutput('num-violations', results.getTotalViolationCount().toString());
-        dependencies.setOutput('num-sev1-violations', results.getSev1ViolationCount().toString());
-        dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString());
-        dependencies.setOutput('num-sev3-violations', results.getSev3ViolationCount().toString());
-        dependencies.setOutput('num-sev4-violations', results.getSev4ViolationCount().toString());
-        dependencies.setOutput('num-sev5-violations', results.getSev5ViolationCount().toString());
-        dependencies.info(`outputs:\n` +
-            `  exit-code: ${codeAnalyzerOutput.exitCode}\n` +
-            `  num-violations: ${results.getTotalViolationCount()}\n` +
-            `  num-sev1-violations: ${results.getSev1ViolationCount()}\n` +
-            `  num-sev2-violations: ${results.getSev2ViolationCount()}\n` +
-            `  num-sev3-violations: ${results.getSev3ViolationCount()}\n` +
-            `  num-sev4-violations: ${results.getSev4ViolationCount()}\n` +
-            `  num-sev5-violations: ${results.getSev5ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY);
         const summaryMarkdown = summarizer.createSummaryMarkdown(results);
