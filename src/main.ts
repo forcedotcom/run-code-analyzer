@@ -110,7 +110,8 @@ export async function run(
         review.comments = [
             {
                 path: displayFilePath,
-                body: 'asdfasdfasdfasdf'
+                body: 'asdfasdfasdfasdf',
+                position: 37
             }
         ]
         process.env.GITHUB_TOKEN = inputs.githubToken
