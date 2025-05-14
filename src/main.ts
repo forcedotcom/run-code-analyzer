@@ -104,13 +104,14 @@ export async function run(
         review.owner = github.context.payload.pull_request!.base.repo.owner.login
         review.pullNumber = github.context.payload.pull_request!.number
         review.commitId = github.context.payload.pull_request!.head.sha
-        review.comments = [
-            {
+        review.comments = []
+        for (let i = 0; i < 40; i++) {
+            review.comments.push({
                 path: fileAPath,
-                body: 'asdfasdfasdfasdf',
+                body: `This is comment #${i + 1}`,
                 position: 14
-            }
-        ]
+            })
+        }
         process.env.GITHUB_TOKEN = inputs.githubToken
         const octokit = new Octokit()
 
