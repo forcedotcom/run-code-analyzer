@@ -159091,11 +159091,8 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         const allViolations = results.getViolationsSortedBySeverity();
         dependencies.info(`There are ${allViolations.length} violations`);
         let i = 0;
-        let displayFilePath = '';
+        let fileAPath = 'test/sample-code/fileA.cls';
         for (const violation of results.getViolationsSortedBySeverity()) {
-            if ((violation.getLocation().getFile() ?? '').endsWith('Display.ts')) {
-                displayFilePath = violation.getLocation().getFile();
-            }
             i += 1;
             dependencies.errorWithAnnotation(violation.getMessage(), {
                 file: violation.getLocation().getFile(),
@@ -159130,9 +159127,9 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         review.commitId = github.context.payload.pull_request.head.sha;
         review.comments = [
             {
-                path: displayFilePath,
+                path: fileAPath,
                 body: 'asdfasdfasdfasdf',
-                position: 37
+                position: 14
             }
         ];
         process.env.GITHUB_TOKEN = inputs.githubToken;
