@@ -105,7 +105,7 @@ export async function run(
         review.pullNumber = github.context.payload.pull_request!.number
         review.commitId = github.context.payload.pull_request!.head.sha
         review.comments = []
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 500; i++) {
             review.comments.push({
                 path: fileAPath,
                 body: `This is comment #${i + 1}`,
