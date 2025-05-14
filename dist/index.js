@@ -159126,11 +159126,11 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         review.pullNumber = github.context.payload.pull_request.number;
         review.commitId = github.context.payload.pull_request.head.sha;
         review.comments = [];
-        for (let i = 0; i < 500; i++) {
+        for (let i = 0; i < 3; i++) {
             review.comments.push({
                 path: fileAPath,
                 body: `This is comment #${i + 1}`,
-                position: 14
+                position: 20
             });
         }
         process.env.GITHUB_TOKEN = inputs.githubToken;
