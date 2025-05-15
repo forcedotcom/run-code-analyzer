@@ -96,7 +96,7 @@ export async function run(
         dependencies.endGroup()
 
         dependencies.startGroup('CREATING REVIEW')
-        const summaryLink = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}`
+        const summaryLink = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}/attempts/1#summary-${github.context.job}`
         const review: any = {
             event: 'COMMENT',
             body: `SFCA found ${results.getTotalViolationCount()} violations. See [action summary](${summaryLink})`

@@ -159117,7 +159117,7 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             `  num-sev5-violations: ${results.getSev5ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup('CREATING REVIEW');
-        const summaryLink = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}`;
+        const summaryLink = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}/attempts/1#summary-${github.context.job}`;
         const review = {
             event: 'COMMENT',
             body: `SFCA found ${results.getTotalViolationCount()} violations. See [action summary](${summaryLink})`
