@@ -105,7 +105,7 @@ export async function run(
         })
         const matrix = process.env.matrix ? JSON.parse(process.env.matrix) : undefined
         const job_name = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`
-        const jobId = workflow_run.jobs.find(job => job.name === github.context.job)!.id
+        const jobId = workflow_run.jobs.find(job => job.name === job_name)!.id
         const summaryLink = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}/attempts/1#summary-${jobId}`
         const review: any = {
             event: 'COMMENT',
