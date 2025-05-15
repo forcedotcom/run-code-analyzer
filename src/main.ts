@@ -122,7 +122,6 @@ export async function run(
             repo: review.repo,
             pull_number: review.pullNumber,
             body: review.body,
-            comments: review.comments,
             event: review.event
         })
         dependencies.info(`Created review with ID ${id}`)
