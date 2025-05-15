@@ -159117,8 +159117,8 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             `  num-sev5-violations: ${results.getSev5ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup('CREATING REVIEW');
-        const octokit = new dist_bundle_Octokit();
         process.env.GITHUB_TOKEN = inputs.githubToken;
+        const octokit = new dist_bundle_Octokit();
         const { data: workflow_run } = await octokit.rest.actions.listJobsForWorkflowRun({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,

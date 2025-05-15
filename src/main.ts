@@ -96,8 +96,8 @@ export async function run(
         dependencies.endGroup()
 
         dependencies.startGroup('CREATING REVIEW')
-        const octokit = new Octokit()
         process.env.GITHUB_TOKEN = inputs.githubToken
+        const octokit = new Octokit()
         const { data: workflow_run } = await octokit.rest.actions.listJobsForWorkflowRun({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
