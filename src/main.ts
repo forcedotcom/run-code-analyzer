@@ -96,7 +96,17 @@ export async function run(
         dependencies.endGroup()
 
         dependencies.startGroup('CREATING REVIEW')
-        const summaryLink = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}/attempts/1#summary-${github.context.job}`
+        const octokit = new Octokit()
+        process.env.GITHUB_TOKEN = inputs.githubToken
+        const { data: workflow_run } = await octokit.rest.actions.listJobsForWorkflowRun({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            run_id: github.context.runId
+        })
+        const matrix = process.env.matrix ? JSON.parse(process.env.matrix) : undefined
+        const job_name = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`
+        const jobId = workflow_run.jobs.find(job => job.name === github.context.job)!.id
+        const summaryLink = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}/attempts/1#summary-${jobId}`
         const review: any = {
             event: 'COMMENT',
             body: `SFCA found ${results.getTotalViolationCount()} violations. See [action summary](${summaryLink})`
@@ -112,9 +122,6 @@ export async function run(
                 body: `This is comment #${i + 1}`
             })
         }
-        process.env.GITHUB_TOKEN = inputs.githubToken
-        const octokit = new Octokit()
-
         const {
             data: { id }
         } = await octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {

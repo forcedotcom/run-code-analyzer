@@ -159117,7 +159117,17 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             `  num-sev5-violations: ${results.getSev5ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup('CREATING REVIEW');
-        const summaryLink = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}/attempts/1#summary-${github.context.job}`;
+        const octokit = new dist_bundle_Octokit();
+        process.env.GITHUB_TOKEN = inputs.githubToken;
+        const { data: workflow_run } = await octokit.rest.actions.listJobsForWorkflowRun({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            run_id: github.context.runId
+        });
+        const matrix = process.env.matrix ? JSON.parse(process.env.matrix) : undefined;
+        const job_name = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`;
+        const jobId = workflow_run.jobs.find(job => job.name === github.context.job).id;
+        const summaryLink = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}/actions/runs/${github.context.runId}/attempts/1#summary-${jobId}`;
         const review = {
             event: 'COMMENT',
             body: `SFCA found ${results.getTotalViolationCount()} violations. See [action summary](${summaryLink})`
@@ -159133,8 +159143,6 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
                 body: `This is comment #${i + 1}`
             });
         }
-        process.env.GITHUB_TOKEN = inputs.githubToken;
-        const octokit = new dist_bundle_Octokit();
         const { data: { id } } = await octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
             owner: review.owner,
             repo: review.repo,
