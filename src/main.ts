@@ -105,11 +105,10 @@ export async function run(
         review.pullNumber = github.context.payload.pull_request!.number
         review.commitId = github.context.payload.pull_request!.head.sha
         review.comments = []
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 1; i++) {
             review.comments.push({
                 path: fileAPath,
-                body: `This is comment #${i + 1}`,
-                position: 20
+                body: `This is comment #${i + 1}`
             })
         }
         process.env.GITHUB_TOKEN = inputs.githubToken
