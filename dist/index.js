@@ -159548,10 +159548,10 @@ class RuntimeSummarizer {
             summary += `Showing ${numViolationsIncluded} of ${violations.length} violations:${external_os_.EOL}`;
         }
         summary +=
-            `<table>` +
+            `<details><summary>${tableRows.length} violations</summary><table>` +
                 `<tr><th> </th><th>Location</th><th>Rule</th><th>Message</th></tr>${external_os_.EOL}` +
                 `${tableRows}` +
-                `</table>${external_os_.EOL}`;
+                `</table></details>${external_os_.EOL}`;
         return summary;
     }
 }

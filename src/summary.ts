@@ -64,10 +64,10 @@ export class RuntimeSummarizer implements Summarizer {
             summary += `Showing ${numViolationsIncluded} of ${violations.length} violations:${EOL}`
         }
         summary +=
-            `<table>` +
+            `<details><summary>${tableRows.length} violations</summary><table>` +
             `<tr><th> </th><th>Location</th><th>Rule</th><th>Message</th></tr>${EOL}` +
             `${tableRows}` +
-            `</table>${EOL}`
+            `</table></details>${EOL}`
 
         return summary
     }
