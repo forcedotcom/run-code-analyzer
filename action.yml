@@ -54,6 +54,11 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Check out to facilitate diffing
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Identify changed files
       shell: bash
       if: ${{ github.event_name == 'pull_request' }}
