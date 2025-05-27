@@ -182,6 +182,10 @@ export class FakeViolationLocation implements ViolationLocation {
         return this.compareToReturnValue
     }
 
+    getFile(): string {
+        return 'fakeFile'
+    }
+
     toStringReturnValue = 'someLocation'
     toStringCallCount = 0
     toString(): string {

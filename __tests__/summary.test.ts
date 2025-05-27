@@ -6,19 +6,58 @@ import { FakeResults, FakeViolationLocation } from './fakes'
 
 describe('RuntimeSummarizer Tests', () => {
     const resultsFactory: ResultsFactory = new RuntimeResultsFactory()
-    const summarizer: Summarizer = new RuntimeSummarizer()
+    let summarizer: Summarizer = new RuntimeSummarizer()
 
-    it('Test createSummaryMarkdown with sample run results', () => {
-        const results: Results = resultsFactory.createResults(
-            path.join('.', '__tests__', 'data', 'sampleRunResults.json')
-        )
-        const summaryMarkdown = summarizer.createSummaryMarkdown(results)
+    describe('Tests using sampleRunResults.json', () => {
+        const results: Results = resultsFactory.createResults(path.join(__dirname, 'data', 'sampleRunResults.json'))
 
-        const expectedSummaryMarkdown = fs.readFileSync(
-            path.join('.', '__tests__', 'data', 'sampleRunResults_expectedSummary.md'),
-            { encoding: 'utf8' }
-        )
-        expect(summaryMarkdown).toEqual(expectedSummaryMarkdown)
+        it('Sorts violations into tables based on whether they occur in changed files', () => {
+            const changedFiles: string[] = [
+                'force-app/main/default/aura/AccountRepeat/AccountRepeatController.js',
+                'force-app/main/default/aura/DOMXSS/DOMXSSController.js',
+                'force-app/main/default/classes/NameController.cls',
+                'force-app/main/default/classes/SimpleAccount.cls'
+            ]
+            summarizer = new RuntimeSummarizer()
+
+            const summaryMarkdown: string = summarizer.createSummaryMarkdown(results, changedFiles)
+
+            const expectedSummaryMarkdown: string = fs.readFileSync(
+                path.join(__dirname, 'data', 'sampleRunResults_twoTablesSummary.md'),
+                'utf-8'
+            )
+            expect(summaryMarkdown).toEqual(expectedSummaryMarkdown)
+        })
+
+        it.each([
+            { case: 'all violations are in changed files', changedFiles: getAllFilesInSample() },
+            {
+                case: 'all violations are in unchanged files',
+                changedFiles: ['force-app/main/default/classes/DoNoUseThisClassName.cls']
+            },
+            { case: 'no changed files are reported', changedFiles: [] } // This case is relevant for when the action is used outside the context of a Pull Request
+        ])('When $case, only one table is displayed', ({ changedFiles }) => {
+            summarizer = new RuntimeSummarizer()
+
+            const summaryMarkdown: string = summarizer.createSummaryMarkdown(results, changedFiles)
+
+            const expectedSummaryMarkdown: string = fs.readFileSync(
+                path.join(__dirname, 'data', 'sampleRunResults_oneTableSummary.md'),
+                'utf-8'
+            )
+            expect(summaryMarkdown).toEqual(expectedSummaryMarkdown)
+        })
+
+        function getAllFilesInSample(): string[] {
+            return [
+                ...new Set(
+                    results
+                        .getViolationsSortedBySeverity()
+                        .flatMap(v => v.getLocations())
+                        .map(v => v.getFile())
+                ).keys()
+            ]
+        }
     })
 
     it('Test createSummaryMarkdown with results that have no violations', () => {
@@ -56,7 +95,8 @@ describe('RuntimeSummarizer Tests', () => {
                 'someRule',
                 undefined,
                 `some message ${i + 1}`,
-                dummyLocation
+                0,
+                [dummyLocation]
             )
             results.getViolationsSortedBySeverityReturnValue.push(dummyViolation)
         }

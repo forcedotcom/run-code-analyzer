@@ -16,7 +16,8 @@ export interface Results {
 
 export interface Violation {
     getSeverity(): number
-    getLocation(): ViolationLocation
+    getPrimaryLocationIndex(): number
+    getLocations(): ViolationLocation[]
     getRuleEngine(): string
     getRuleName(): string
     getRuleUrl(): string | undefined
@@ -25,6 +26,7 @@ export interface Violation {
 }
 
 export interface ViolationLocation {
+    getFile(): string
     toString(): string
     compareTo(other: ViolationLocation): number
 }
@@ -37,11 +39,9 @@ export class RuntimeResultsFactory implements ResultsFactory {
         const violations: Violation[] = []
         for (const violationObj of resultObj['violations']) {
             const primaryLocationIndex: number = violationObj['primaryLocationIndex']
-            const primaryLocation = violationObj['locations'][primaryLocationIndex]
-            const violationLocation: ViolationLocation = new RunViolationLocation(
-                primaryLocation['file'],
-                primaryLocation['startLine'],
-                primaryLocation['startColumn']
+            const violationLocations: ViolationLocation[] = violationObj['locations'].map(
+                (l: { file: string; startLine: number; startColumn: number }) =>
+                    new RunViolationLocation(l['file'], l['startLine'], l['startColumn'])
             )
 
             violations.push(
@@ -51,7 +51,8 @@ export class RuntimeResultsFactory implements ResultsFactory {
                     violationObj['rule'],
                     violationObj['resources'][0],
                     violationObj['message'],
-                    violationLocation
+                    primaryLocationIndex,
+                    violationLocations
                 )
             )
         }
@@ -106,7 +107,8 @@ export class RuntimeViolation implements Violation {
     private readonly ruleName: string
     private readonly ruleUrl?: string
     private readonly message: string
-    private readonly location: ViolationLocation
+    private readonly primaryLocationIdx: number
+    private readonly locations: ViolationLocation[]
 
     constructor(
         severity: number,
@@ -114,22 +116,20 @@ export class RuntimeViolation implements Violation {
         ruleName: string,
         ruleUrl: string | undefined,
         message: string,
-        location: ViolationLocation
+        primaryLocationIdx: number,
+        locations: ViolationLocation[]
     ) {
         this.severity = severity
         this.ruleEngine = ruleEngine
         this.ruleName = ruleName
         this.ruleUrl = ruleUrl
         this.message = message
-        this.location = location
+        this.primaryLocationIdx = primaryLocationIdx
+        this.locations = locations
     }
 
     getSeverity(): number {
         return this.severity
-    }
-
-    getLocation(): ViolationLocation {
-        return this.location
     }
 
     getRuleEngine(): string {
@@ -148,13 +148,23 @@ export class RuntimeViolation implements Violation {
         return this.message
     }
 
+    getPrimaryLocationIndex(): number {
+        return this.primaryLocationIdx
+    }
+
+    getLocations(): ViolationLocation[] {
+        return this.locations
+    }
+
     compareTo(other: Violation): number {
         if (this.getSeverity() !== other.getSeverity()) {
             return this.getSeverity() - other.getSeverity()
         }
-        const locationCompare: number = this.getLocation().compareTo(other.getLocation())
-        if (locationCompare !== 0) {
-            return locationCompare
+        const primaryLocationCompare: number = this.getLocations()[this.getPrimaryLocationIndex()].compareTo(
+            other.getLocations()[other.getPrimaryLocationIndex()]
+        )
+        if (primaryLocationCompare !== 0) {
+            return primaryLocationCompare
         }
         if (this.getRuleEngine() !== other.getRuleEngine()) {
             return this.getRuleEngine() < other.getRuleEngine() ? -1 : 1
@@ -186,6 +196,10 @@ export class RunViolationLocation implements ViolationLocation {
             }
         }
         return locStr
+    }
+
+    getFile(): string {
+        return this.fileName
     }
 
     compareTo(other: ViolationLocation): number {

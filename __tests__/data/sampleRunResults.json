@@ -1,12 +1,12 @@
 {
     "runDir": "/Users/runner/work/sample-sf-project/sample-sf-project/",
     "violationCounts": {
-        "total": 202,
+        "total": 203,
         "sev1": 0,
         "sev2": 88,
         "sev3": 49,
         "sev4": 44,
-        "sev5": 21
+        "sev5": 22
     },
     "versions": {
         "code-analyzer": "0.20.2",
@@ -3680,6 +3680,31 @@
             ],
             "message": "Avoid unescaped user controlled content in EL",
             "resources": ["https://docs.pmd-code.org/pmd-doc-7.8.0/pmd_rules_visualforce_security.html#vfunescapeel"]
+        },
+        {
+            "rule": "DetectCopyPasteForApex",
+            "engine": "cpd",
+            "severity": 5,
+            "tags": ["Recommended", "Design", "Apex"],
+            "primaryLocationIndex": 0,
+            "locations": [
+                {
+                    "file": "force-app/main/default/classes/NameController.cls",
+                    "startLine": 1,
+                    "startColumn": 1,
+                    "endLine": 10,
+                    "endColumn": 50
+                },
+                {
+                    "file": "force-app/main/default/classes/SharingInnerClass.cls",
+                    "startLine": 15,
+                    "startColumn": 1,
+                    "endLine": 25,
+                    "endColumn": 50
+                }
+            ],
+            "message": "Duplicate code detected for language 'apex'. Found 2 code locations containing the same block of code consisting of 123 tokens across 10 lines.",
+            "resources": ["https://docs.pmd-code.org/latest/pmd_userdocs_cpd.html#refactoring-duplicates"]
         }
     ]
 }
