@@ -196,9 +196,9 @@ export class FakeViolationLocation implements ViolationLocation {
 
 export class FakeSummarizer implements Summarizer {
     createSummaryMarkdownReturnValue = 'someSummaryMarkdown'
-    createSummaryMarkdownCallHistory: { results: Results }[] = []
-    createSummaryMarkdown(results: Results): string {
-        this.createSummaryMarkdownCallHistory.push({ results })
+    createSummaryMarkdownCallHistory: { results: Results; changedFiles?: string[] }[] = []
+    createSummaryMarkdown(results: Results, changedFiles?: string[]): string {
+        this.createSummaryMarkdownCallHistory.push({ results, changedFiles })
         return this.createSummaryMarkdownReturnValue
     }
 }

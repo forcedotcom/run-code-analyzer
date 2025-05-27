@@ -80,7 +80,7 @@ export async function run(
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
-        const summaryMarkdown: string = summarizer.createSummaryMarkdown(results)
+        const summaryMarkdown: string = summarizer.createSummaryMarkdown(results, inputs.changedFiles)
         await dependencies.writeSummary(summaryMarkdown)
         dependencies.endGroup()
     } catch (error) {

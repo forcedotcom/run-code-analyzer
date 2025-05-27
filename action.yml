@@ -31,19 +31,41 @@ inputs:
 outputs:
   exit-code:
     description: The Salesforce Code Analyzer execution exit code.
+    value: ${{ steps.run-code-analysis.outputs.exit-code }}
   num-violations:
     description: The total number of violations found.
+    value: ${{ steps.run-code-analysis.outputs.num-violations }}
   num-sev1-violations:
     description: The number of Critical (1) severity violations found.
+    value: ${{ steps.run-code-analysis.outputs.num-sev1-violations }}
   num-sev2-violations:
     description: The number of High (2) severity violations found.
+    value: ${{ steps.run-code-analysis.outputs.num-sev2-violations }}
   num-sev3-violations:
     description: The number of Medium (3) severity violations found.
+    value: ${{ steps.run-code-analysis.outputs.num-sev3-violations }}
   num-sev4-violations:
     description: The number of Low (4) severity violations found.
+    value: ${{ steps.run-code-analysis.outputs.num-sev4-violations }}
   num-sev5-violations:
     description: The number of Info (5) severity violations found.
+    value: ${{ steps.run-code-analysis.outputs.num-sev5-violations }}
 
 runs:
-  using: node20
-  main: dist/index.js
+  using: composite
+  steps:
+    - name: Identify changed files
+      shell: bash
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        BASE_SHA=${{ github.event.pull_request.base.sha }}
+        HEAD_SHA=${{ github.event.pull_request.head.sha }}
+        git diff --name-only $HEAD_SHA $BASE_SHA > changed_files.txt
+    - name: Write empty changed files
+      shell: bash
+      if: ${{ github.event_name != 'pull_request' }}
+      run: |
+        echo '' > changed_files.txt
+    - id: run-code-analysis
+      shell: bash
+      run: node dist/index.js

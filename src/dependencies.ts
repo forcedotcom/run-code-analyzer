@@ -4,6 +4,7 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import { CommandOutput, EnvironmentVariables, Inputs } from './types'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
+import path from 'path'
 import fs from 'fs'
 
 const COMMAND_NOT_FOUND_EXIT_CODE = 127
@@ -55,9 +56,14 @@ export class RuntimeDependencies implements Dependencies {
     }
 
     getInputs(): Inputs {
+        const changedFiles: string[] = fs
+            .readFileSync(path.join('.', 'changed_files.txt'), 'utf-8')
+            .split('\n')
+            .map(s => s.trim())
         return {
             runArguments: core.getInput('run-arguments'),
-            resultsArtifactName: core.getInput('results-artifact-name')
+            resultsArtifactName: core.getInput('results-artifact-name'),
+            changedFiles
         }
     }
 
