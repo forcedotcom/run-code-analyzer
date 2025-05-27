@@ -4,6 +4,7 @@
     "version": "2.1.0",
     "author": "The Salesforce Code Analyzer Team",
     "private": true,
+    "type": "module",
     "homepage": "https://github.com/forcedotcom/run-code-analyzer",
     "repository": {
         "type": "git",

@@ -3,8 +3,10 @@ import { DefaultArtifactClient } from '@actions/artifact'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as github from '@actions/github'
+import { Octokit } from '@octokit/action'
 import { CommandOutput, EnvironmentVariables, Inputs } from './types'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
+
 import fs from 'fs'
 
 const COMMAND_NOT_FOUND_EXIT_CODE = 127
@@ -113,7 +115,6 @@ export class RuntimeDependencies implements Dependencies {
 
     async getChangedFiles(): Promise<string[]> {
         if (github.context.payload.pull_request) {
-            const Octokit = (await import('@octokit/action')).Octokit
             process.env.GITHUB_TOKEN = core.getInput('github-token')
             const octokit = new Octokit()
             const response = await octokit.request(
