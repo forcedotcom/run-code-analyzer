@@ -19,9 +19,11 @@ export async function run(
     summarizer: Summarizer
 ): Promise<void> {
     try {
+        dependencies.startGroup('Getting diff')
+        const changedFiles = await dependencies.getChangedFiles()
+        dependencies.endGroup()
         dependencies.startGroup(MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT)
         const inputs: Inputs = dependencies.getInputs()
-        const changedFiles = await dependencies.getChangedFiles()
         dependencies.info(`There were ${changedFiles.length} changed files returned, in theory`)
         await installSalesforceCliIfNeeded(dependencies, commandExecutor)
         await installMinimumCodeAnalyzerPluginVersionIfNeeded(dependencies, commandExecutor)

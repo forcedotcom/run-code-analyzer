@@ -155213,9 +155213,11 @@ const STDERR_ERROR_MARKER = 'Error';
  */
 async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
     try {
+        dependencies.startGroup('Getting diff');
+        const changedFiles = await dependencies.getChangedFiles();
+        dependencies.endGroup();
         dependencies.startGroup(MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT);
         const inputs = dependencies.getInputs();
-        const changedFiles = await dependencies.getChangedFiles();
         dependencies.info(`There were ${changedFiles.length} changed files returned, in theory`);
         await installSalesforceCliIfNeeded(dependencies, commandExecutor);
         await installMinimumCodeAnalyzerPluginVersionIfNeeded(dependencies, commandExecutor);
@@ -159225,15 +159227,15 @@ class RuntimeDependencies {
         if (github.context.payload.pull_request) {
             process.env.GITHUB_TOKEN = core.getInput('github-token');
             const octokit = new dist_bundle_Octokit();
-            const response = await octokit.request(`/repos/${github.context.repo.owner}/${github.context.repo.repo}/pulls/${github.context.payload.pull_request.number}}`, {
+            const data = (await octokit.request(`/repos/${github.context.repo.owner}/${github.context.repo.repo}/pulls/${github.context.payload.pull_request.number}}`, {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 pull_number: `${github.context.payload.pull_request.number}`,
                 headers: {
                     accept: 'application/vnd.github.diff'
                 }
-            });
-            core.info(`response is ${JSON.stringify(response)}`);
+            })).data;
+            core.info(`data was ${data}`);
         }
         return [];
     }

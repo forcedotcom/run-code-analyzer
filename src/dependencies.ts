@@ -117,18 +117,20 @@ export class RuntimeDependencies implements Dependencies {
         if (github.context.payload.pull_request) {
             process.env.GITHUB_TOKEN = core.getInput('github-token')
             const octokit = new Octokit()
-            const response = await octokit.request(
-                `/repos/${github.context.repo.owner}/${github.context.repo.repo}/pulls/${github.context.payload.pull_request.number}}`,
-                {
-                    owner: github.context.repo.owner,
-                    repo: github.context.repo.repo,
-                    pull_number: `${github.context.payload.pull_request.number}`,
-                    headers: {
-                        accept: 'application/vnd.github.diff'
+            const data: string = (
+                await octokit.request(
+                    `/repos/${github.context.repo.owner}/${github.context.repo.repo}/pulls/${github.context.payload.pull_request.number}}`,
+                    {
+                        owner: github.context.repo.owner,
+                        repo: github.context.repo.repo,
+                        pull_number: `${github.context.payload.pull_request.number}`,
+                        headers: {
+                            accept: 'application/vnd.github.diff'
+                        }
                     }
-                }
-            )
-            core.info(`response is ${JSON.stringify(response)}`)
+                )
+            ).data
+            core.info(`data was ${data}`)
         }
         return []
     }
