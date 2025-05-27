@@ -73,4 +73,4 @@ runs:
         echo '' > changed_files.txt
     - id: run-code-analysis
       shell: bash
-      run: node dist/index.js
+      run: node ${{ github.action_path }}/dist/index.js
