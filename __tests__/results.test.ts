@@ -17,15 +17,15 @@ describe('RuntimeResultsFactory Tests', () => {
         const results: Results = resultsFactory.createResults(
             path.join('.', '__tests__', 'data', 'sampleRunResults.json')
         )
-        expect(results.getTotalViolationCount()).toEqual(202)
+        expect(results.getTotalViolationCount()).toEqual(203)
         expect(results.getSev1ViolationCount()).toEqual(0)
         expect(results.getSev2ViolationCount()).toEqual(88)
         expect(results.getSev3ViolationCount()).toEqual(49)
         expect(results.getSev4ViolationCount()).toEqual(44)
-        expect(results.getSev5ViolationCount()).toEqual(21)
+        expect(results.getSev5ViolationCount()).toEqual(22)
 
         const violations: Violation[] = results.getViolationsSortedBySeverity()
-        expect(violations).toHaveLength(202)
+        expect(violations).toHaveLength(203)
 
         // Check sorted by severity
         for (let i = 0; i < 88; i++) {
@@ -46,7 +46,8 @@ describe('RuntimeResultsFactory Tests', () => {
         expect(violations[89].getRuleName()).toEqual('no-var')
         expect(violations[89].getRuleUrl()).toEqual('https://eslint.org/docs/latest/rules/no-var')
         expect(violations[89].getMessage()).toEqual('Unexpected var, use let or const instead.')
-        expect(violations[89].getLocation().toString()).toEqual(
+        expect(violations[89].getLocations()).toHaveLength(1)
+        expect(violations[89].getLocations()[0].toString()).toEqual(
             'force-app/main/default/aura/AccountRepeat/AccountRepeatController.js:5:13'
         )
     })
@@ -55,13 +56,14 @@ describe('RuntimeResultsFactory Tests', () => {
 describe('RuntimeViolation Tests', () => {
     it('Test getters', () => {
         const loc: FakeViolationLocation = new FakeViolationLocation()
-        const violation: Violation = new RuntimeViolation(2, 'engine', 'name', 'url', 'msg', loc)
+        const violation: Violation = new RuntimeViolation(2, 'engine', 'name', 'url', 'msg', 0, [loc])
         expect(violation.getSeverity()).toEqual(2)
         expect(violation.getRuleEngine()).toEqual('engine')
         expect(violation.getRuleName()).toEqual('name')
         expect(violation.getRuleUrl()).toEqual('url')
         expect(violation.getMessage()).toEqual('msg')
-        expect(violation.getLocation()).toEqual(loc)
+        expect(violation.getLocations()).toHaveLength(1)
+        expect(violation.getLocations()[0]).toEqual(loc)
     })
 
     it('Test compareTo when severity is not the same', () => {
@@ -69,8 +71,8 @@ describe('RuntimeViolation Tests', () => {
         loc1.compareToReturnValue = -1
         const loc2: FakeViolationLocation = new FakeViolationLocation()
         loc2.compareToReturnValue = 1
-        const v1: Violation = new RuntimeViolation(2, 'engine1', 'name1', 'url1', 'msg1', loc1)
-        const v2: Violation = new RuntimeViolation(1, 'engine2', 'name2', 'url2', 'msg2', loc2)
+        const v1: Violation = new RuntimeViolation(2, 'engine1', 'name1', 'url1', 'msg1', 0, [loc1])
+        const v2: Violation = new RuntimeViolation(1, 'engine2', 'name2', 'url2', 'msg2', 0, [loc2])
 
         expect(v1.compareTo(v2)).toEqual(1)
         expect(v2.compareTo(v1)).toEqual(-1)
@@ -81,8 +83,8 @@ describe('RuntimeViolation Tests', () => {
         loc1.compareToReturnValue = 1
         const loc2: FakeViolationLocation = new FakeViolationLocation()
         loc2.compareToReturnValue = -1
-        const v1: Violation = new RuntimeViolation(2, 'engine1', 'name1', 'url1', 'msg1', loc1)
-        const v2: Violation = new RuntimeViolation(2, 'engine2', 'name2', 'url2', 'msg2', loc2)
+        const v1: Violation = new RuntimeViolation(2, 'engine1', 'name1', 'url1', 'msg1', 0, [loc1])
+        const v2: Violation = new RuntimeViolation(2, 'engine2', 'name2', 'url2', 'msg2', 0, [loc2])
 
         expect(v1.compareTo(v2)).toEqual(1)
         expect(v2.compareTo(v1)).toEqual(-1)
@@ -91,8 +93,8 @@ describe('RuntimeViolation Tests', () => {
     it('Test compareTo when severity and location are the same but engine is different', () => {
         const loc1: FakeViolationLocation = new FakeViolationLocation()
         const loc2: FakeViolationLocation = new FakeViolationLocation()
-        const v1: Violation = new RuntimeViolation(2, 'engineB', 'name1', 'url1', 'msg1', loc1)
-        const v2: Violation = new RuntimeViolation(2, 'engineA', 'name2', 'url2', 'msg2', loc2)
+        const v1: Violation = new RuntimeViolation(2, 'engineB', 'name1', 'url1', 'msg1', 0, [loc1])
+        const v2: Violation = new RuntimeViolation(2, 'engineA', 'name2', 'url2', 'msg2', 0, [loc2])
 
         expect(v1.compareTo(v2)).toEqual(1)
         expect(v2.compareTo(v1)).toEqual(-1)
@@ -101,8 +103,8 @@ describe('RuntimeViolation Tests', () => {
     it('Test compareTo when severity, location, and engine are the same but rule name is different', () => {
         const loc1: FakeViolationLocation = new FakeViolationLocation()
         const loc2: FakeViolationLocation = new FakeViolationLocation()
-        const v1: Violation = new RuntimeViolation(2, 'engine', 'name1', 'url1', 'msg1', loc1)
-        const v2: Violation = new RuntimeViolation(2, 'engine', 'name2', 'url2', 'msg2', loc2)
+        const v1: Violation = new RuntimeViolation(2, 'engine', 'name1', 'url1', 'msg1', 0, [loc1])
+        const v2: Violation = new RuntimeViolation(2, 'engine', 'name2', 'url2', 'msg2', 0, [loc2])
 
         expect(v1.compareTo(v2)).toEqual(-1)
         expect(v2.compareTo(v1)).toEqual(1)
@@ -111,8 +113,8 @@ describe('RuntimeViolation Tests', () => {
     it('Test compareTo when severity, location, engine, and rule name are the same', () => {
         const loc1: FakeViolationLocation = new FakeViolationLocation()
         const loc2: FakeViolationLocation = new FakeViolationLocation()
-        const v1: Violation = new RuntimeViolation(2, 'engine', 'name', 'url1', 'msg1', loc1)
-        const v2: Violation = new RuntimeViolation(2, 'engine', 'name', 'url2', 'msg2', loc2)
+        const v1: Violation = new RuntimeViolation(2, 'engine', 'name', 'url1', 'msg1', 0, [loc1])
+        const v2: Violation = new RuntimeViolation(2, 'engine', 'name', 'url2', 'msg2', 0, [loc2])
 
         expect(v1.compareTo(v2)).toEqual(0)
         expect(v2.compareTo(v1)).toEqual(0)

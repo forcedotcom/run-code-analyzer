@@ -109149,9 +109149,8 @@ class RuntimeResultsFactory {
         const violations = [];
         for (const violationObj of resultObj['violations']) {
             const primaryLocationIndex = violationObj['primaryLocationIndex'];
-            const primaryLocation = violationObj['locations'][primaryLocationIndex];
-            const violationLocation = new RunViolationLocation(primaryLocation['file'], primaryLocation['startLine'], primaryLocation['startColumn']);
-            violations.push(new RuntimeViolation(violationObj['severity'], violationObj['engine'], violationObj['rule'], violationObj['resources'][0], violationObj['message'], violationLocation));
+            const violationLocations = violationObj['locations'].map((l) => new RunViolationLocation(l['file'], l['startLine'], l['startColumn']));
+            violations.push(new RuntimeViolation(violationObj['severity'], violationObj['engine'], violationObj['rule'], violationObj['resources'][0], violationObj['message'], primaryLocationIndex, violationLocations));
         }
         return new RuntimeResults(violations);
     }
@@ -109196,20 +109195,19 @@ class RuntimeViolation {
     ruleName;
     ruleUrl;
     message;
-    location;
-    constructor(severity, ruleEngine, ruleName, ruleUrl, message, location) {
+    primaryLocationIdx;
+    locations;
+    constructor(severity, ruleEngine, ruleName, ruleUrl, message, primaryLocationIdx, locations) {
         this.severity = severity;
         this.ruleEngine = ruleEngine;
         this.ruleName = ruleName;
         this.ruleUrl = ruleUrl;
         this.message = message;
-        this.location = location;
+        this.primaryLocationIdx = primaryLocationIdx;
+        this.locations = locations;
     }
     getSeverity() {
         return this.severity;
-    }
-    getLocation() {
-        return this.location;
     }
     getRuleEngine() {
         return this.ruleEngine;
@@ -109223,13 +109221,19 @@ class RuntimeViolation {
     getMessage() {
         return this.message;
     }
+    getPrimaryLocationIndex() {
+        return this.primaryLocationIdx;
+    }
+    getLocations() {
+        return this.locations;
+    }
     compareTo(other) {
         if (this.getSeverity() !== other.getSeverity()) {
             return this.getSeverity() - other.getSeverity();
         }
-        const locationCompare = this.getLocation().compareTo(other.getLocation());
-        if (locationCompare !== 0) {
-            return locationCompare;
+        const primaryLocationCompare = this.getLocations()[this.getPrimaryLocationIndex()].compareTo(other.getLocations()[other.getPrimaryLocationIndex()]);
+        if (primaryLocationCompare !== 0) {
+            return primaryLocationCompare;
         }
         if (this.getRuleEngine() !== other.getRuleEngine()) {
             return this.getRuleEngine() < other.getRuleEngine() ? -1 : 1;
@@ -109259,6 +109263,9 @@ class RunViolationLocation {
             }
         }
         return locStr;
+    }
+    getFile() {
+        return this.fileName;
     }
     compareTo(other) {
         if (!(other instanceof RunViolationLocation)) {
@@ -109312,7 +109319,7 @@ const SEVERITY_EMOJIS = new Map([
     [5, ':white_circle:']
 ]);
 class RuntimeSummarizer {
-    createSummaryMarkdown(results) {
+    createSummaryMarkdown(results, changedFiles = []) {
         let summary = `## Salesforce Code Analyzer Results${os_1.EOL}`;
         if (results.getTotalViolationCount() === 0) {
             summary += `### :white_check_mark: 0 Violations Found${os_1.EOL}`;
@@ -109327,39 +109334,82 @@ class RuntimeSummarizer {
                 `${SEVERITY_EMOJIS.get(4)} ${results.getSev4ViolationCount()} Low severity violation(s)<br/>${os_1.EOL}` +
                 `${SEVERITY_EMOJIS.get(5)} ${results.getSev5ViolationCount()} Info severity violation(s)${os_1.EOL}` +
                 `</blockquote>${os_1.EOL}`;
-        let tableRows = '';
         const violations = results.getViolationsSortedBySeverity();
-        let numViolationsIncluded = 0;
+        const changedFilesSet = new Set(changedFiles);
+        const violationsInChangedFiles = [];
+        const violationsOutsideChangedFiles = [];
         for (const violation of violations) {
-            const severityEmoji = SEVERITY_EMOJIS.get(violation.getSeverity());
-            const locationStr = makeSmaller(makeSourceAndSinkBold(trimAndBreakNewlines(violation.getLocation().toString())));
-            const ruleLink = createRuleLink(violation.getRuleName(), violation.getRuleUrl());
-            const engineAndRule = makeSmaller(`${violation.getRuleEngine()}:${ruleLink}`);
-            const message = makeSmaller(trimAndBreakNewlines(escapeHtml(violation.getMessage())));
-            const tableRow = `<tr>` +
-                `<td>${severityEmoji}</td>` +
-                `<td>${locationStr}</td>` +
-                `<td>${engineAndRule}</td>` +
-                `<td>${message}</td>` +
-                `</tr>${os_1.EOL}`;
-            if (tableRows.length + tableRow.length > TABLE_ROWS_CHAR_LIMIT) {
-                break;
+            const hasLocationInChangedFile = violation
+                .getLocations()
+                .map(l => l.getFile())
+                .some(f => changedFilesSet.has(f));
+            if (hasLocationInChangedFile) {
+                violationsInChangedFiles.push(violation);
             }
-            tableRows += tableRow;
-            numViolationsIncluded++;
+            else {
+                violationsOutsideChangedFiles.push(violation);
+            }
         }
-        if (numViolationsIncluded < violations.length) {
-            summary += `Showing ${numViolationsIncluded} of ${violations.length} violations:${os_1.EOL}`;
+        if (violationsInChangedFiles.length > 0 && violationsOutsideChangedFiles.length > 0) {
+            const violationsInsideFilesTable = createTable(violationsInChangedFiles, TABLE_ROWS_CHAR_LIMIT / 2);
+            const violationsOutsideFilesTable = createTable(violationsOutsideChangedFiles, TABLE_ROWS_CHAR_LIMIT / 2);
+            summary +=
+                // eslint-disable-next-line prefer-template
+                `<details>${os_1.EOL}` +
+                    `<summary>${violationsInChangedFiles.length} violations in files changed by this pull request</summary>${os_1.EOL}` +
+                    violationsInsideFilesTable +
+                    `</details>${os_1.EOL}` +
+                    `<details>${os_1.EOL}` +
+                    `<summary>${violationsOutsideChangedFiles.length} violations in files unchanged by this pull request</summary>${os_1.EOL}` +
+                    violationsOutsideFilesTable +
+                    `</details>${os_1.EOL}`;
         }
-        summary +=
-            `<table>` +
-                `<tr><th> </th><th>Location</th><th>Rule</th><th>Message</th></tr>${os_1.EOL}` +
-                `${tableRows}` +
-                `</table>${os_1.EOL}`;
+        else {
+            summary += createTable(violations, TABLE_ROWS_CHAR_LIMIT);
+        }
         return summary;
     }
 }
 exports.RuntimeSummarizer = RuntimeSummarizer;
+function createTable(violations, tableRowsCharLimit) {
+    let tableRows = '';
+    let numViolationsIncluded = 0;
+    for (const violation of violations) {
+        const severityEmoji = SEVERITY_EMOJIS.get(violation.getSeverity());
+        const locationStr = makeSmaller(makeSourceAndSinkBold(trimAndBreakNewlines(makeLocationsString(violation.getLocations(), violation.getPrimaryLocationIndex()))));
+        const ruleLink = createRuleLink(violation.getRuleName(), violation.getRuleUrl());
+        const engineAndRule = makeSmaller(`${violation.getRuleEngine()}:${ruleLink}`);
+        const message = makeSmaller(trimAndBreakNewlines(escapeHtml(violation.getMessage())));
+        const tableRow = `<tr>` +
+            `<td>${severityEmoji}</td>` +
+            `<td>${locationStr}</td>` +
+            `<td>${engineAndRule}</td>` +
+            `<td>${message}</td>` +
+            `</tr>${os_1.EOL}`;
+        if (tableRows.length + tableRow.length > tableRowsCharLimit) {
+            break;
+        }
+        tableRows += tableRow;
+        numViolationsIncluded++;
+    }
+    let summary = '';
+    if (numViolationsIncluded < violations.length) {
+        summary += `Showing ${numViolationsIncluded} of ${violations.length} violations:${os_1.EOL}`;
+    }
+    summary +=
+        `<table>` +
+            `<tr><th> </th><th>Location</th><th>Rule</th><th>Message</th></tr>${os_1.EOL}` +
+            `${tableRows}` +
+            `</table>${os_1.EOL}`;
+    return summary;
+}
+function makeLocationsString(locations, primaryIdx) {
+    const locationStrings = [];
+    for (let i = 0; i < locations.length; i++) {
+        locationStrings.push(`${locations.length > 1 && i === primaryIdx ? '(main) ' : ''}${locations[i].toString()}`);
+    }
+    return locationStrings.join('\n');
+}
 function escapeHtml(text) {
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
