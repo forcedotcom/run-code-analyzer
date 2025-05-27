@@ -74,3 +74,6 @@ runs:
     - id: run-code-analysis
       shell: bash
       run: node ${{ github.action_path }}/dist/index.js
+      env:
+        RUN_ARGUMENTS: ${{ inputs.run-arguments }}
+        RESULTS_ARTIFACT_NAME: ${{inputs.results-arifact-name }}

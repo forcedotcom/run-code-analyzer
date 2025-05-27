@@ -61,8 +61,8 @@ export class RuntimeDependencies implements Dependencies {
             .split('\n')
             .map(s => s.trim())
         return {
-            runArguments: core.getInput('run-arguments'),
-            resultsArtifactName: core.getInput('results-artifact-name'),
+            runArguments: process.env.RUN_ARGUMENTS!,
+            resultsArtifactName: process.env.RESULTS_ARTIFACT_NAME!,
             changedFiles
         }
     }
