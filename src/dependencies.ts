@@ -2,6 +2,7 @@ import { mergeWithProcessEnvVars } from './utils'
 import { DefaultArtifactClient } from '@actions/artifact'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import * as github from '@actions/github'
 import { CommandOutput, EnvironmentVariables, Inputs } from './types'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
 import fs from 'fs'
@@ -34,6 +35,8 @@ export interface Dependencies {
 
     fileExists(file: string): boolean
 
+    getChangedFiles(): Promise<string[]>
+
     writeSummary(summaryMarkdown: string): Promise<void>
 }
 
@@ -57,7 +60,8 @@ export class RuntimeDependencies implements Dependencies {
     getInputs(): Inputs {
         return {
             runArguments: core.getInput('run-arguments'),
-            resultsArtifactName: core.getInput('results-artifact-name')
+            resultsArtifactName: core.getInput('results-artifact-name'),
+            githubToken: core.getInput('github-token')
         }
     }
 
@@ -105,6 +109,27 @@ export class RuntimeDependencies implements Dependencies {
 
     fileExists(file: string): boolean {
         return fs.existsSync(file)
+    }
+
+    async getChangedFiles(): Promise<string[]> {
+        if (github.context.payload.pull_request) {
+            const Octokit = (await import('@octokit/action')).Octokit
+            process.env.GITHUB_TOKEN = core.getInput('github-token')
+            const octokit = new Octokit()
+            const response = await octokit.request(
+                `/repos/${github.context.repo.owner}/${github.context.repo.repo}/pulls/${github.context.payload.pull_request.number}}`,
+                {
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    pull_number: `${github.context.payload.pull_request.number}`,
+                    headers: {
+                        accept: 'application/vnd.github.diff'
+                    }
+                }
+            )
+            core.info(`response is ${JSON.stringify(response)}`)
+        }
+        return []
     }
 
     async writeSummary(summaryMarkdown: string): Promise<void> {

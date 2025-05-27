@@ -69,6 +69,7 @@
         "@actions/artifact": "^2.2.1",
         "@actions/core": "^1.11.1",
         "@actions/exec": "^1.1.1",
+        "@octokit/action": "^8.0.2",
         "semver": "^7.6.3"
     },
     "devDependencies": {

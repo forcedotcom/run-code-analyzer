@@ -35,6 +35,7 @@ describe('RuntimeDependencies Code Coverage', () => {
         })
         const inputs: Inputs = dependencies.getInputs()
         expect(inputs).toEqual({
+            githubToken: 'github-token Value',
             runArguments: 'run-arguments Value',
             resultsArtifactName: 'results-artifact-name Value'
         })

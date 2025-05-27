@@ -27,6 +27,10 @@ inputs:
       Default: "salesforce-code-analyzer-results"
     required: false
     default: 'salesforce-code-analyzer-results'
+  github-token:
+    description: |-
+      The token to use
+    required: true
 
 outputs:
   exit-code:
