@@ -1,5 +1,5 @@
 import { InputArguments } from './utils'
-import { Dependencies } from './dependencies'
+import { Dependencies, RuntimeDependencies } from './dependencies'
 import { CommandOutput, Inputs } from './types'
 import { CommandExecutor } from './commands'
 import { MESSAGE_FCNS, MESSAGES, MIN_CODE_ANALYZER_VERSION_REQUIRED } from './constants'
@@ -19,6 +19,9 @@ export async function run(
     summarizer: Summarizer
 ): Promise<void> {
     try {
+        dependencies.startGroup('Getting changed files')
+        const changedFiles: string[] = await (dependencies as RuntimeDependencies).getChangedFiles()
+        dependencies.info(`The ${changedFiles.length} changed files are ${JSON.stringify(changedFiles)}`)
         dependencies.startGroup(MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT)
         const inputs: Inputs = dependencies.getInputs()
         await installSalesforceCliIfNeeded(dependencies, commandExecutor)

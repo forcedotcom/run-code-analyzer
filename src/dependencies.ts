@@ -2,6 +2,7 @@ import { mergeWithProcessEnvVars } from './utils'
 import { DefaultArtifactClient } from '@actions/artifact'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import * as github from '@actions/github'
 import { CommandOutput, EnvironmentVariables, Inputs } from './types'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
 import fs from 'fs'
@@ -59,6 +60,37 @@ export class RuntimeDependencies implements Dependencies {
             runArguments: core.getInput('run-arguments'),
             resultsArtifactName: core.getInput('results-artifact-name')
         }
+    }
+
+    async getChangedFiles(): Promise<string[]> {
+        const context = github.context
+        if (!context.payload.pull_request) {
+            return []
+        }
+        const prNumber: number = context.payload.pull_request.number
+        const token = core.getInput('github-token')
+        const octokit = github.getOctokit(token)
+        const changedFiles: string[] = []
+        const perPage = 100
+        let page = 1
+        let files
+
+        do {
+            const response = await octokit.rest.pulls.listFiles({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                per_page: perPage,
+                page
+            })
+            files = response.data
+            for (const file of files) {
+                changedFiles.push(file.filename)
+            }
+            page += 1
+        } while (files.length === perPage)
+
+        return changedFiles
     }
 
     async execCommand(command: string, envVars: EnvironmentVariables = {}, silent = false): Promise<CommandOutput> {

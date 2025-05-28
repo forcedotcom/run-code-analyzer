@@ -108929,6 +108929,7 @@ const utils_1 = __nccwpck_require__(71798);
 const artifact_1 = __nccwpck_require__(76846);
 const core = __importStar(__nccwpck_require__(37484));
 const exec = __importStar(__nccwpck_require__(95236));
+const github = __importStar(__nccwpck_require__(93228));
 const fs_1 = __importDefault(__nccwpck_require__(79896));
 const COMMAND_NOT_FOUND_EXIT_CODE = 127;
 /**
@@ -108950,6 +108951,34 @@ class RuntimeDependencies {
             runArguments: core.getInput('run-arguments'),
             resultsArtifactName: core.getInput('results-artifact-name')
         };
+    }
+    async getChangedFiles() {
+        const context = github.context;
+        if (!context.payload.pull_request) {
+            return [];
+        }
+        const prNumber = context.payload.pull_request.number;
+        const token = core.getInput('github-token');
+        const octokit = github.getOctokit(token);
+        const changedFiles = [];
+        const perPage = 100;
+        let page = 1;
+        let files;
+        do {
+            const response = await octokit.rest.pulls.listFiles({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                per_page: perPage,
+                page
+            });
+            files = response.data;
+            for (const file of files) {
+                changedFiles.push(file.filename);
+            }
+            page += 1;
+        } while (files.length === perPage);
+        return changedFiles;
     }
     async execCommand(command, envVars = {}, silent = false) {
         try {
@@ -109016,6 +109045,9 @@ const STDERR_ERROR_MARKER = 'Error';
  */
 async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
     try {
+        dependencies.startGroup('Getting changed files');
+        const changedFiles = await dependencies.getChangedFiles();
+        dependencies.info(`The ${changedFiles.length} changed files are ${JSON.stringify(changedFiles)}`);
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT);
         const inputs = dependencies.getInputs();
         await installSalesforceCliIfNeeded(dependencies, commandExecutor);
