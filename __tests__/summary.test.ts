@@ -55,6 +55,7 @@ describe('RuntimeSummarizer Tests', () => {
                         .getViolationsSortedBySeverity()
                         .flatMap(v => v.getLocations())
                         .map(v => v.getFile())
+                        .filter(f => f !== undefined)
                 ).keys()
             ]
         }

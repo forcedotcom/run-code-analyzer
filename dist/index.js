@@ -113333,7 +113333,7 @@ class RuntimeSummarizer {
             const hasLocationInChangedFile = violation
                 .getLocations()
                 .map(l => l.getFile())
-                .some(f => changedFilesSet.has(f));
+                .some(f => f && changedFilesSet.has(f));
             if (hasLocationInChangedFile) {
                 violationsInChangedFiles.push(violation);
             }

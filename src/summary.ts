@@ -43,7 +43,7 @@ export class RuntimeSummarizer implements Summarizer {
             const hasLocationInChangedFile: boolean = violation
                 .getLocations()
                 .map(l => l.getFile())
-                .some(f => changedFilesSet.has(f))
+                .some(f => f && changedFilesSet.has(f))
             if (hasLocationInChangedFile) {
                 violationsInChangedFiles.push(violation)
             } else {

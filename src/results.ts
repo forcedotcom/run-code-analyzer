@@ -26,7 +26,7 @@ export interface Violation {
 }
 
 export interface ViolationLocation {
-    getFile(): string
+    getFile(): string | undefined
     toString(): string
     compareTo(other: ViolationLocation): number
 }
@@ -198,7 +198,7 @@ export class RunViolationLocation implements ViolationLocation {
         return locStr
     }
 
-    getFile(): string {
+    getFile(): string | undefined {
         return this.fileName
     }
 
