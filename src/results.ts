@@ -167,18 +167,18 @@ export class RuntimeViolation implements Violation {
 }
 
 export class RunViolationLocation implements ViolationLocation {
-    private readonly fileName: string
+    private readonly fileName: string | undefined
     private readonly line: number | undefined
     private readonly column: number | undefined
 
-    constructor(fileName: string, line: number | undefined, column: number | undefined) {
+    constructor(fileName: string | undefined, line: number | undefined, column: number | undefined) {
         this.fileName = fileName
         this.line = line
         this.column = column
     }
 
     toString(): string {
-        let locStr = this.fileName
+        let locStr = this.fileName ?? '(No Code Location)'
         if (this.line !== undefined) {
             locStr += `:${this.line}`
             if (this.column !== undefined) {
@@ -192,8 +192,12 @@ export class RunViolationLocation implements ViolationLocation {
         if (!(other instanceof RunViolationLocation)) {
             return -1
         }
-        if (this.fileName !== other.fileName) {
+        if (this.fileName && other.fileName && this.fileName !== other.fileName) {
             return this.fileName < other.fileName ? -1 : 1
+        } else if (this.fileName && !other.fileName) {
+            return -1 // We want undefined code locations to go first
+        } else if (!this.fileName && other.fileName) {
+            return 1
         } else if (this.line !== other.line) {
             if (this.line === undefined) {
                 return 1

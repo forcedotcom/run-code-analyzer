@@ -109251,7 +109251,7 @@ class RunViolationLocation {
         this.column = column;
     }
     toString() {
-        let locStr = this.fileName;
+        let locStr = this.fileName ?? '(No Code Location)';
         if (this.line !== undefined) {
             locStr += `:${this.line}`;
             if (this.column !== undefined) {
@@ -109264,8 +109264,14 @@ class RunViolationLocation {
         if (!(other instanceof RunViolationLocation)) {
             return -1;
         }
-        if (this.fileName !== other.fileName) {
+        if (this.fileName && other.fileName && this.fileName !== other.fileName) {
             return this.fileName < other.fileName ? -1 : 1;
+        }
+        else if (this.fileName && !other.fileName) {
+            return -1; // We want undefined code locations to go first
+        }
+        else if (!this.fileName && other.fileName) {
+            return 1;
         }
         else if (this.line !== other.line) {
             if (this.line === undefined) {

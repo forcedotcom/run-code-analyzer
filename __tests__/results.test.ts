@@ -138,6 +138,11 @@ describe('RunViolationLocation Tests', () => {
         expect(loc.toString()).toEqual('/some/file.apex:12')
     })
 
+    it('Test when violation location has no file', () => {
+        const loc: ViolationLocation = new RunViolationLocation(undefined, undefined, undefined)
+        expect(loc.toString()).toEqual('(No Code Location)')
+    })
+
     it('Test compareTo when file names are different', () => {
         const loc1: ViolationLocation = new RunViolationLocation('fileB', 12, 34)
         const loc2: ViolationLocation = new RunViolationLocation('fileA', 56, 78)
@@ -172,6 +177,24 @@ describe('RunViolationLocation Tests', () => {
         expect(loc1.compareTo(loc2)).toEqual(0)
         expect(loc2.compareTo(loc1)).toEqual(0)
         expect(loc3.compareTo(loc3)).toEqual(0)
+    })
+
+    it('Test compareTo when both locations do not have a file', () => {
+        const loc1: ViolationLocation = new RunViolationLocation(undefined, undefined, undefined)
+        const loc2: ViolationLocation = new RunViolationLocation(undefined, undefined, undefined)
+        expect(loc1.compareTo(loc2)).toEqual(0)
+    })
+
+    it('Test compareTo when first location does not have a file but the second one does', () => {
+        const loc1: ViolationLocation = new RunViolationLocation(undefined, undefined, undefined)
+        const loc2: ViolationLocation = new RunViolationLocation('file', 12, 34)
+        expect(loc1.compareTo(loc2)).toEqual(1)
+    })
+
+    it('Test compareTo when first location does have a file but the second one does not', () => {
+        const loc1: ViolationLocation = new RunViolationLocation('file', 12, 34)
+        const loc2: ViolationLocation = new RunViolationLocation(undefined, undefined, undefined)
+        expect(loc1.compareTo(loc2)).toEqual(-1)
     })
 
     it('Test RunViolationLocation always comes before another ViolationLocation', () => {
