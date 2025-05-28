@@ -8,7 +8,6 @@ import { CommandOutput, Inputs } from '../src/types'
 import { ExecOptions, ExecOutput } from '@actions/exec'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
 import { DefaultArtifactClient } from '@actions/artifact'
-import { FakePullRequestClient } from './fakes'
 import { UploadArtifactOptions, UploadArtifactResponse } from '@actions/artifact/lib/internal/shared/interfaces'
 
 describe('RuntimeDependencies Code Coverage', () => {
@@ -34,13 +33,12 @@ describe('RuntimeDependencies Code Coverage', () => {
         jest.spyOn(core, 'getInput').mockImplementation((name: string): string => {
             return `${name} Value`
         })
-        const dummyFiles: string[] = ['dummy1.js', 'dummy2.js']
-        dependencies = new RuntimeDependencies(new DefaultArtifactClient(), new FakePullRequestClient(dummyFiles))
+        dependencies = new RuntimeDependencies(new DefaultArtifactClient())
         const inputs: Inputs = await dependencies.getInputs()
         expect(inputs).toEqual({
             runArguments: 'run-arguments Value',
             resultsArtifactName: 'results-artifact-name Value',
-            changedFiles: dummyFiles
+            githubToken: 'github-token Value'
         })
     })
 

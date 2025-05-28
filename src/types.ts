@@ -3,7 +3,7 @@ import { ExecOutput } from '@actions/exec'
 export type Inputs = {
     runArguments: string
     resultsArtifactName: string
-    changedFiles: string[]
+    githubToken: string
 }
 
 export type EnvironmentVariables = { [key: string]: string }

@@ -80,7 +80,10 @@ export async function run(
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
-        const summaryMarkdown: string = summarizer.createSummaryMarkdown(results, inputs.changedFiles)
+        const summaryMarkdown: string = summarizer.createSummaryMarkdown(
+            results,
+            await dependencies.getChangedFiles(inputs.githubToken)
+        )
         await dependencies.writeSummary(summaryMarkdown)
         dependencies.endGroup()
     } catch (error) {

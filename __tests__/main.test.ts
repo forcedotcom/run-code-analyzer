@@ -94,7 +94,7 @@ describe('main run Tests', () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f myFile.html --output-file=another.xml -f=great.json --output-file  cool.sarif -w ./src',
             resultsArtifactName: 'customArtifactName',
-            changedFiles: []
+            githubToken: 'dummyToken'
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -128,7 +128,7 @@ describe('main run Tests', () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f myFile.html --view table',
             resultsArtifactName: 'salesforce-code-analyzer-results',
-            changedFiles: []
+            githubToken: 'dummyToken'
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -155,7 +155,7 @@ describe('main run Tests', () => {
         dependencies.getInputsReturnValue = {
             runArguments: '',
             resultsArtifactName: 'salesforce-code-analyzer-results',
-            changedFiles: []
+            githubToken: 'dummyToken'
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -182,7 +182,7 @@ describe('main run Tests', () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-c someConfig.yml --view detail',
             resultsArtifactName: 'salesforce-code-analyzer-results',
-            changedFiles: []
+            githubToken: 'dummyToken'
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -328,7 +328,7 @@ describe('main run Tests', () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f userResults.xml',
             resultsArtifactName: 'customArtifactName',
-            changedFiles: []
+            githubToken: 'dummyToken'
         }
         dependencies.fileExistsReturnValue = false
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)

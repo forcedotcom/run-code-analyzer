@@ -19,6 +19,8 @@ export interface Dependencies {
 
     getInputs(): Promise<Inputs>
 
+    getChangedFiles(githubToken: string): Promise<string[]>
+
     execCommand(command: string, envVars?: EnvironmentVariables, runSilently?: boolean): Promise<CommandOutput>
 
     uploadArtifact(artifactName: string, artifactFiles: string[]): Promise<void>
@@ -38,23 +40,14 @@ export interface Dependencies {
     writeSummary(summaryMarkdown: string): Promise<void>
 }
 
-export interface PullRequestClient {
-    getChangedFiles(githubToken: string): Promise<string[]>
-}
-
 /**
  * Class that wires up the runtime dependencies
  */
 export class RuntimeDependencies implements Dependencies {
     private readonly artifactClient: ArtifactClient
-    private readonly pullRequestClient: PullRequestClient
 
-    constructor(
-        artifactClient: ArtifactClient = new DefaultArtifactClient(),
-        pullRequestClient: PullRequestClient = new RuntimePullRequestClient()
-    ) {
+    constructor(artifactClient: ArtifactClient = new DefaultArtifactClient()) {
         this.artifactClient = artifactClient
-        this.pullRequestClient = pullRequestClient
     }
 
     startGroup(name: string): void {
@@ -69,8 +62,38 @@ export class RuntimeDependencies implements Dependencies {
         return {
             runArguments: core.getInput('run-arguments'),
             resultsArtifactName: core.getInput('results-artifact-name'),
-            changedFiles: await this.pullRequestClient.getChangedFiles(core.getInput('github-token'))
+            githubToken: core.getInput('github-token')
         }
+    }
+
+    // istanbul ignore next - Unit testing this method is excessively difficult, so it's being covered with E2E tests instead
+    async getChangedFiles(githubToken: string): Promise<string[]> {
+        if (!github.context.payload.pull_request) {
+            return []
+        }
+
+        const prNumber: number = github.context.payload.pull_request.number
+        const octokit = github.getOctokit(githubToken)
+        const changedFiles: string[] = []
+        const perPage = 100
+        let page = 1
+        let files
+
+        do {
+            const response = await octokit.rest.pulls.listFiles({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                pull_number: prNumber,
+                per_page: perPage,
+                page
+            })
+            files = response.data
+            for (const file of files) {
+                changedFiles.push(file.filename)
+            }
+            page += 1
+        } while (files.length === perPage)
+        return changedFiles
     }
 
     async execCommand(command: string, envVars: EnvironmentVariables = {}, silent = false): Promise<CommandOutput> {
@@ -122,43 +145,5 @@ export class RuntimeDependencies implements Dependencies {
     async writeSummary(summaryMarkdown: string): Promise<void> {
         core.summary.addRaw(summaryMarkdown)
         await core.summary.write()
-    }
-}
-
-// istanbul ignore next - Testing this is both difficult and excessive
-class RuntimePullRequestClient implements PullRequestClient {
-    private readonly context
-
-    constructor() {
-        this.context = github.context
-    }
-
-    async getChangedFiles(githubToken: string): Promise<string[]> {
-        if (!this.context.payload.pull_request) {
-            return []
-        }
-
-        const prNumber: number = this.context.payload.pull_request.number
-        const octokit = github.getOctokit(githubToken)
-        const changedFiles: string[] = []
-        const perPage = 100
-        let page = 1
-        let files
-
-        do {
-            const response = await octokit.rest.pulls.listFiles({
-                owner: this.context.repo.owner,
-                repo: this.context.repo.repo,
-                pull_number: prNumber,
-                per_page: perPage,
-                page
-            })
-            files = response.data
-            for (const file of files) {
-                changedFiles.push(file.filename)
-            }
-            page += 1
-        } while (files.length === perPage)
-        return changedFiles
     }
 }

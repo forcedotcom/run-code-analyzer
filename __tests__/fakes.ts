@@ -1,4 +1,4 @@
-import { Dependencies, PullRequestClient } from '../src/dependencies'
+import { Dependencies } from '../src/dependencies'
 import { CommandOutput, EnvironmentVariables, Inputs } from '../src/types'
 import { CommandExecutor } from '../src/commands'
 import { Results, ResultsFactory, Violation, ViolationLocation } from '../src/results'
@@ -26,12 +26,19 @@ export class FakeDependencies implements Dependencies {
     getInputsReturnValue: Inputs = {
         runArguments: '--view detail --output-file sfca_results.json',
         resultsArtifactName: 'salesforce-code-analyzer-results',
-        changedFiles: []
+        githubToken: 'dummyToken'
     }
     getInputsCallCount = 0
     async getInputs(): Promise<Inputs> {
         this.getInputsCallCount++
         return this.getInputsReturnValue
+    }
+
+    getChangedFilesReturnValue: string[] = []
+    getChangedFilesCallCount = 0
+    async getChangedFiles(_githubToken: string): Promise<string[]> {
+        this.getChangedFilesCallCount++
+        return this.getChangedFilesReturnValue
     }
 
     uploadArtifactCallHistory: { artifactName: string; artifactFiles: string[] }[] = []
@@ -75,18 +82,6 @@ export class FakeDependencies implements Dependencies {
     writeSummaryCallHistory: { summaryMarkdown: string }[] = []
     async writeSummary(summaryMarkdown: string): Promise<void> {
         this.writeSummaryCallHistory.push({ summaryMarkdown })
-    }
-}
-
-export class FakePullRequestClient implements PullRequestClient {
-    private readonly dummyChangedFiles: string[]
-
-    constructor(dummyChangedFiles: string[]) {
-        this.dummyChangedFiles = dummyChangedFiles
-    }
-
-    async getChangedFiles(_githubToken: string): Promise<string[]> {
-        return this.dummyChangedFiles
     }
 }
 

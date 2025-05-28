@@ -112885,10 +112885,8 @@ const COMMAND_NOT_FOUND_EXIT_CODE = 127;
  */
 class RuntimeDependencies {
     artifactClient;
-    pullRequestClient;
-    constructor(artifactClient = new artifact_1.DefaultArtifactClient(), pullRequestClient = new RuntimePullRequestClient()) {
+    constructor(artifactClient = new artifact_1.DefaultArtifactClient()) {
         this.artifactClient = artifactClient;
-        this.pullRequestClient = pullRequestClient;
     }
     startGroup(name) {
         core.startGroup(name);
@@ -112900,8 +112898,35 @@ class RuntimeDependencies {
         return {
             runArguments: core.getInput('run-arguments'),
             resultsArtifactName: core.getInput('results-artifact-name'),
-            changedFiles: await this.pullRequestClient.getChangedFiles(core.getInput('github-token'))
+            githubToken: core.getInput('github-token')
         };
+    }
+    // istanbul ignore next - Unit testing this method is excessively difficult, so it's being covered with E2E tests instead
+    async getChangedFiles(githubToken) {
+        if (!github.context.payload.pull_request) {
+            return [];
+        }
+        const prNumber = github.context.payload.pull_request.number;
+        const octokit = github.getOctokit(githubToken);
+        const changedFiles = [];
+        const perPage = 100;
+        let page = 1;
+        let files;
+        do {
+            const response = await octokit.rest.pulls.listFiles({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                pull_number: prNumber,
+                per_page: perPage,
+                page
+            });
+            files = response.data;
+            for (const file of files) {
+                changedFiles.push(file.filename);
+            }
+            page += 1;
+        } while (files.length === perPage);
+        return changedFiles;
     }
     async execCommand(command, envVars = {}, silent = false) {
         try {
@@ -112948,39 +112973,6 @@ class RuntimeDependencies {
     }
 }
 exports.RuntimeDependencies = RuntimeDependencies;
-// istanbul ignore next - Testing this is both difficult and excessive
-class RuntimePullRequestClient {
-    context;
-    constructor() {
-        this.context = github.context;
-    }
-    async getChangedFiles(githubToken) {
-        if (!this.context.payload.pull_request) {
-            return [];
-        }
-        const prNumber = this.context.payload.pull_request.number;
-        const octokit = github.getOctokit(githubToken);
-        const changedFiles = [];
-        const perPage = 100;
-        let page = 1;
-        let files;
-        do {
-            const response = await octokit.rest.pulls.listFiles({
-                owner: this.context.repo.owner,
-                repo: this.context.repo.repo,
-                pull_number: prNumber,
-                per_page: perPage,
-                page
-            });
-            files = response.data;
-            for (const file of files) {
-                changedFiles.push(file.filename);
-            }
-            page += 1;
-        } while (files.length === perPage);
-        return changedFiles;
-    }
-}
 
 
 /***/ }),
@@ -113051,7 +113043,7 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             `  num-sev5-violations: ${results.getSev5ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.CREATING_SUMMARY);
-        const summaryMarkdown = summarizer.createSummaryMarkdown(results, inputs.changedFiles);
+        const summaryMarkdown = summarizer.createSummaryMarkdown(results, await dependencies.getChangedFiles(inputs.githubToken));
         await dependencies.writeSummary(summaryMarkdown);
         dependencies.endGroup();
     }
