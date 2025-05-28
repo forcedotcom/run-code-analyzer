@@ -112955,6 +112955,12 @@ class RuntimeDependencies {
         const repo = github.context.repo.repo;
         const prNumber = github.context.payload.pull_request.number;
         const octokit = github.getOctokit(githubToken);
+        await octokit.rest.pulls.deletePendingReview({
+            owner,
+            repo,
+            pull_number: prNumber,
+            review_id: 2876373633
+        });
         const { data: { id } } = await octokit.rest.pulls.createReview({
             owner,
             repo,
