@@ -86,6 +86,12 @@ export async function run(
         )
         await dependencies.writeSummary(summaryMarkdown)
         dependencies.endGroup()
+        if (dependencies.isPullRequest()) {
+            const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
+            const summaryBody = MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), summaryLink)
+            const reviewId: number = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody)
+            dependencies.info(MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId))
+        }
     } catch (error) {
         if (error instanceof Error) {
             dependencies.fail(`${MESSAGES.UNEXPECTED_ERROR}\n\n${error.stack}`)

@@ -17,6 +17,8 @@ export interface Dependencies {
 
     endGroup(): void
 
+    isPullRequest(): boolean
+
     getInputs(): Promise<Inputs>
 
     getChangedFiles(githubToken: string): Promise<string[]>
@@ -24,6 +26,10 @@ export interface Dependencies {
     execCommand(command: string, envVars?: EnvironmentVariables, runSilently?: boolean): Promise<CommandOutput>
 
     uploadArtifact(artifactName: string, artifactFiles: string[]): Promise<void>
+
+    createActionSummaryLink(githubToken: string): Promise<string>
+
+    createPullRequestReview(githubToken: string, reviewBody: string): Promise<number>
 
     setOutput(name: string, value: string): void
 
@@ -56,6 +62,10 @@ export class RuntimeDependencies implements Dependencies {
 
     endGroup(): void {
         core.endGroup()
+    }
+
+    isPullRequest(): boolean {
+        return github.context.payload.pull_request != undefined
     }
 
     async getInputs(): Promise<Inputs> {
@@ -94,6 +104,41 @@ export class RuntimeDependencies implements Dependencies {
             page += 1
         } while (files.length === perPage)
         return changedFiles
+    }
+
+    // istanbul ignore next - A direct test of this method would be nice, but it's somewhat excessive
+    async createActionSummaryLink(githubToken: string): Promise<string> {
+        const owner = github.context.repo.owner
+        const repo = github.context.repo.repo
+        const runId = github.context.runId
+        const runAttempt = github.context.runAttempt
+        const octokit = github.getOctokit(githubToken)
+        const { data: workflow_run } = await octokit.rest.actions.listJobsForWorkflowRun({
+            owner,
+            repo,
+            run_id: runId
+        })
+        const matrix = process.env.matrix ? JSON.parse(process.env.matrix) : undefined
+        const jobName = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`
+        const jobId = workflow_run.jobs.find(job => job.name === jobName)!.id
+        return `https://github.com/${owner}/${repo}/actions/runs/${runId}/${runAttempt}#summary-${jobId}`
+    }
+
+    async createPullRequestReview(githubToken: string, reviewBody: string): Promise<number> {
+        const owner = github.context.repo.owner
+        const repo = github.context.repo.repo
+        const prNumber: number = github.context.payload.pull_request!.number
+        const octokit = github.getOctokit(githubToken)
+        const {
+            data: { id }
+        } = await octokit.rest.pulls.createReview({
+            owner,
+            repo,
+            pull_number: prNumber,
+            event: 'COMMENT',
+            body: reviewBody
+        })
+        return id
     }
 
     async execCommand(command: string, envVars: EnvironmentVariables = {}, silent = false): Promise<CommandOutput> {

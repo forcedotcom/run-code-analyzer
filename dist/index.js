@@ -112823,7 +112823,9 @@ exports.MESSAGES = {
 };
 exports.MESSAGE_FCNS = {
     PLUGIN_FOUND: (pluginName, pluginVersion) => `Found version ${pluginVersion} of the ${pluginName} plugin installed.`,
-    FILE_NOT_FOUND: (fileName) => `The file ${fileName} was not found. Check the logs for an error.`
+    FILE_NOT_FOUND: (fileName) => `The file ${fileName} was not found. Check the logs for an error.`,
+    REVIEW_BODY: (resultsCount, summaryLink) => `Salesforce Code Analyzer found ${resultsCount} violations. See [action summary](${summaryLink})`,
+    CREATED_PR_REVIEW: (reviewId) => `Created Pull Request Review with ID ${reviewId}`
 };
 /* eslint-enable */
 
@@ -112894,6 +112896,9 @@ class RuntimeDependencies {
     endGroup() {
         core.endGroup();
     }
+    isPullRequest() {
+        return github.context.payload.pull_request != undefined;
+    }
     async getInputs() {
         return {
             runArguments: core.getInput('run-arguments'),
@@ -112927,6 +112932,37 @@ class RuntimeDependencies {
             page += 1;
         } while (files.length === perPage);
         return changedFiles;
+    }
+    // istanbul ignore next - A direct test of this method would be nice, but it's somewhat excessive
+    async createActionSummaryLink(githubToken) {
+        const owner = github.context.repo.owner;
+        const repo = github.context.repo.repo;
+        const runId = github.context.runId;
+        const runAttempt = github.context.runAttempt;
+        const octokit = github.getOctokit(githubToken);
+        const { data: workflow_run } = await octokit.rest.actions.listJobsForWorkflowRun({
+            owner,
+            repo,
+            run_id: runId
+        });
+        const matrix = process.env.matrix ? JSON.parse(process.env.matrix) : undefined;
+        const jobName = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`;
+        const jobId = workflow_run.jobs.find(job => job.name === jobName).id;
+        return `https://github.com/${owner}/${repo}/actions/runs/${runId}/${runAttempt}#summary-${jobId}`;
+    }
+    async createPullRequestReview(githubToken, reviewBody) {
+        const owner = github.context.repo.owner;
+        const repo = github.context.repo.repo;
+        const prNumber = github.context.payload.pull_request.number;
+        const octokit = github.getOctokit(githubToken);
+        const { data: { id } } = await octokit.rest.pulls.createReview({
+            owner,
+            repo,
+            pull_number: prNumber,
+            event: 'COMMENT',
+            body: reviewBody
+        });
+        return id;
     }
     async execCommand(command, envVars = {}, silent = false) {
         try {
@@ -113046,6 +113082,12 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         const summaryMarkdown = summarizer.createSummaryMarkdown(results, await dependencies.getChangedFiles(inputs.githubToken));
         await dependencies.writeSummary(summaryMarkdown);
         dependencies.endGroup();
+        if (dependencies.isPullRequest()) {
+            const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
+            const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), summaryLink);
+            const reviewId = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody);
+            dependencies.info(constants_1.MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId));
+        }
     }
     catch (error) {
         if (error instanceof Error) {

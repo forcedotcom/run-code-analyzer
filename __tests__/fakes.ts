@@ -15,6 +15,13 @@ export class FakeDependencies implements Dependencies {
         this.endGroupCallCount++
     }
 
+    isPullRequestReturnValue = false
+    isPullRequestCallCount = 0
+    isPullRequest(): boolean {
+        this.isPullRequestCallCount++
+        return this.isPullRequestReturnValue
+    }
+
     execCommandReturnValue: CommandOutput = { exitCode: 0, stdout: '', stderr: '' }
     execCommandCallHistory: { command: string; envVars: EnvironmentVariables; runSilently: boolean }[] = []
     async execCommand(command: string, envVars: EnvironmentVariables, runSilently: boolean): Promise<CommandOutput> {
@@ -39,6 +46,19 @@ export class FakeDependencies implements Dependencies {
     async getChangedFiles(_githubToken: string): Promise<string[]> {
         this.getChangedFilesCallCount++
         return this.getChangedFilesReturnValue
+    }
+
+    createActionSummaryLinkReturnValue: string = 'www.example.com'
+    createActionSummaryLinkCallCount = 0
+    async createActionSummaryLink(_githubToken: string): Promise<string> {
+        this.createActionSummaryLinkCallCount++
+        return this.createActionSummaryLinkReturnValue
+    }
+
+    createPullRequestReviewCallCount = 0
+    async createPullRequestReview(_githubToken: string, _reviewBody: string): Promise<number> {
+        this.createPullRequestReviewCallCount++
+        return 7
     }
 
     uploadArtifactCallHistory: { artifactName: string; artifactFiles: string[] }[] = []

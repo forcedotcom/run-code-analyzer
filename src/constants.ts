@@ -34,6 +34,9 @@ export const MESSAGES = {
 export const MESSAGE_FCNS = {
     PLUGIN_FOUND: (pluginName: string, pluginVersion: string) =>
         `Found version ${pluginVersion} of the ${pluginName} plugin installed.`,
-    FILE_NOT_FOUND: (fileName: string) => `The file ${fileName} was not found. Check the logs for an error.`
+    FILE_NOT_FOUND: (fileName: string) => `The file ${fileName} was not found. Check the logs for an error.`,
+    REVIEW_BODY: (resultsCount: number, summaryLink: string) =>
+        `Salesforce Code Analyzer found ${resultsCount} violations. See [action summary](${summaryLink})`,
+    CREATED_PR_REVIEW: (reviewId: number) => `Created Pull Request Review with ID ${reviewId}`
 }
 /* eslint-enable */
