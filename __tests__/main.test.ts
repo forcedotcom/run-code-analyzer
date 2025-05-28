@@ -93,7 +93,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with various output files including json', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f myFile.html --output-file=another.xml -f=great.json --output-file  cool.sarif -w ./src',
-            resultsArtifactName: 'customArtifactName'
+            resultsArtifactName: 'customArtifactName',
+            changedFiles: []
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -126,7 +127,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with non-json output file', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f myFile.html --view table',
-            resultsArtifactName: 'salesforce-code-analyzer-results'
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            changedFiles: []
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -152,7 +154,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with zero output files and no view', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '',
-            resultsArtifactName: 'salesforce-code-analyzer-results'
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            changedFiles: []
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -178,7 +181,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with zero output files but supplies a view', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-c someConfig.yml --view detail',
-            resultsArtifactName: 'salesforce-code-analyzer-results'
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            changedFiles: []
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -236,7 +240,7 @@ describe('main run Tests', () => {
 
     it('Test misc error thrown by action', async () => {
         class ThrowingDependencies extends FakeDependencies {
-            override getInputs(): Inputs {
+            override async getInputs(): Promise<Inputs> {
                 throw new Error('bang')
             }
         }
@@ -323,7 +327,8 @@ describe('main run Tests', () => {
     it('Test when the user output file does not exist after run then we fail', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f userResults.xml',
-            resultsArtifactName: 'customArtifactName'
+            resultsArtifactName: 'customArtifactName',
+            changedFiles: []
         }
         dependencies.fileExistsReturnValue = false
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)

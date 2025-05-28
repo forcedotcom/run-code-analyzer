@@ -20,7 +20,7 @@ export async function run(
 ): Promise<void> {
     try {
         dependencies.startGroup(MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT)
-        const inputs: Inputs = dependencies.getInputs()
+        const inputs: Inputs = await dependencies.getInputs()
         await installSalesforceCliIfNeeded(dependencies, commandExecutor)
         await installMinimumCodeAnalyzerPluginVersionIfNeeded(dependencies, commandExecutor)
         dependencies.endGroup()
@@ -80,7 +80,7 @@ export async function run(
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
-        const summaryMarkdown: string = summarizer.createSummaryMarkdown(results)
+        const summaryMarkdown: string = summarizer.createSummaryMarkdown(results, inputs.changedFiles)
         await dependencies.writeSummary(summaryMarkdown)
         dependencies.endGroup()
     } catch (error) {

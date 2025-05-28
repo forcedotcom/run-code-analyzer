@@ -1,4 +1,4 @@
-import { Dependencies } from '../src/dependencies'
+import { Dependencies, PullRequestClient } from '../src/dependencies'
 import { CommandOutput, EnvironmentVariables, Inputs } from '../src/types'
 import { CommandExecutor } from '../src/commands'
 import { Results, ResultsFactory, Violation, ViolationLocation } from '../src/results'
@@ -25,10 +25,11 @@ export class FakeDependencies implements Dependencies {
     // We should match the default input values from action.yml here:
     getInputsReturnValue: Inputs = {
         runArguments: '--view detail --output-file sfca_results.json',
-        resultsArtifactName: 'salesforce-code-analyzer-results'
+        resultsArtifactName: 'salesforce-code-analyzer-results',
+        changedFiles: []
     }
     getInputsCallCount = 0
-    getInputs(): Inputs {
+    async getInputs(): Promise<Inputs> {
         this.getInputsCallCount++
         return this.getInputsReturnValue
     }
@@ -74,6 +75,18 @@ export class FakeDependencies implements Dependencies {
     writeSummaryCallHistory: { summaryMarkdown: string }[] = []
     async writeSummary(summaryMarkdown: string): Promise<void> {
         this.writeSummaryCallHistory.push({ summaryMarkdown })
+    }
+}
+
+export class FakePullRequestClient implements PullRequestClient {
+    private readonly dummyChangedFiles: string[]
+
+    constructor(dummyChangedFiles: string[]) {
+        this.dummyChangedFiles = dummyChangedFiles
+    }
+
+    async getChangedFiles(_githubToken: string): Promise<string[]> {
+        return this.dummyChangedFiles
     }
 }
 

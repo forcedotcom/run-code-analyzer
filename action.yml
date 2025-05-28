@@ -27,6 +27,10 @@ inputs:
       Default: "salesforce-code-analyzer-results"
     required: false
     default: 'salesforce-code-analyzer-results'
+  github-token:
+    description: |-
+      Github token to allow Github API calls. This token must have write access for pull requests.
+    required: true
 
 outputs:
   exit-code:
