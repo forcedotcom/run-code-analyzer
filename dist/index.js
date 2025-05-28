@@ -112948,7 +112948,7 @@ class RuntimeDependencies {
         const matrix = process.env.matrix ? JSON.parse(process.env.matrix) : undefined;
         const jobName = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`;
         const jobId = workflow_run.jobs.find(job => job.name === jobName).id;
-        return `https://github.com/${owner}/${repo}/actions/runs/${runId}/${runAttempt}#summary-${jobId}`;
+        return `https://github.com/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}#summary-${jobId}`;
     }
     async createPullRequestReview(githubToken, reviewBody) {
         const owner = github.context.repo.owner;
