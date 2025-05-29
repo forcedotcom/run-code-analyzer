@@ -112951,9 +112951,13 @@ class RuntimeDependencies {
         core.info(`The job names we know about are ${JSON.stringify(workflow_run.jobs.map(job => job.name), null, 4)}`);
         core.info(`Job jsons are ${JSON.stringify(workflow_run.jobs, null, 4)}`);
         core.info(`Process env is ${JSON.stringify(process.env, null, 4)}`);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const jobId = workflow_run.jobs.find(job => job.name === jobName).id;
-        return `https://github.com/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}#summary-${jobId}`;
+        const matchingJob = workflow_run.jobs.find(job => job.name === jobName);
+        if (matchingJob) {
+            return `https://github.com/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}#summary-${matchingJob.id}`;
+        }
+        else {
+            return `https://github.com/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}`;
+        }
     }
     async createPullRequestReview(githubToken, reviewBody) {
         const owner = github.context.repo.owner;
