@@ -6,7 +6,7 @@ import { FakeResults, FakeViolationLocation } from './fakes'
 
 describe('RuntimeSummarizer Tests', () => {
     const resultsFactory: ResultsFactory = new RuntimeResultsFactory()
-    let summarizer: Summarizer = new RuntimeSummarizer()
+    const summarizer: Summarizer = new RuntimeSummarizer()
 
     describe('Tests using sampleRunResults.json', () => {
         const results: Results = resultsFactory.createResults(path.join(__dirname, 'data', 'sampleRunResults.json'))
@@ -18,7 +18,6 @@ describe('RuntimeSummarizer Tests', () => {
                 'force-app/main/default/classes/NameController.cls',
                 'force-app/main/default/classes/SimpleAccount.cls'
             ]
-            summarizer = new RuntimeSummarizer()
 
             const summaryMarkdown: string = summarizer.createSummaryMarkdown(results, changedFiles)
 
@@ -37,8 +36,6 @@ describe('RuntimeSummarizer Tests', () => {
             },
             { case: 'no changed files are reported', changedFiles: [] } // This case is relevant for when the action is used outside the context of a Pull Request
         ])('When $case, only one table is displayed', ({ changedFiles }) => {
-            summarizer = new RuntimeSummarizer()
-
             const summaryMarkdown: string = summarizer.createSummaryMarkdown(results, changedFiles)
 
             const expectedSummaryMarkdown: string = fs.readFileSync(

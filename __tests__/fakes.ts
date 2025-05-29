@@ -36,7 +36,7 @@ export class FakeDependencies implements Dependencies {
         githubToken: 'dummyToken'
     }
     getInputsCallCount = 0
-    async getInputs(): Promise<Inputs> {
+    getInputs(): Inputs {
         this.getInputsCallCount++
         return this.getInputsReturnValue
     }

@@ -20,7 +20,7 @@ export async function run(
 ): Promise<void> {
     try {
         dependencies.startGroup(MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT)
-        const inputs: Inputs = await dependencies.getInputs()
+        const inputs: Inputs = dependencies.getInputs()
         await installSalesforceCliIfNeeded(dependencies, commandExecutor)
         await installMinimumCodeAnalyzerPluginVersionIfNeeded(dependencies, commandExecutor)
         dependencies.endGroup()

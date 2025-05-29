@@ -112899,7 +112899,7 @@ class RuntimeDependencies {
     isPullRequest() {
         return github.context.payload.pull_request !== undefined;
     }
-    async getInputs() {
+    getInputs() {
         return {
             runArguments: core.getInput('run-arguments'),
             resultsArtifactName: core.getInput('results-artifact-name'),
@@ -113040,7 +113040,7 @@ const STDERR_ERROR_MARKER = 'Error';
 async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
     try {
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.PREPARING_ENVIRONMENT);
-        const inputs = await dependencies.getInputs();
+        const inputs = dependencies.getInputs();
         await installSalesforceCliIfNeeded(dependencies, commandExecutor);
         await installMinimumCodeAnalyzerPluginVersionIfNeeded(dependencies, commandExecutor);
         dependencies.endGroup();

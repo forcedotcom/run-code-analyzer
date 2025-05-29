@@ -19,7 +19,7 @@ export interface Dependencies {
 
     isPullRequest(): boolean
 
-    getInputs(): Promise<Inputs>
+    getInputs(): Inputs
 
     getChangedFiles(githubToken: string): Promise<string[]>
 
@@ -68,7 +68,7 @@ export class RuntimeDependencies implements Dependencies {
         return github.context.payload.pull_request !== undefined
     }
 
-    async getInputs(): Promise<Inputs> {
+    getInputs(): Inputs {
         return {
             runArguments: core.getInput('run-arguments'),
             resultsArtifactName: core.getInput('results-artifact-name'),

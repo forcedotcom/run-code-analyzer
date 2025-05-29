@@ -240,7 +240,7 @@ describe('main run Tests', () => {
 
     it('Test misc error thrown by action', async () => {
         class ThrowingDependencies extends FakeDependencies {
-            override async getInputs(): Promise<Inputs> {
+            override getInputs(): Inputs {
                 throw new Error('bang')
             }
         }
