@@ -121,7 +121,9 @@ export class RuntimeDependencies implements Dependencies {
         const matrix = process.env.matrix ? JSON.parse(process.env.matrix) : undefined
         const jobName = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`
         core.info(`github.context.job = ${github.context.job}; jobName is ${jobName}`)
-        core.info(`The jobs we know about are ${JSON.stringify(workflow_run.jobs.map(job => job.name))}`)
+        core.info(`The job names we know about are ${JSON.stringify(workflow_run.jobs.map(job => job.name))}`)
+        core.info(`Job jsons are ${JSON.stringify(workflow_run.jobs)}`)
+        core.info(`Process env is ${JSON.stringify(process.env)}`)
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const jobId = workflow_run.jobs.find(job => job.name === jobName)!.id
         return `https://github.com/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}#summary-${jobId}`
