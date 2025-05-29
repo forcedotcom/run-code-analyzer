@@ -47,6 +47,8 @@ outputs:
     description: The number of Low (4) severity violations found.
   num-sev5-violations:
     description: The number of Info (5) severity violations found.
+  review-id:
+    description: If this action was run against a Pull Request, this is the ID of the review that was created.
 
 runs:
   using: node20

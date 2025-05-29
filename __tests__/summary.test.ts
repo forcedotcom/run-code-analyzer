@@ -62,7 +62,7 @@ describe('RuntimeSummarizer Tests', () => {
     })
 
     describe('Table size limit enforcement', () => {
-        it('First table\'s size is deducted from the limit available to the second table', () => {
+        it("First table's size is deducted from the limit available to the second table", () => {
             const numViolations = 7000
             const results: FakeResults = new FakeResults()
             results.getTotalViolationCountReturnValue = numViolations
@@ -72,11 +72,7 @@ describe('RuntimeSummarizer Tests', () => {
             results.getSev4ViolationCountReturnValue = 0
             results.getSev5ViolationCountReturnValue = 0
             results.getViolationsSortedBySeverityReturnValue = []
-            const dummyFiles: string[] = [
-                '/some/file1.ts',
-                '/some/file2.ts',
-                '/some/file3.ts'
-            ]
+            const dummyFiles: string[] = ['/some/file1.ts', '/some/file2.ts', '/some/file3.ts']
             for (let i = 0; i < numViolations; i++) {
                 const dummyLocation: FakeViolationLocation = new FakeViolationLocation()
                 dummyLocation.getFileReturnValue = dummyFiles[i % 3]
@@ -111,11 +107,7 @@ describe('RuntimeSummarizer Tests', () => {
             results.getSev4ViolationCountReturnValue = 0
             results.getSev5ViolationCountReturnValue = 0
             results.getViolationsSortedBySeverityReturnValue = []
-            const dummyFiles: string[] = [
-                '/some/file1.ts',
-                '/some/file2.ts',
-                '/some/file3.ts'
-            ]
+            const dummyFiles: string[] = ['/some/file1.ts', '/some/file2.ts', '/some/file3.ts']
             for (let i = 0; i < numViolations; i++) {
                 const dummyLocation: FakeViolationLocation = new FakeViolationLocation()
                 dummyLocation.getFileReturnValue = dummyFiles[i % 3]

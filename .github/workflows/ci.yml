@@ -79,4 +79,6 @@ jobs:
 
       - name: Print Output
         id: output
-        run: echo "${{ steps.test-action.outputs.exit-code }}"
+        run: |
+          echo "${{ steps.test-action.outputs.exit-code }}"
+          echo "${{ steps.test-action.outputs.review-id }}"

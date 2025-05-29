@@ -112897,7 +112897,7 @@ class RuntimeDependencies {
         core.endGroup();
     }
     isPullRequest() {
-        return github.context.payload.pull_request != undefined;
+        return github.context.payload.pull_request !== undefined;
     }
     async getInputs() {
         return {
@@ -112947,12 +112947,14 @@ class RuntimeDependencies {
         });
         const matrix = process.env.matrix ? JSON.parse(process.env.matrix) : undefined;
         const jobName = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const jobId = workflow_run.jobs.find(job => job.name === jobName).id;
         return `https://github.com/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}#summary-${jobId}`;
     }
     async createPullRequestReview(githubToken, reviewBody) {
         const owner = github.context.repo.owner;
         const repo = github.context.repo.repo;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const prNumber = github.context.payload.pull_request.number;
         const octokit = github.getOctokit(githubToken);
         const { data: { id } } = await octokit.rest.pulls.createReview({
@@ -113086,6 +113088,7 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
             const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), summaryLink);
             const reviewId = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody);
+            dependencies.setOutput('review-id', `${reviewId}`);
             dependencies.info(constants_1.MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId));
         }
     }
@@ -113376,8 +113379,8 @@ class RuntimeSummarizer {
             }
         }
         if (violationsInChangedFiles.length > 0 && violationsOutsideChangedFiles.length > 0) {
-            const violationsInsideFilesTable = createTable(violationsInChangedFiles, TABLE_ROWS_CHAR_LIMIT / 2);
-            const violationsOutsideFilesTable = createTable(violationsOutsideChangedFiles, TABLE_ROWS_CHAR_LIMIT / 2);
+            const violationsInsideFilesTable = createTable(violationsInChangedFiles, TABLE_ROWS_CHAR_LIMIT);
+            const violationsOutsideFilesTable = createTable(violationsOutsideChangedFiles, TABLE_ROWS_CHAR_LIMIT - violationsInsideFilesTable.length);
             summary +=
                 // eslint-disable-next-line prefer-template
                 `<details>${os_1.EOL}` +

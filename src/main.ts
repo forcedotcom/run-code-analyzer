@@ -90,6 +90,7 @@ export async function run(
             const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
             const summaryBody = MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), summaryLink)
             const reviewId: number = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody)
+            dependencies.setOutput('review-id', `${reviewId}`)
             dependencies.info(MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId))
         }
     } catch (error) {

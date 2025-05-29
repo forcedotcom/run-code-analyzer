@@ -48,7 +48,7 @@ export class FakeDependencies implements Dependencies {
         return this.getChangedFilesReturnValue
     }
 
-    createActionSummaryLinkReturnValue: string = 'www.example.com'
+    createActionSummaryLinkReturnValue = 'www.example.com'
     createActionSummaryLinkCallCount = 0
     async createActionSummaryLink(_githubToken: string): Promise<string> {
         this.createActionSummaryLinkCallCount++
@@ -210,7 +210,7 @@ export class FakeViolationLocation implements ViolationLocation {
         return this.compareToReturnValue
     }
 
-    getFileReturnValue: string = 'fakeFile'
+    getFileReturnValue = 'fakeFile'
     getFile(): string {
         return this.getFileReturnValue
     }
