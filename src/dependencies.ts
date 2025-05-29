@@ -120,9 +120,16 @@ export class RuntimeDependencies implements Dependencies {
         })
         const matrix = process.env.matrix ? JSON.parse(process.env.matrix) : undefined
         const jobName = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const jobId = workflow_run.jobs.find(job => job.name === jobName)!.id
-        return `https://github.com/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}#summary-${jobId}`
+        const matchingJob = workflow_run.jobs.find(job => job.name === jobName)
+        // Infuriatingly, there's no way to get the job's display name from within the action context, and the github API
+        // call _only_ returns the display name. So if the user assigns the job a custom name, or does shenanigans with
+        // matrices, then we can't link directly to the table, and have to link to just the page itself and expect the user]
+        // to scroll down the table themselves.
+        if (matchingJob) {
+            return `https://github.com/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}#summary-${matchingJob.id}`
+        } else {
+            return `https://github.com/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}`
+        }
     }
 
     async createPullRequestReview(githubToken: string, reviewBody: string): Promise<number> {
