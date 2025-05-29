@@ -112824,7 +112824,7 @@ exports.MESSAGES = {
 exports.MESSAGE_FCNS = {
     PLUGIN_FOUND: (pluginName, pluginVersion) => `Found version ${pluginVersion} of the ${pluginName} plugin installed.`,
     FILE_NOT_FOUND: (fileName) => `The file ${fileName} was not found. Check the logs for an error.`,
-    REVIEW_BODY: (resultsCount, summaryLink) => `Salesforce Code Analyzer found ${resultsCount} violations. See [action summary](${summaryLink})`,
+    REVIEW_BODY: (resultsCount, resultsInChangedFilesCount, summaryLink) => `Salesforce Code Analyzer found ${resultsCount} violations, including ${resultsInChangedFilesCount} in files changed by this pull request. See [action summary](${summaryLink})`,
     CREATED_PR_REVIEW: (reviewId) => `Created Pull Request Review with ID ${reviewId}`
 };
 /* eslint-enable */
@@ -113089,12 +113089,20 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             `  num-sev5-violations: ${results.getSev5ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.CREATING_SUMMARY);
-        const summaryMarkdown = summarizer.createSummaryMarkdown(results, await dependencies.getChangedFiles(inputs.githubToken));
+        const changedFiles = await dependencies.getChangedFiles(inputs.githubToken);
+        const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles);
         await dependencies.writeSummary(summaryMarkdown);
         dependencies.endGroup();
         if (dependencies.isPullRequest()) {
             const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
-            const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), summaryLink);
+            const changedFilesSet = new Set(changedFiles);
+            const violationsInChangedFilesCount = results.getViolationsSortedBySeverity().filter(v => {
+                return v
+                    .getLocations()
+                    .map(l => l.getFile())
+                    .some(f => f && changedFilesSet.has(f));
+            }).length;
+            const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), violationsInChangedFilesCount, summaryLink);
             const reviewId = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody);
             dependencies.setOutput('review-id', `${reviewId}`);
             dependencies.info(constants_1.MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId));

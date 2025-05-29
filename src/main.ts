@@ -80,15 +80,24 @@ export async function run(
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
-        const summaryMarkdown: string = summarizer.createSummaryMarkdown(
-            results,
-            await dependencies.getChangedFiles(inputs.githubToken)
-        )
+        const changedFiles: string[] = await dependencies.getChangedFiles(inputs.githubToken)
+        const summaryMarkdown: string = summarizer.createSummaryMarkdown(results, changedFiles)
         await dependencies.writeSummary(summaryMarkdown)
         dependencies.endGroup()
         if (dependencies.isPullRequest()) {
             const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
-            const summaryBody = MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), summaryLink)
+            const changedFilesSet: Set<string> = new Set(changedFiles)
+            const violationsInChangedFilesCount: number = results.getViolationsSortedBySeverity().filter(v => {
+                return v
+                    .getLocations()
+                    .map(l => l.getFile())
+                    .some(f => f && changedFilesSet.has(f))
+            }).length
+            const summaryBody = MESSAGE_FCNS.REVIEW_BODY(
+                results.getTotalViolationCount(),
+                violationsInChangedFilesCount,
+                summaryLink
+            )
             const reviewId: number = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody)
             dependencies.setOutput('review-id', `${reviewId}`)
             dependencies.info(MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId))
