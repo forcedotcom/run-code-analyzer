@@ -78,6 +78,7 @@ jobs:
         uses: ./
         with:
           run-arguments: --view detail --workspace "./src,./__tests__" --output-file results.json
+          github-token: ${{github.token}}
 
       - name: Print Output
         id: output
