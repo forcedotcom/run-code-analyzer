@@ -52,10 +52,10 @@ export class RuntimeSummarizer implements Summarizer {
         }
 
         if (violationsInChangedFiles.length > 0 && violationsOutsideChangedFiles.length > 0) {
-            const violationsInsideFilesTable: string = createTable(violationsInChangedFiles, TABLE_ROWS_CHAR_LIMIT / 2)
+            const violationsInsideFilesTable: string = createTable(violationsInChangedFiles, TABLE_ROWS_CHAR_LIMIT)
             const violationsOutsideFilesTable: string = createTable(
                 violationsOutsideChangedFiles,
-                TABLE_ROWS_CHAR_LIMIT / 2
+                TABLE_ROWS_CHAR_LIMIT - violationsInsideFilesTable.length
             )
             summary +=
                 // eslint-disable-next-line prefer-template
