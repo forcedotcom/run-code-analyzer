@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Code Analyzer Issues Repository
-    url: https://github.com/forcedotcom/code-analyzer/issues
-    about: Please create your issues in our main repository.
+  - name: Report a Bug
+    url: https://github.com/forcedotcom/code-analyzer/issues/new?template=3-github_action_bug.yml
+    about: Create an issue in our main repository.
+  - name: Request a New Feature
+    url: https://github.com/forcedotcom/code-analyzer/issues/new?template=5-feature_request.yml
+    about: Request a feature in our main repository.
