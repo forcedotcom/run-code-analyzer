@@ -112901,27 +112901,6 @@ class RuntimeDependencies {
         core.info(`entire context is ${JSON.stringify(github.context, null, 2)}`);
         return github.context.payload.pull_request !== undefined;
     }
-    async isGithubTokenValid(githubToken) {
-        try {
-            const octokit = github.getOctokit(githubToken);
-            core.info(`octokit was created`);
-            // Validate the token and get the username
-            const { data: user } = await octokit.rest.users.getAuthenticated();
-            const username = user.login;
-            core.info(`User was ${JSON.stringify(user, null, 2)}`);
-            const { data } = await octokit.rest.repos.getCollaboratorPermissionLevel({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                username
-            });
-            core.info(`Data is ${JSON.stringify(data, null, 2)}`);
-            return data.permission === 'write' || data.permission === 'admin';
-        }
-        catch (error) {
-            core.error(`Failed to validate token, ${error.stack}`);
-            return false;
-        }
-    }
     getInputs() {
         return {
             runArguments: core.getInput('run-arguments'),
@@ -113110,23 +113089,32 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             `  num-sev5-violations: ${results.getSev5ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.CREATING_SUMMARY);
-        if (dependencies.isPullRequest() &&
-            inputs.githubToken &&
-            (await dependencies.isGithubTokenValid(inputs.githubToken))) {
-            const changedFiles = await dependencies.getChangedFiles(inputs.githubToken);
+        if (dependencies.isPullRequest() && inputs.githubToken) {
+            let changedFiles = [];
+            try {
+                changedFiles = await dependencies.getChangedFiles(inputs.githubToken);
+            }
+            catch (error) {
+                dependencies.warn(`Getting changed files failed: ${error.stack}`);
+            }
             const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles);
-            const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
-            const changedFilesSet = new Set(changedFiles);
-            const violationsInChangedFilesCount = results.getViolationsSortedBySeverity().filter(v => {
-                return v
-                    .getLocations()
-                    .map(l => l.getFile())
-                    .some(f => f && changedFilesSet.has(f));
-            }).length;
-            const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), violationsInChangedFilesCount, summaryLink);
-            const reviewId = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody);
-            dependencies.setOutput('review-id', `${reviewId}`);
-            dependencies.info(constants_1.MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId));
+            try {
+                const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
+                const changedFilesSet = new Set(changedFiles);
+                const violationsInChangedFilesCount = results.getViolationsSortedBySeverity().filter(v => {
+                    return v
+                        .getLocations()
+                        .map(l => l.getFile())
+                        .some(f => f && changedFilesSet.has(f));
+                }).length;
+                const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), violationsInChangedFilesCount, summaryLink);
+                const reviewId = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody);
+                dependencies.setOutput('review-id', `${reviewId}`);
+                dependencies.info(constants_1.MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId));
+            }
+            catch (error) {
+                dependencies.warn(`Failed to create review: ${error.stack}`);
+            }
             await dependencies.writeSummary(summaryMarkdown);
             dependencies.endGroup();
         }

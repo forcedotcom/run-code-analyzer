@@ -129,7 +129,7 @@ describe('main run Tests', () => {
             expectation: 'a review is created',
             isPullRequest: true,
             tokenIsValid: true,
-            expectedReviews: 1,
+            expectedReviewAttempts: 1,
             expectedWarnings: 0
         },
         {
@@ -137,7 +137,7 @@ describe('main run Tests', () => {
             expectation: 'no review is created, and a warning is issued',
             isPullRequest: true,
             tokenIsValid: false,
-            expectedReviews: 0,
+            expectedReviewAttempts: 1,
             expectedWarnings: 1
         },
         {
@@ -145,40 +145,57 @@ describe('main run Tests', () => {
             expectation: 'no review is created',
             isPullRequest: false,
             tokenIsValid: false,
-            expectedReviews: 0,
+            expectedReviewAttempts: 0,
             expectedWarnings: 0
         }
-    ])('When $case, $expectation', async ({ isPullRequest, tokenIsValid, expectedReviews, expectedWarnings }) => {
-        dependencies.getInputsReturnValue = {
-            runArguments: '-f myFile.html --view table',
-            resultsArtifactName: 'salesforce-code-analyzer-results',
-            githubToken: 'dummyToken'
+    ])(
+        'When $case, $expectation',
+        async ({ isPullRequest, tokenIsValid, expectedReviewAttempts, expectedWarnings }) => {
+            class ThrowingDependencies extends FakeDependencies {
+                private throwError: boolean
+                constructor(throwError: boolean) {
+                    super()
+                    this.throwError = throwError
+                }
+                override async getChangedFiles(): Promise<string[]> {
+                    if (this.throwError) {
+                        throw new Error('bang')
+                    } else {
+                        return ['dummyFile1.cls']
+                    }
+                }
+            }
+            dependencies = new ThrowingDependencies(expectedWarnings === 1)
+            dependencies.getInputsReturnValue = {
+                runArguments: '-f myFile.html --view table',
+                resultsArtifactName: 'salesforce-code-analyzer-results',
+                githubToken: 'dummyToken'
+            }
+            dependencies.isPullRequestReturnValue = isPullRequest
+            await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+            expect(commandExecutor.isSalesforceCliInstalledCallCount).toEqual(1)
+
+            expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+            expect(commandExecutor.runCodeAnalyzerCallHistory).toContainEqual({
+                runArguments: '-f myFile.html --view table --output-file sfca_results.json' // We add in at least one json file
+            })
+
+            expect(dependencies.uploadArtifactCallHistory).toHaveLength(1)
+            expect(dependencies.uploadArtifactCallHistory).toContainEqual({
+                artifactName: 'salesforce-code-analyzer-results',
+                artifactFiles: ['myFile.html'] // Our json file doesn't get included since the user didn't specify it
+            })
+
+            expect(resultsFactory.createResultsCallHistory).toHaveLength(1)
+            expect(resultsFactory.createResultsCallHistory).toContainEqual({
+                resultsFile: 'sfca_results.json' // We have our added json file to parse
+            })
+
+            expect(dependencies.createPullRequestReviewCallCount).toEqual(expectedReviewAttempts)
+            expect(dependencies.warnCallHistory).toHaveLength(expectedWarnings)
         }
-        dependencies.isPullRequestReturnValue = isPullRequest
-        dependencies.isGithubTokenValidReturnValue = tokenIsValid
-        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
-
-        expect(commandExecutor.isSalesforceCliInstalledCallCount).toEqual(1)
-
-        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
-        expect(commandExecutor.runCodeAnalyzerCallHistory).toContainEqual({
-            runArguments: '-f myFile.html --view table --output-file sfca_results.json' // We add in at least one json file
-        })
-
-        expect(dependencies.uploadArtifactCallHistory).toHaveLength(1)
-        expect(dependencies.uploadArtifactCallHistory).toContainEqual({
-            artifactName: 'salesforce-code-analyzer-results',
-            artifactFiles: ['myFile.html'] // Our json file doesn't get included since the user didn't specify it
-        })
-
-        expect(resultsFactory.createResultsCallHistory).toHaveLength(1)
-        expect(resultsFactory.createResultsCallHistory).toContainEqual({
-            resultsFile: 'sfca_results.json' // We have our added json file to parse
-        })
-
-        expect(dependencies.createPullRequestReviewCallCount).toEqual(expectedReviews)
-        expect(dependencies.warnCallHistory).toHaveLength(expectedWarnings)
-    })
+    )
 
     it('Test user supplies non-default inputs with non-json output file', async () => {
         dependencies.getInputsReturnValue = {
