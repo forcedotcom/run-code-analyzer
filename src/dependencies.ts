@@ -88,7 +88,8 @@ export class RuntimeDependencies implements Dependencies {
             })
             core.info(`Data is ${JSON.stringify(data, null, 2)}`)
             return data.permission === 'write' || data.permission === 'admin'
-        } catch (_error) {
+        } catch (error) {
+            core.error(`Failed to validate token, ${(error as Error).stack}`)
             return false
         }
     }
