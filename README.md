@@ -21,7 +21,14 @@ The `forcedotcom/run-code-analyzer@v2` GitHub Action is based on [Salesforce Cod
   * Each output file specified by a `--output-file` (or `-f`) flag is included in the ZIP archive [GitHub workflow run artifact](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts) for you to download.
 * <b>`results-artifact-name`</b>  *(Default: `salesforce-code-analyzer-results`)*
   * Specifies the name of the ZIP archive [GitHub workflow run artifact](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts) where the results output files are uploaded.
-
+* <b>`github-token`</b>  *(Default: `null`)*
+  * When this action is run against a Pull Request, a Github Token can be provided, which will be used to create a Review of the Pull Request that specifies how many violations were found (both in the project as a whole and in changed files), and links to the action summary page.
+  * This token must have Write permissions for Pull Requests.
+    * You can use the default Github Token stored as the `GITHUB_TOKEN` secret, provided that you also use the job-level `permissions` property to give that token write access for pull requests.
+```yaml
+jobs:
+  my action
+```
 ## v2 Outputs
 * `exit-code`
   * The Salesforce Code Analyzer execution exit code.
@@ -37,6 +44,8 @@ The `forcedotcom/run-code-analyzer@v2` GitHub Action is based on [Salesforce Cod
   * The number of Low (4) severity violations found.
 * `num-sev5-violations`
   * The number of Info (5) severity violations found.
+* `review-id`
+  * If the action created a Pull Request Review, this is its ID.
 
 This `run-code-analyzer@v2` action won't exit your GitHub workflow when it finds violations. We recommend that you add a subsequent step to your workflow that uses the available outputs to determine how your workflow should proceed.
 

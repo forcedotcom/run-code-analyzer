@@ -40,7 +40,7 @@ export class RuntimeResultsFactory implements ResultsFactory {
         for (const violationObj of resultObj['violations']) {
             const primaryLocationIndex: number = violationObj['primaryLocationIndex']
             const violationLocations: ViolationLocation[] = violationObj['locations'].map(
-                (l: { file: string; startLine: number; startColumn: number }) =>
+                (l: { file?: string; startLine?: number; startColumn?: number }) =>
                     new RunViolationLocation(l['file'], l['startLine'], l['startColumn'])
             )
 

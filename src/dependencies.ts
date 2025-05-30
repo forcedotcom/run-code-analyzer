@@ -19,6 +19,8 @@ export interface Dependencies {
 
     isPullRequest(): boolean
 
+    isGithubTokenValid(githubToken: string): Promise<boolean>
+
     getInputs(): Inputs
 
     getChangedFiles(githubToken: string): Promise<string[]>
@@ -68,6 +70,25 @@ export class RuntimeDependencies implements Dependencies {
         return github.context.payload.pull_request !== undefined
     }
 
+    async isGithubTokenValid(githubToken: string): Promise<boolean> {
+        try {
+            const octokit = github.getOctokit(githubToken)
+
+            // Validate the token and get the username
+            const { data: user } = await octokit.rest.users.getAuthenticated()
+            const username = user.login
+
+            const { data } = await octokit.rest.repos.getCollaboratorPermissionLevel({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                username
+            })
+            return data.permission === 'write' || data.permission === 'admin'
+        } catch (_error) {
+            return false
+        }
+    }
+
     getInputs(): Inputs {
         return {
             runArguments: core.getInput('run-arguments'),
@@ -78,11 +99,8 @@ export class RuntimeDependencies implements Dependencies {
 
     // istanbul ignore next - Unit testing this method is excessively difficult, so it's being covered with E2E tests instead
     async getChangedFiles(githubToken: string): Promise<string[]> {
-        if (!github.context.payload.pull_request) {
-            return []
-        }
-
-        const prNumber: number = github.context.payload.pull_request.number
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const prNumber: number = github.context.payload.pull_request!.number
         const octokit = github.getOctokit(githubToken)
         const changedFiles: string[] = []
         const perPage = 100

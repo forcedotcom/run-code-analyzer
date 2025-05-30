@@ -80,11 +80,14 @@ export async function run(
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
-        const changedFiles: string[] = await dependencies.getChangedFiles(inputs.githubToken)
-        const summaryMarkdown: string = summarizer.createSummaryMarkdown(results, changedFiles)
-        await dependencies.writeSummary(summaryMarkdown)
-        dependencies.endGroup()
-        if (dependencies.isPullRequest()) {
+        if (
+            dependencies.isPullRequest() &&
+            inputs.githubToken &&
+            (await dependencies.isGithubTokenValid(inputs.githubToken))
+        ) {
+            const changedFiles: string[] = await dependencies.getChangedFiles(inputs.githubToken)
+            const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles)
+
             const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
             const changedFilesSet: Set<string> = new Set(changedFiles)
             const violationsInChangedFilesCount: number = results.getViolationsSortedBySeverity().filter(v => {
@@ -101,6 +104,16 @@ export async function run(
             const reviewId: number = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody)
             dependencies.setOutput('review-id', `${reviewId}`)
             dependencies.info(MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId))
+
+            await dependencies.writeSummary(summaryMarkdown)
+            dependencies.endGroup()
+        } else {
+            if (dependencies.isPullRequest() && inputs.githubToken) {
+                dependencies.warn(MESSAGES.GITHUB_TOKEN_NOT_USABLE)
+            }
+            const summaryMarkdown = summarizer.createSummaryMarkdown(results)
+            await dependencies.writeSummary(summaryMarkdown)
+            dependencies.endGroup()
         }
     } catch (error) {
         if (error instanceof Error) {

@@ -26,6 +26,7 @@ export const MESSAGES = {
         `We will attempt to install the latest code-analyzer plugin on your behalf.`,
     CODE_ANALYZER_PLUGIN_INSTALL_FAILED: `Failed to install the latest code-analyzer plugin on your behalf.`,
     CODE_ANALYZER_FAILED: 'Salesforce Code Analyzer failed.',
+    GITHUB_TOKEN_NOT_USABLE: 'The provided github token is either invalid or lacks write permission on pull requests',
     UNEXPECTED_ERROR:
         `An unexpected error was thrown (see below). First check to make sure you are providing valid ` +
         `inputs. If you cannot resolve the error then create an issue at ` +

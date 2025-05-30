@@ -22,6 +22,11 @@ export class FakeDependencies implements Dependencies {
         return this.isPullRequestReturnValue
     }
 
+    isGithubTokenValidReturnValue = true
+    async isGithubTokenValid(_githubToken: string): Promise<boolean> {
+        return this.isGithubTokenValidReturnValue
+    }
+
     execCommandReturnValue: CommandOutput = { exitCode: 0, stdout: '', stderr: '' }
     execCommandCallHistory: { command: string; envVars: EnvironmentVariables; runSilently: boolean }[] = []
     async execCommand(command: string, envVars: EnvironmentVariables, runSilently: boolean): Promise<CommandOutput> {

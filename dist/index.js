@@ -112817,6 +112817,7 @@ exports.MESSAGES = {
         `We will attempt to install the latest code-analyzer plugin on your behalf.`,
     CODE_ANALYZER_PLUGIN_INSTALL_FAILED: `Failed to install the latest code-analyzer plugin on your behalf.`,
     CODE_ANALYZER_FAILED: 'Salesforce Code Analyzer failed.',
+    GITHUB_TOKEN_NOT_USABLE: 'The provided github token is either invalid or lacks write permission on pull requests',
     UNEXPECTED_ERROR: `An unexpected error was thrown (see below). First check to make sure you are providing valid ` +
         `inputs. If you cannot resolve the error then create an issue at ` +
         `https://github.com/forcedotcom/run-code-analyzer/issues.`
@@ -112899,6 +112900,23 @@ class RuntimeDependencies {
     isPullRequest() {
         return github.context.payload.pull_request !== undefined;
     }
+    async isGithubTokenValid(githubToken) {
+        try {
+            const octokit = github.getOctokit(githubToken);
+            // Validate the token and get the username
+            const { data: user } = await octokit.rest.users.getAuthenticated();
+            const username = user.login;
+            const { data } = await octokit.rest.repos.getCollaboratorPermissionLevel({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                username
+            });
+            return data.permission === 'write' || data.permission === 'admin';
+        }
+        catch (_error) {
+            return false;
+        }
+    }
     getInputs() {
         return {
             runArguments: core.getInput('run-arguments'),
@@ -112908,9 +112926,7 @@ class RuntimeDependencies {
     }
     // istanbul ignore next - Unit testing this method is excessively difficult, so it's being covered with E2E tests instead
     async getChangedFiles(githubToken) {
-        if (!github.context.payload.pull_request) {
-            return [];
-        }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const prNumber = github.context.payload.pull_request.number;
         const octokit = github.getOctokit(githubToken);
         const changedFiles = [];
@@ -113089,11 +113105,11 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             `  num-sev5-violations: ${results.getSev5ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.CREATING_SUMMARY);
-        const changedFiles = await dependencies.getChangedFiles(inputs.githubToken);
-        const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles);
-        await dependencies.writeSummary(summaryMarkdown);
-        dependencies.endGroup();
-        if (dependencies.isPullRequest()) {
+        if (dependencies.isPullRequest() &&
+            inputs.githubToken &&
+            (await dependencies.isGithubTokenValid(inputs.githubToken))) {
+            const changedFiles = await dependencies.getChangedFiles(inputs.githubToken);
+            const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles);
             const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
             const changedFilesSet = new Set(changedFiles);
             const violationsInChangedFilesCount = results.getViolationsSortedBySeverity().filter(v => {
@@ -113106,6 +113122,16 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             const reviewId = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody);
             dependencies.setOutput('review-id', `${reviewId}`);
             dependencies.info(constants_1.MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId));
+            await dependencies.writeSummary(summaryMarkdown);
+            dependencies.endGroup();
+        }
+        else {
+            if (dependencies.isPullRequest() && inputs.githubToken) {
+                dependencies.warn(constants_1.MESSAGES.GITHUB_TOKEN_NOT_USABLE);
+            }
+            const summaryMarkdown = summarizer.createSummaryMarkdown(results);
+            await dependencies.writeSummary(summaryMarkdown);
+            dependencies.endGroup();
         }
     }
     catch (error) {

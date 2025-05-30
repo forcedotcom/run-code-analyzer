@@ -29,8 +29,10 @@ inputs:
     default: 'salesforce-code-analyzer-results'
   github-token:
     description: |-
-      Github token to allow Github API calls. This token must have write access for pull requests.
-    required: true
+      When this action is run against a Pull Request, a Github Token can be provided, which will be used to create a Review of the Pull Request that specifies how many violations were found (both in the project as a whole and in changed files), and links to the action summary page.
+      
+      This token must have Write permissions for Pull Requests.
+    required: false
 
 outputs:
   exit-code:
@@ -48,7 +50,7 @@ outputs:
   num-sev5-violations:
     description: The number of Info (5) severity violations found.
   review-id:
-    description: If this action was run against a Pull Request, this is the ID of the review that was created.
+    description: If this action created a Pull Request Review, this is its ID.
 
 runs:
   using: node20
