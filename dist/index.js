@@ -112898,19 +112898,23 @@ class RuntimeDependencies {
         core.endGroup();
     }
     isPullRequest() {
+        core.info(`entire context is ${JSON.stringify(github.context, null, 2)}`);
         return github.context.payload.pull_request !== undefined;
     }
     async isGithubTokenValid(githubToken) {
         try {
             const octokit = github.getOctokit(githubToken);
+            core.info(`octokit was created`);
             // Validate the token and get the username
             const { data: user } = await octokit.rest.users.getAuthenticated();
             const username = user.login;
+            core.info(`User was ${JSON.stringify(user, null, 2)}`);
             const { data } = await octokit.rest.repos.getCollaboratorPermissionLevel({
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 username
             });
+            core.info(`Data is ${JSON.stringify(data, null, 2)}`);
             return data.permission === 'write' || data.permission === 'admin';
         }
         catch (_error) {
