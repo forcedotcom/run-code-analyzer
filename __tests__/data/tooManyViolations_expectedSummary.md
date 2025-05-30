@@ -7,7 +7,7 @@
 :yellow_circle: 0 Low severity violation(s)<br/>
 :white_circle: 0 Info severity violation(s)
 </blockquote>
-Showing 6014 of 12345 violations:
+Showing 6014 of 12345 violations (unable to show all results since max summary char limit reached):
 <table><tr><th> </th><th>Location</th><th>Rule</th><th>Message</th></tr>
 <tr><td>:orange_circle:</td><td><sup>/some/file.ts:1:0</sup></td><td><sup>someEngine:someRule</sup></td><td><sup>some message 1</sup></td></tr>
 <tr><td>:orange_circle:</td><td><sup>/some/file.ts:2:0</sup></td><td><sup>someEngine:someRule</sup></td><td><sup>some message 2</sup></td></tr>

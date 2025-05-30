@@ -113438,7 +113438,7 @@ function createTable(violations, tableRowsCharLimit) {
     }
     let summary = '';
     if (numViolationsIncluded < violations.length) {
-        summary += `Showing ${numViolationsIncluded} of ${violations.length} violations:${os_1.EOL}`;
+        summary += `Showing ${numViolationsIncluded} of ${violations.length} violations (unable to show all results since max summary char limit reached):${os_1.EOL}`;
     }
     summary +=
         `<table>` +

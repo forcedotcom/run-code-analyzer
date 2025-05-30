@@ -2348,7 +2348,7 @@
 </details>
 <details>
 <summary>4666 violations in files unchanged by this pull request</summary>
-Showing 3640 of 4666 violations:
+Showing 3640 of 4666 violations (unable to show all results since max summary char limit reached):
 <table><tr><th> </th><th>Location</th><th>Rule</th><th>Message</th></tr>
 <tr><td>:orange_circle:</td><td><sup>/some/file2.ts:2:0</sup></td><td><sup>someEngine:someRule</sup></td><td><sup>some message 2</sup></td></tr>
 <tr><td>:orange_circle:</td><td><sup>/some/file3.ts:3:0</sup></td><td><sup>someEngine:someRule</sup></td><td><sup>some message 3</sup></td></tr>

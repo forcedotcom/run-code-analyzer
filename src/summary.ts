@@ -104,7 +104,7 @@ function createTable(violations: Violation[], tableRowsCharLimit: number): strin
 
     let summary = ''
     if (numViolationsIncluded < violations.length) {
-        summary += `Showing ${numViolationsIncluded} of ${violations.length} violations:${EOL}`
+        summary += `Showing ${numViolationsIncluded} of ${violations.length} violations (unable to show all results since max summary char limit reached):${EOL}`
     }
     summary +=
         `<table>` +

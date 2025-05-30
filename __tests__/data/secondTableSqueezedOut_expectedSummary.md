@@ -9,7 +9,7 @@
 </blockquote>
 <details>
 <summary>16667 violations in files changed by this pull request</summary>
-Showing 5930 of 16667 violations:
+Showing 5930 of 16667 violations (unable to show all results since max summary char limit reached):
 <table><tr><th> </th><th>Location</th><th>Rule</th><th>Message</th></tr>
 <tr><td>:orange_circle:</td><td><sup>/some/file1.ts:1:0</sup></td><td><sup>someEngine:someRule</sup></td><td><sup>some message 1</sup></td></tr>
 <tr><td>:orange_circle:</td><td><sup>/some/file1.ts:4:0</sup></td><td><sup>someEngine:someRule</sup></td><td><sup>some message 4</sup></td></tr>
@@ -5945,7 +5945,7 @@ Showing 5930 of 16667 violations:
 </details>
 <details>
 <summary>33333 violations in files unchanged by this pull request</summary>
-Showing 0 of 33333 violations:
+Showing 0 of 33333 violations (unable to show all results since max summary char limit reached):
 <table><tr><th> </th><th>Location</th><th>Rule</th><th>Message</th></tr>
 </table>
 </details>
