@@ -61,9 +61,13 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
 ## Example v2 Usage
 
     name: Salesforce Code Analyzer Workflow
-    on: push
+    on:
+      pull_request:
+      push:
     jobs:
       salesforce-code-analyzer-workflow:
+        permissions:
+          pull-requests: write # Grants write permission to default token, so run-code-analyzer can create a PR review
         runs-on: ubuntu-latest
         steps:
           - name: Check out files
@@ -96,6 +100,7 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
             with:
               run-arguments: --workspace . --view detail --output-file sfca_results.html --output-file sfca_results.json
               results-artifact-name: salesforce-code-analyzer-results
+              github-token: ${{ github.token }}
     
           - name: Check the outputs to determine whether to fail
             if: |
