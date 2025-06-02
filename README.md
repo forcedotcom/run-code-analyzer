@@ -15,16 +15,16 @@ The `forcedotcom/run-code-analyzer@v2` GitHub Action is based on [Salesforce Cod
 
 ## v2 Inputs
 * <b>`run-arguments`</b> *(Default: `--view detail --output-file sfca_results.json`)*
-  * Specifies the arguments passed to the `run` command.
-    * For a full list of acceptable arguments for the `run` command, see the [code-analyzer Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_code-analyzer_commands_unified.htm).
-  * The stdout text from the `run` command is written to the [GitHub workflow run logs](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/monitoring-workflows/using-workflow-run-logs).
+  * Specifies the flags passed to the `code-analyzer run` command.
+    * For a full list of valid flags for the `code-analyzer run` command, see the [code-analyzer Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_code-analyzer_commands_unified.htm).
+  * The stdout text from the `code-analyzer run` command is written to the [GitHub workflow run logs](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/monitoring-workflows/using-workflow-run-logs).
   * Each output file specified by a `--output-file` (or `-f`) flag is included in the ZIP archive [GitHub workflow run artifact](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts) for you to download.
 * <b>`results-artifact-name`</b>  *(Default: `salesforce-code-analyzer-results`)*
   * Specifies the name of the ZIP archive [GitHub workflow run artifact](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts) where the results output files are uploaded.
 * <b>`github-token`</b>
-  * When this action is run against a Pull Request, a GitHub Token can be provided, which will be used to create a Review of the Pull Request that specifies how many violations were found (both in the project as a whole and in changed files), and links to the action summary page.
-  * This token must have Write permissions for Pull Requests.
-    * You can use the default GitHub Token stored as the `GITHUB_TOKEN` secret, provided that you also use the job-level `permissions` property to give that token write access for pull requests.
+  * When this action is run against a pull request, you can provide a GitHub token, which is used to create a review of the pull request. The review specifies how many violations were found (both in the project as a whole and in changed files) and links to the action summary page.
+  * This token must have write permissions for pull requests.
+    * You can use the default GitHub token stored as the `GITHUB_TOKEN` secret, as long as you also use the job-level `permissions` property to give that token write access for pull requests.
 
 ## v2 Outputs
 * `exit-code`
@@ -42,12 +42,12 @@ The `forcedotcom/run-code-analyzer@v2` GitHub Action is based on [Salesforce Cod
 * `num-sev5-violations`
   * The number of Info (5) severity violations found.
 * `review-id`
-  * If the action created a Pull Request Review, this is its ID.
+  * If the action created a pull request review, this is its ID.
 
-This `run-code-analyzer@v2` action won't exit your GitHub workflow when it finds violations. We recommend that you add a subsequent step to your workflow that uses the available outputs to determine how your workflow should proceed.
+This `run-code-analyzer@v2` action doesn't exit your GitHub workflow when it finds violations. We recommend that you add a subsequent step to your workflow that uses the available outputs to determine how your workflow should proceed.
 
 ## Environment Prerequisites
-The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer.html) and its bundled engines can each have their own set of requirements in order to run successfully. So we recommend that you set up your GitHub runner(s) with this software:
+The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer.html) and its bundled engines can each have their own set of requirements in order to run successfully. We recommend that you set up your GitHub runner(s) with this software:
 * `node` version 20.9.0 or greater
   * Required by all engines.
 * `java` version 11 or greater
@@ -71,7 +71,7 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
           - name: Check out files
             uses: actions/checkout@v4
 
-          # PREREQUISITES - Only needed if runner doesn't already satisfy these requirements
+          # PREREQUISITES - Only needed if the runner doesn't already satisfy these requirements.
           - name: Ensure node v20.9.0 or greater
             uses: actions/setup-node@v4
             with:
@@ -100,7 +100,7 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
               results-artifact-name: salesforce-code-analyzer-results
               github-token: ${{ github.token }}
     
-          - name: Check the outputs to determine whether to fail
+          - name: Check the Outputs to Determine Whether to Fail
             if: |
               steps.run-code-analyzer.outputs.exit-code > 0 ||
               steps.run-code-analyzer.outputs.num-sev1-violations > 0 ||

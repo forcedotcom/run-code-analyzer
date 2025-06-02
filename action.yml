@@ -1,7 +1,6 @@
 name: 'Run Salesforce Code Analyzer'
 description:
-  'Scans your code for violations using Salesforce Code Analyzer, uploads results as an artifact, and creates a job
-  summary.'
+  'Scans your code for violations using Salesforce Code Analyzer, uploads results as an artifact, and creates a job summary.'
 author: 'Salesforce Code Analyzer Team'
 
 branding:
@@ -11,27 +10,27 @@ branding:
 inputs:
   run-arguments:
     description: |-
-      Specifies arguments passed to the `run` command.
+      Specifies the flags passed to the `code-analyzer run` command.
       Default: "--view detail --output-file sfca_results.json"
 
-      For a full list of acceptable arguments for the run command, see the [code-analyzer Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_code-analyzer_commands_unified.htm).
+      For a full list of valid flags for the `code-analyzer run` command, see the [code-analyzer Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_code-analyzer_commands_unified.htm).
 
-      The stdout text from the `run` command is written to the GitHub workflow run logs.
+      The stdout text from the `code-analyzer run` command is written to the GitHub workflow run logs.
 
-      Each output file specified by a `--output-file` (or `-f`) flag is included in the zip archive GitHub workflow run artifact for you to download.
+      Each output file specified by a `--output-file` (or `-f`) flag is included in the ZIP archive [GitHub workflow run artifact](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts) for you to download.
     required: false
     default: '--view detail --output-file sfca_results.json'
   results-artifact-name:
     description: |-
-      Specifies the name of the zip archive GitHub workflow run artifact where the results output file is uploaded.
+      Specifies the name of the ZIP archive [GitHub workflow run artifact](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts) where the results output files are uploaded.
       Default: "salesforce-code-analyzer-results"
     required: false
     default: 'salesforce-code-analyzer-results'
   github-token:
     description: |-
-      When this action is run against a Pull Request, a Github Token can be provided, which will be used to create a Review of the Pull Request that specifies how many violations were found (both in the project as a whole and in changed files), and links to the action summary page.
+      When this action is run against a pull request, you can provide a Github token, which is used to create a review of the pull request. The review specifies how many violations were found (both in the project as a whole and in changed files) and links to the action summary page.
 
-      This token must have Write permissions for Pull Requests.
+      This token must have write permissions for pull requests.
     required: false
 
 outputs:
@@ -50,7 +49,7 @@ outputs:
   num-sev5-violations:
     description: The number of Info (5) severity violations found.
   review-id:
-    description: If this action created a Pull Request Review, this is its ID.
+    description: If this action created a pull request review, this is its ID.
 
 runs:
   using: node20
