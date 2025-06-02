@@ -112956,14 +112956,21 @@ class RuntimeDependencies {
         const runId = github.context.runId;
         const runAttempt = github.context.runAttempt;
         const octokit = github.getOctokit(githubToken);
-        const { data: workflow_run } = await octokit.rest.actions.listJobsForWorkflowRun({
-            owner,
-            repo,
-            run_id: runId
-        });
-        const matrix = process.env.matrix ? JSON.parse(process.env.matrix) : undefined;
-        const jobName = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`;
-        const matchingJob = workflow_run.jobs.find(job => job.name === jobName);
+        let matchingJob;
+        try {
+            const { data: workflow_run } = await octokit.rest.actions.listJobsForWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+            });
+            const matrix = process.env.matrix ? JSON.parse(process.env.matrix) : undefined;
+            const jobName = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`;
+            matchingJob = workflow_run.jobs.find(job => job.name === jobName);
+        }
+        catch (error) {
+            core.warning("Failed to query jobs for workflow run. Please add `actions: read` to the job's permissions");
+            matchingJob = undefined;
+        }
         // Infuriatingly, there's no way to get the job's display name from within the action context, and the github API
         // call _only_ returns the display name. So if the user assigns the job a custom name, or does shenanigans with
         // matrices, then we can't link directly to the table, and have to link to just the page itself and expect the user]

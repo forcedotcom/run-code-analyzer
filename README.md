@@ -67,7 +67,9 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
     jobs:
       salesforce-code-analyzer-workflow:
         permissions:
-          pull-requests: write # Grants write permission to default token, so run-code-analyzer can create a PR review
+          contents: read # Grants permission to check out the repository.
+          pull-requests: write # Grants permission to create a pull request review. Unnecessary if you don't want that functionality.
+          actions: read # Grants permission to read the in-progress actions. Optional, but allows the pull request review to link directly to the results table.
         runs-on: ubuntu-latest
         steps:
           - name: Check out files
