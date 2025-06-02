@@ -59,8 +59,7 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
 
     name: Salesforce Code Analyzer Workflow
     on:
-      pull_request: # This event is required for the action to create a pull request review.
-      push:
+      pull_request:
     jobs:
       salesforce-code-analyzer-workflow:
         permissions:
