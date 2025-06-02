@@ -9,12 +9,12 @@ export const MESSAGES = {
         ANALYZING_RESULTS: 'Analyzing Results',
         CREATING_SUMMARY: 'Creating Summary'
     },
-    CALCULATING_CHANGED_FILES: 'Attempting to calculate the list of changed files',
-    CALCULATED_CHANGED_FILES: 'Successfully calculated the files that changed in this PR',
+    CALCULATING_CHANGED_FILES: 'Attempting to calculate the list of changed files.',
+    CALCULATED_CHANGED_FILES: 'Successfully calculated the files that changed in this PR.',
     ATTEMPTING_TO_CREATE_PR_REVIEW: 'Attempting to create pull request review...',
     PR_FOUND_WITHOUT_GH_TOKEN:
-        'Pull request identified but no GitHub Token provided. Creating job summary without a PR review',
-    NOT_PR: 'Not running on a Pull Request. Creating job summary without a PR review',
+        'Pull request identified but no GitHub Token provided. Creating job summary without a PR review.',
+    NOT_PR: 'Not running on a Pull Request. Creating job summary without a PR review.',
     MISSING_NORMALIZE_SEVERITY: `Missing required --normalize-severity argument from run-arguments input.`,
     SF_CLI_NOT_INSTALLED:
         `The sf command was not found.\n` +
