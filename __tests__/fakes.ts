@@ -22,11 +22,6 @@ export class FakeDependencies implements Dependencies {
         return this.isPullRequestReturnValue
     }
 
-    isGithubTokenValidReturnValue = true
-    async isGithubTokenValid(_githubToken: string): Promise<boolean> {
-        return this.isGithubTokenValidReturnValue
-    }
-
     execCommandReturnValue: CommandOutput = { exitCode: 0, stdout: '', stderr: '' }
     execCommandCallHistory: { command: string; envVars: EnvironmentVariables; runSilently: boolean }[] = []
     async execCommand(command: string, envVars: EnvironmentVariables, runSilently: boolean): Promise<CommandOutput> {
@@ -46,11 +41,11 @@ export class FakeDependencies implements Dependencies {
         return this.getInputsReturnValue
     }
 
-    getChangedFilesReturnValue: string[] = []
+    getChangedFilesCallback: () => Promise<string[]> = async () => []
     getChangedFilesCallCount = 0
     async getChangedFiles(_githubToken: string): Promise<string[]> {
         this.getChangedFilesCallCount++
-        return this.getChangedFilesReturnValue
+        return this.getChangedFilesCallback()
     }
 
     createActionSummaryLinkReturnValue = 'www.example.com'
@@ -60,10 +55,11 @@ export class FakeDependencies implements Dependencies {
         return this.createActionSummaryLinkReturnValue
     }
 
+    createPullRequestReviewCallback: () => Promise<number> = async () => 7
     createPullRequestReviewCallCount = 0
     async createPullRequestReview(_githubToken: string, _reviewBody: string): Promise<number> {
         this.createPullRequestReviewCallCount++
-        return 7
+        return this.createPullRequestReviewCallback()
     }
 
     uploadArtifactCallHistory: { artifactName: string; artifactFiles: string[] }[] = []

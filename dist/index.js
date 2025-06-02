@@ -112825,6 +112825,9 @@ exports.MESSAGES = {
 exports.MESSAGE_FCNS = {
     PLUGIN_FOUND: (pluginName, pluginVersion) => `Found version ${pluginVersion} of the ${pluginName} plugin installed.`,
     FILE_NOT_FOUND: (fileName) => `The file ${fileName} was not found. Check the logs for an error.`,
+    FAILED_TO_GET_CHANGED_FILES: (stack) => `Could not get changed files associated with pull request. Error: ${stack}`,
+    FAILED_TO_READ_JOBS: (stack) => `Could not read jobs associated with this workflow. Error: ${stack}`,
+    FAILED_TO_CREATE_REVIEW: (stack) => `Could not create Pull Request Review. Error: ${stack}`,
     REVIEW_BODY: (resultsCount, resultsInChangedFilesCount, summaryLink) => `Salesforce Code Analyzer found ${resultsCount} violations, including ${resultsInChangedFilesCount} in files changed by this pull request. See [action summary](${summaryLink})`,
     CREATED_PR_REVIEW: (reviewId) => `Created Pull Request Review with ID ${reviewId}`
 };
@@ -112882,6 +112885,7 @@ const core = __importStar(__nccwpck_require__(37484));
 const exec = __importStar(__nccwpck_require__(95236));
 const github = __importStar(__nccwpck_require__(93228));
 const fs_1 = __importDefault(__nccwpck_require__(79896));
+const constants_1 = __nccwpck_require__(27242);
 const COMMAND_NOT_FOUND_EXIT_CODE = 127;
 /**
  * Class that wires up the runtime dependencies
@@ -112899,23 +112903,6 @@ class RuntimeDependencies {
     }
     isPullRequest() {
         return github.context.payload.pull_request !== undefined;
-    }
-    async isGithubTokenValid(githubToken) {
-        try {
-            const octokit = github.getOctokit(githubToken);
-            // Validate the token and get the username
-            const { data: user } = await octokit.rest.users.getAuthenticated();
-            const username = user.login;
-            const { data } = await octokit.rest.repos.getCollaboratorPermissionLevel({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                username
-            });
-            return data.permission === 'write' || data.permission === 'admin';
-        }
-        catch (_error) {
-            return false;
-        }
     }
     getInputs() {
         return {
@@ -112968,7 +112955,7 @@ class RuntimeDependencies {
             matchingJob = workflow_run.jobs.find(job => job.name === jobName);
         }
         catch (error) {
-            core.warning("Failed to query jobs for workflow run. Please add `actions: read` to the job's permissions");
+            core.warning(constants_1.MESSAGE_FCNS.FAILED_TO_READ_JOBS(error.stack ?? error.message));
             matchingJob = undefined;
         }
         // Infuriatingly, there's no way to get the job's display name from within the action context, and the github API
@@ -113112,23 +113099,36 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             `  num-sev5-violations: ${results.getSev5ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.CREATING_SUMMARY);
-        if (dependencies.isPullRequest() &&
-            inputs.githubToken &&
-            (await dependencies.isGithubTokenValid(inputs.githubToken))) {
-            const changedFiles = await dependencies.getChangedFiles(inputs.githubToken);
+        if (dependencies.isPullRequest() && inputs.githubToken) {
+            let changedFiles = [];
+            let couldReadChangedFiles = true;
+            try {
+                changedFiles = await dependencies.getChangedFiles(inputs.githubToken);
+            }
+            catch (error) {
+                couldReadChangedFiles = false;
+                dependencies.warn(constants_1.MESSAGE_FCNS.FAILED_TO_GET_CHANGED_FILES(error.stack ?? error.message));
+            }
             const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles);
-            const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
-            const changedFilesSet = new Set(changedFiles);
-            const violationsInChangedFilesCount = results.getViolationsSortedBySeverity().filter(v => {
-                return v
-                    .getLocations()
-                    .map(l => l.getFile())
-                    .some(f => f && changedFilesSet.has(f));
-            }).length;
-            const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), violationsInChangedFilesCount, summaryLink);
-            const reviewId = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody);
-            dependencies.setOutput('review-id', `${reviewId}`);
-            dependencies.info(constants_1.MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId));
+            if (couldReadChangedFiles) {
+                const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
+                const changedFilesSet = new Set(changedFiles);
+                const violationsInChangedFilesCount = results.getViolationsSortedBySeverity().filter(v => {
+                    return v
+                        .getLocations()
+                        .map(l => l.getFile())
+                        .some(f => f && changedFilesSet.has(f));
+                }).length;
+                const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), violationsInChangedFilesCount, summaryLink);
+                try {
+                    const reviewId = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody);
+                    dependencies.setOutput('review-id', `${reviewId}`);
+                    dependencies.info(constants_1.MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId));
+                }
+                catch (error) {
+                    dependencies.warn(constants_1.MESSAGE_FCNS.FAILED_TO_CREATE_REVIEW(error.stack ?? error.message));
+                }
+            }
             await dependencies.writeSummary(summaryMarkdown);
             dependencies.endGroup();
         }

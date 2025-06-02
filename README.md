@@ -67,9 +67,9 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
     jobs:
       salesforce-code-analyzer-workflow:
         permissions:
-          contents: read # Grants permission to check out the repository.
-          pull-requests: write # Grants permission to create a pull request review. Unnecessary if you don't want that functionality.
-          actions: read # Grants permission to read the in-progress actions. Optional, but allows the pull request review to link directly to the results table.
+          pull-requests: write # Grants permission to create a pull request review. Only necessary if running against pull requests.
+          contents: read # Grants permission to check out the repository. Only necessary for private repos.
+          actions: read # Grants permission to read the in-progress actions. Only necessary for private repos.
         runs-on: ubuntu-latest
         steps:
           - name: Check out files

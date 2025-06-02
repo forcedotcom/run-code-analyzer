@@ -6,6 +6,7 @@ import * as github from '@actions/github'
 import { CommandOutput, EnvironmentVariables, Inputs } from './types'
 import { ArtifactClient } from '@actions/artifact/lib/internal/client'
 import fs from 'fs'
+import { MESSAGE_FCNS } from './constants'
 
 const COMMAND_NOT_FOUND_EXIT_CODE = 127
 
@@ -18,8 +19,6 @@ export interface Dependencies {
     endGroup(): void
 
     isPullRequest(): boolean
-
-    isGithubTokenValid(githubToken: string): Promise<boolean>
 
     getInputs(): Inputs
 
@@ -68,25 +67,6 @@ export class RuntimeDependencies implements Dependencies {
 
     isPullRequest(): boolean {
         return github.context.payload.pull_request !== undefined
-    }
-
-    async isGithubTokenValid(githubToken: string): Promise<boolean> {
-        try {
-            const octokit = github.getOctokit(githubToken)
-
-            // Validate the token and get the username
-            const { data: user } = await octokit.rest.users.getAuthenticated()
-            const username = user.login
-
-            const { data } = await octokit.rest.repos.getCollaboratorPermissionLevel({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                username
-            })
-            return data.permission === 'write' || data.permission === 'admin'
-        } catch (_error) {
-            return false
-        }
     }
 
     getInputs(): Inputs {
@@ -142,7 +122,7 @@ export class RuntimeDependencies implements Dependencies {
             const jobName = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`
             matchingJob = workflow_run.jobs.find(job => job.name === jobName)
         } catch (error) {
-            core.warning("Failed to query jobs for workflow run. Please add `actions: read` to the job's permissions")
+            core.warning(MESSAGE_FCNS.FAILED_TO_READ_JOBS((error as Error).stack ?? (error as Error).message))
             matchingJob = undefined
         }
         // Infuriatingly, there's no way to get the job's display name from within the action context, and the github API

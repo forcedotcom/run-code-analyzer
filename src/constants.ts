@@ -36,6 +36,10 @@ export const MESSAGE_FCNS = {
     PLUGIN_FOUND: (pluginName: string, pluginVersion: string) =>
         `Found version ${pluginVersion} of the ${pluginName} plugin installed.`,
     FILE_NOT_FOUND: (fileName: string) => `The file ${fileName} was not found. Check the logs for an error.`,
+    FAILED_TO_GET_CHANGED_FILES: (stack: string) =>
+        `Could not get changed files associated with pull request. Error: ${stack}`,
+    FAILED_TO_READ_JOBS: (stack: string) => `Could not read jobs associated with this workflow. Error: ${stack}`,
+    FAILED_TO_CREATE_REVIEW: (stack: string) => `Could not create Pull Request Review. Error: ${stack}`,
     REVIEW_BODY: (resultsCount: number, resultsInChangedFilesCount: number, summaryLink: string) =>
         `Salesforce Code Analyzer found ${resultsCount} violations, including ${resultsInChangedFilesCount} in files changed by this pull request. See [action summary](${summaryLink})`,
     CREATED_PR_REVIEW: (reviewId: number) => `Created Pull Request Review with ID ${reviewId}`

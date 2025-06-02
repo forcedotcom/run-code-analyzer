@@ -80,30 +80,44 @@ export async function run(
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
-        if (
-            dependencies.isPullRequest() &&
-            inputs.githubToken &&
-            (await dependencies.isGithubTokenValid(inputs.githubToken))
-        ) {
-            const changedFiles: string[] = await dependencies.getChangedFiles(inputs.githubToken)
+        if (dependencies.isPullRequest() && inputs.githubToken) {
+            let changedFiles: string[] = []
+            let couldReadChangedFiles = true
+            try {
+                changedFiles = await dependencies.getChangedFiles(inputs.githubToken)
+            } catch (error) {
+                couldReadChangedFiles = false
+                dependencies.warn(
+                    MESSAGE_FCNS.FAILED_TO_GET_CHANGED_FILES((error as Error).stack ?? (error as Error).message)
+                )
+            }
+
             const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles)
 
-            const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
-            const changedFilesSet: Set<string> = new Set(changedFiles)
-            const violationsInChangedFilesCount: number = results.getViolationsSortedBySeverity().filter(v => {
-                return v
-                    .getLocations()
-                    .map(l => l.getFile())
-                    .some(f => f && changedFilesSet.has(f))
-            }).length
-            const summaryBody = MESSAGE_FCNS.REVIEW_BODY(
-                results.getTotalViolationCount(),
-                violationsInChangedFilesCount,
-                summaryLink
-            )
-            const reviewId: number = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody)
-            dependencies.setOutput('review-id', `${reviewId}`)
-            dependencies.info(MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId))
+            if (couldReadChangedFiles) {
+                const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
+                const changedFilesSet: Set<string> = new Set(changedFiles)
+                const violationsInChangedFilesCount: number = results.getViolationsSortedBySeverity().filter(v => {
+                    return v
+                        .getLocations()
+                        .map(l => l.getFile())
+                        .some(f => f && changedFilesSet.has(f))
+                }).length
+                const summaryBody = MESSAGE_FCNS.REVIEW_BODY(
+                    results.getTotalViolationCount(),
+                    violationsInChangedFilesCount,
+                    summaryLink
+                )
+                try {
+                    const reviewId: number = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody)
+                    dependencies.setOutput('review-id', `${reviewId}`)
+                    dependencies.info(MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId))
+                } catch (error) {
+                    dependencies.warn(
+                        MESSAGE_FCNS.FAILED_TO_CREATE_REVIEW((error as Error).stack ?? (error as Error).message)
+                    )
+                }
+            }
 
             await dependencies.writeSummary(summaryMarkdown)
             dependencies.endGroup()
