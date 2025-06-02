@@ -30,7 +30,7 @@ inputs:
   github-token:
     description: |-
       When this action is run against a Pull Request, a Github Token can be provided, which will be used to create a Review of the Pull Request that specifies how many violations were found (both in the project as a whole and in changed files), and links to the action summary page.
-      
+
       This token must have Write permissions for Pull Requests.
     required: false
 
