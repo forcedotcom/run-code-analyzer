@@ -84,7 +84,9 @@ export async function run(
             let changedFiles: string[] = []
             let couldReadChangedFiles = true
             try {
+                dependencies.info(MESSAGES.CALCULATING_CHANGED_FILES)
                 changedFiles = await dependencies.getChangedFiles(inputs.githubToken)
+                dependencies.info(MESSAGES.CALCULATED_CHANGED_FILES)
             } catch (error) {
                 couldReadChangedFiles = false
                 dependencies.warn(
@@ -109,6 +111,7 @@ export async function run(
                     summaryLink
                 )
                 try {
+                    dependencies.info(MESSAGES.ATTEMPTING_TO_CREATE_PR_REVIEW)
                     const reviewId: number = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody)
                     dependencies.setOutput('review-id', `${reviewId}`)
                     dependencies.info(MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId))
@@ -122,8 +125,10 @@ export async function run(
             await dependencies.writeSummary(summaryMarkdown)
             dependencies.endGroup()
         } else {
-            if (dependencies.isPullRequest() && inputs.githubToken) {
-                dependencies.warn(MESSAGES.GITHUB_TOKEN_NOT_USABLE)
+            if (dependencies.isPullRequest()) {
+                dependencies.info(MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN)
+            } else {
+                dependencies.info(MESSAGES.NOT_PR)
             }
             const summaryMarkdown = summarizer.createSummaryMarkdown(results)
             await dependencies.writeSummary(summaryMarkdown)

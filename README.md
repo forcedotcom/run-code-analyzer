@@ -22,9 +22,9 @@ The `forcedotcom/run-code-analyzer@v2` GitHub Action is based on [Salesforce Cod
 * <b>`results-artifact-name`</b>  *(Default: `salesforce-code-analyzer-results`)*
   * Specifies the name of the ZIP archive [GitHub workflow run artifact](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts) where the results output files are uploaded.
 * <b>`github-token`</b>
-  * When this action is run against a Pull Request, a Github Token can be provided, which will be used to create a Review of the Pull Request that specifies how many violations were found (both in the project as a whole and in changed files), and links to the action summary page.
+  * When this action is run against a Pull Request, a GitHub Token can be provided, which will be used to create a Review of the Pull Request that specifies how many violations were found (both in the project as a whole and in changed files), and links to the action summary page.
   * This token must have Write permissions for Pull Requests.
-    * You can use the default Github Token stored as the `GITHUB_TOKEN` secret, provided that you also use the job-level `permissions` property to give that token write access for pull requests.
+    * You can use the default GitHub Token stored as the `GITHUB_TOKEN` secret, provided that you also use the job-level `permissions` property to give that token write access for pull requests.
 
 ## v2 Outputs
 * `exit-code`

@@ -9,6 +9,12 @@ export const MESSAGES = {
         ANALYZING_RESULTS: 'Analyzing Results',
         CREATING_SUMMARY: 'Creating Summary'
     },
+    CALCULATING_CHANGED_FILES: 'Attempting to calculate the list of changed files',
+    CALCULATED_CHANGED_FILES: 'Successfully calculated the files that changed in this PR',
+    ATTEMPTING_TO_CREATE_PR_REVIEW: 'Attempting to create pull request review...',
+    PR_FOUND_WITHOUT_GH_TOKEN:
+        'Pull request identified but no GitHub Token provided. Creating job summary without a PR review',
+    NOT_PR: 'Not running on a Pull Request. Creating job summary without a PR review',
     MISSING_NORMALIZE_SEVERITY: `Missing required --normalize-severity argument from run-arguments input.`,
     SF_CLI_NOT_INSTALLED:
         `The sf command was not found.\n` +
@@ -26,7 +32,6 @@ export const MESSAGES = {
         `We will attempt to install the latest code-analyzer plugin on your behalf.`,
     CODE_ANALYZER_PLUGIN_INSTALL_FAILED: `Failed to install the latest code-analyzer plugin on your behalf.`,
     CODE_ANALYZER_FAILED: 'Salesforce Code Analyzer failed.',
-    GITHUB_TOKEN_NOT_USABLE: 'The provided Github Token is either invalid or lacks write permission on Pull Requests',
     UNEXPECTED_ERROR:
         `An unexpected error was thrown (see below). First check to make sure you are providing valid ` +
         `inputs. If you cannot resolve the error then create an issue at ` +
@@ -37,13 +42,13 @@ export const MESSAGE_FCNS = {
         `Found version ${pluginVersion} of the ${pluginName} plugin installed.`,
     FILE_NOT_FOUND: (fileName: string) => `The file ${fileName} was not found. Check the logs for an error.`,
     FAILED_TO_GET_CHANGED_FILES: (stack: string) =>
-        `Could not get changed files associated with pull request. This may occur if the supplied Github Token is invalid or lacks the 'pull-requests: write' permission. Error: ${stack}`,
+        `Could not get changed files associated with pull request. This may occur if the supplied GitHub Token is invalid or lacks the 'pull-requests: write' permission. Error: ${stack}`,
     FAILED_TO_READ_JOBS: (stack: string) =>
-        `Could not read jobs associated with this workflow. This may occur if the supplied Github Token is invalid or lacks the 'actions: read' permission. Error: ${stack}`,
+        `Could not read jobs associated with this workflow. This may occur if the supplied GitHub Token is invalid or lacks the 'actions: read' permission. Error: ${stack}`,
     FAILED_TO_CREATE_REVIEW: (stack: string) =>
-        `Could not create Pull Request Review. This may occur if the supplied Github Token is invalid or lacks the 'pull-requests: write' permission. Error: ${stack}`,
+        `Could not create Pull Request Review. This may occur if the supplied GitHub Token is invalid or lacks the 'pull-requests: write' permission. Error: ${stack}`,
     REVIEW_BODY: (resultsCount: number, resultsInChangedFilesCount: number, summaryLink: string) =>
-        `Salesforce Code Analyzer found ${resultsCount} violations, including ${resultsInChangedFilesCount} in files changed by this pull request. See [action summary](${summaryLink})`,
+        `${resultsInChangedFilesCount > 0 ? ':warning: ' : ''}Salesforce Code Analyzer found ${resultsCount} violations, including ${resultsInChangedFilesCount} in files changed by this pull request. See [job summary page](${summaryLink}).`,
     CREATED_PR_REVIEW: (reviewId: number) => `Created Pull Request Review with ID ${reviewId}`
 }
 /* eslint-enable */
