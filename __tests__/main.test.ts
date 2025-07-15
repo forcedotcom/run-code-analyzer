@@ -130,7 +130,7 @@ describe('main run Tests', () => {
             githubToken: 'dummyToken'
         }
         dependencies.isPullRequestReturnValue = true
-        dependencies.getChangedFilesCallback = async () => ['dummyfile1.js', 'dummyfile2.js']
+        dependencies.getChangedFilesCallback = async () => ['fakeFile'] // Match the file from FakeViolationLocation to get resultsInChangedFilesCount > 0
         dependencies.createPullRequestReviewCallback = async () => 7
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -157,6 +157,24 @@ describe('main run Tests', () => {
             value: `7`
         })
         expect(dependencies.warnCallHistory).toHaveLength(0)
+    })
+
+    it('When running on a pull request but missing github token, then a review is not created and an info message is logged', async () => {
+        dependencies.getInputsReturnValue = {
+            runArguments: '-f myFile.html --view table',
+            resultsArtifactName: 'salesforce-code-analyzer-results'
+        }
+        dependencies.isPullRequestReturnValue = true
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        expect(commandExecutor.isSalesforceCliInstalledCallCount).toEqual(1)
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        expect(dependencies.uploadArtifactCallHistory).toHaveLength(1)
+        expect(resultsFactory.createResultsCallHistory).toHaveLength(1)
+        expect(dependencies.warnCallHistory).toHaveLength(0)
+
+        expect(dependencies.infoCallHistory).toHaveLength(2)
+        expect(dependencies.infoCallHistory[1].infoMessage).toEqual(MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN)
     })
 
     it.each([

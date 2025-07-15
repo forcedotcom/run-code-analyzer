@@ -1,9 +1,9 @@
-import { InputArguments } from './utils'
+import { InputArguments, getFullErrorMessage } from './utils'
 import { Dependencies } from './dependencies'
 import { CommandOutput, Inputs } from './types'
 import { CommandExecutor } from './commands'
 import { MESSAGE_FCNS, MESSAGES, MIN_CODE_ANALYZER_VERSION_REQUIRED } from './constants'
-import { Results, ResultsFactory } from './results'
+import { Results, ResultsFactory, Violation } from './results'
 import { Summarizer } from './summary'
 
 const STDERR_ERROR_MARKER = 'Error'
@@ -89,9 +89,7 @@ export async function run(
                 dependencies.info(MESSAGES.CALCULATED_CHANGED_FILES)
             } catch (error) {
                 couldReadChangedFiles = false
-                dependencies.warn(
-                    MESSAGE_FCNS.FAILED_TO_GET_CHANGED_FILES((error as Error).stack ?? (error as Error).message)
-                )
+                dependencies.warn(MESSAGE_FCNS.FAILED_TO_GET_CHANGED_FILES(getFullErrorMessage(error)))
             }
 
             const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles)
@@ -99,12 +97,14 @@ export async function run(
             if (couldReadChangedFiles) {
                 const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
                 const changedFilesSet: Set<string> = new Set(changedFiles)
-                const violationsInChangedFilesCount: number = results.getViolationsSortedBySeverity().filter(v => {
-                    return v
-                        .getLocations()
-                        .map(l => l.getFile())
-                        .some(f => f && changedFilesSet.has(f))
-                }).length
+                const violationsInChangedFilesCount: number = results
+                    .getViolationsSortedBySeverity()
+                    .filter((v: Violation): boolean =>
+                        v
+                            .getLocations()
+                            .map(l => l.getFile())
+                            .some(f => f && changedFilesSet.has(f))
+                    ).length
                 const summaryBody = MESSAGE_FCNS.REVIEW_BODY(
                     results.getTotalViolationCount(),
                     violationsInChangedFilesCount,
@@ -116,9 +116,7 @@ export async function run(
                     dependencies.setOutput('review-id', `${reviewId}`)
                     dependencies.info(MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId))
                 } catch (error) {
-                    dependencies.warn(
-                        MESSAGE_FCNS.FAILED_TO_CREATE_REVIEW((error as Error).stack ?? (error as Error).message)
-                    )
+                    dependencies.warn(MESSAGE_FCNS.FAILED_TO_CREATE_REVIEW(getFullErrorMessage(error)))
                 }
             }
 
@@ -135,9 +133,7 @@ export async function run(
             dependencies.endGroup()
         }
     } catch (error) {
-        if (error instanceof Error) {
-            dependencies.fail(`${MESSAGES.UNEXPECTED_ERROR}\n\n${error.stack}`)
-        }
+        dependencies.fail(`${MESSAGES.UNEXPECTED_ERROR}\n\n${getFullErrorMessage(error)}`)
     }
 }
 

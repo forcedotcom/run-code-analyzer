@@ -143,7 +143,6 @@ describe('RuntimeSummarizer Tests', () => {
             path.join('.', '__tests__', 'data', 'zeroViolations_expectedSummary.md'),
             { encoding: 'utf8' }
         )
-        fs.writeFileSync(path.join(__dirname, 'data', 'beep.md'), summaryMarkdown)
         expect(summaryMarkdown).toEqual(expectedSummaryMarkdown)
     })
 

@@ -1,7 +1,7 @@
 {
     "name": "run-code-analyzer",
     "description": "GitHub Action to run the Salesforce Code Analyzer",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "author": "The Salesforce Code Analyzer Team",
     "private": true,
     "homepage": "https://github.com/forcedotcom/run-code-analyzer",
@@ -28,9 +28,10 @@
         "coverage": "make-coverage-badge --output-path ./badges/coverage.svg",
         "format:write": "prettier --write **/*.ts",
         "format:check": "prettier --check **/*.ts",
-        "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
+        "lint": "npx eslint .",
         "package": "ncc build src/index.ts --license licenses.txt --out dist",
         "package:watch": "npm run package -- --watch",
+        "show-coverage": "open ./coverage/lcov-report/index.html",
         "test": "jest",
         "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
     },
@@ -66,29 +67,30 @@
         ]
     },
     "dependencies": {
-        "@actions/artifact": "^2.2.1",
+        "@actions/artifact": "^2.3.2",
         "@actions/core": "^1.11.1",
         "@actions/exec": "^1.1.1",
         "@actions/github": "^6.0.1",
-        "semver": "^7.6.3"
+        "semver": "^7.7.2"
     },
     "devDependencies": {
-        "@types/jest": "^29.5.14",
-        "@types/node": "^22.10.9",
-        "@types/semver": "^7.5.8",
-        "@typescript-eslint/eslint-plugin": "^8.21.0",
-        "@typescript-eslint/parser": "^8.21.0",
+        "@eslint/js": "^9.31.0",
+        "@types/jest": "^30.0.0",
+        "@types/node": "^22.16.4",
+        "@types/semver": "^7.7.0",
         "@vercel/ncc": "^0.38.3",
-        "eslint": "^8.57.1",
-        "eslint-plugin-github": "^5.1.5",
-        "eslint-plugin-jest": "^28.11.0",
-        "eslint-plugin-jsonc": "^2.18.2",
-        "eslint-plugin-prettier": "^5.2.3",
-        "jest": "^29.7.0",
+        "eslint": "^9.31.0",
+        "eslint-plugin-github": "^6.0.0",
+        "eslint-plugin-jest": "^29.0.1",
+        "eslint-plugin-jsonc": "^2.20.1",
+        "eslint-plugin-prettier": "^5.5.1",
+        "globals": "^16.3.0",
+        "jest": "^30.0.4",
         "make-coverage-badge": "^1.2.0",
-        "prettier": "^3.4.2",
-        "prettier-eslint": "^16.3.0",
-        "ts-jest": "^29.2.5",
-        "typescript": "^5.7.3"
+        "prettier": "^3.6.2",
+        "prettier-eslint": "^16.4.2",
+        "ts-jest": "^29.4.0",
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.37.0"
     }
 }

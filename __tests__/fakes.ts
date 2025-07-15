@@ -1,7 +1,7 @@
 import { Dependencies } from '../src/dependencies'
 import { CommandOutput, EnvironmentVariables, Inputs } from '../src/types'
 import { CommandExecutor } from '../src/commands'
-import { Results, ResultsFactory, Violation, ViolationLocation } from '../src/results'
+import { Results, ResultsFactory, RuntimeViolation, Violation, ViolationLocation } from '../src/results'
 import { Summarizer } from '../src/summary'
 
 export class FakeDependencies implements Dependencies {
@@ -195,7 +195,23 @@ export class FakeResults implements Results {
         return this.getTotalViolationCountReturnValue
     }
 
-    getViolationsSortedBySeverityReturnValue: Violation[] = []
+    getViolationsSortedBySeverityReturnValue: Violation[] = [
+        createSampleViolation(1, 1),
+        createSampleViolation(2, 2),
+        createSampleViolation(3, 2),
+        createSampleViolation(4, 3),
+        createSampleViolation(5, 3),
+        createSampleViolation(6, 3),
+        createSampleViolation(7, 4),
+        createSampleViolation(8, 4),
+        createSampleViolation(9, 4),
+        createSampleViolation(10, 4),
+        createSampleViolation(11, 5),
+        createSampleViolation(12, 5),
+        createSampleViolation(13, 5),
+        createSampleViolation(14, 5),
+        createSampleViolation(15, 5)
+    ]
     getViolationsSortedBySeverityCallCount = 0
     getViolationsSortedBySeverity(): Violation[] {
         this.getViolationsSortedBySeverityCallCount++
@@ -231,4 +247,16 @@ export class FakeSummarizer implements Summarizer {
         this.createSummaryMarkdownCallHistory.push({ results })
         return this.createSummaryMarkdownReturnValue
     }
+}
+
+function createSampleViolation(violationId: number, sev: number): Violation {
+    return new RuntimeViolation(
+        sev,
+        'someEngine',
+        `someRule${violationId}`,
+        undefined,
+        `someMessage${violationId}`,
+        0,
+        [new FakeViolationLocation()]
+    )
 }

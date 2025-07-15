@@ -1,4 +1,4 @@
-import { mergeWithProcessEnvVars } from './utils'
+import { mergeWithProcessEnvVars, getFullErrorMessage } from './utils'
 import { DefaultArtifactClient } from '@actions/artifact'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
@@ -77,7 +77,6 @@ export class RuntimeDependencies implements Dependencies {
         }
     }
 
-    // istanbul ignore next - Unit testing this method is excessively difficult, so it's being covered with E2E tests instead
     async getChangedFiles(githubToken: string): Promise<string[]> {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const prNumber: number = github.context.payload.pull_request!.number
@@ -104,7 +103,6 @@ export class RuntimeDependencies implements Dependencies {
         return changedFiles
     }
 
-    // istanbul ignore next - A direct test of this method would be nice, but it's somewhat excessive
     async createActionSummaryLink(githubToken: string): Promise<string> {
         const owner = github.context.repo.owner
         const repo = github.context.repo.repo
@@ -122,7 +120,7 @@ export class RuntimeDependencies implements Dependencies {
             const jobName = `${github.context.job}${matrix ? ` (${Object.values(matrix).join(', ')})` : ''}`
             matchingJob = workflow_run.jobs.find(job => job.name === jobName)
         } catch (error) {
-            core.warning(MESSAGE_FCNS.FAILED_TO_READ_JOBS((error as Error).stack ?? (error as Error).message))
+            core.warning(MESSAGE_FCNS.FAILED_TO_READ_JOBS(getFullErrorMessage(error)))
             matchingJob = undefined
         }
         // Infuriatingly, there's no way to get the job's display name from within the action context, and the github API

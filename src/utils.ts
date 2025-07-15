@@ -11,6 +11,7 @@ export function mergeWithProcessEnvVars(envVars: EnvironmentVariables): Environm
         mergedEnvVars[k] = envVars[k]
     }
     for (const k in process.env) {
+        /* istanbul ignore else */
         if (process.env[k] !== undefined) {
             mergedEnvVars[k] = process.env[k]
         }
@@ -85,4 +86,10 @@ function markSpacesBetweenQuotes(value: string, spaceMarker: string): string {
         }
     }
     return output
+}
+
+export function getFullErrorMessage(err: unknown): string {
+    return err instanceof Error
+        ? (err.stack ?? /* istanbul ignore next */ err.message)
+        : /* istanbul ignore next */ String(err)
 }

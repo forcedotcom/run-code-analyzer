@@ -1,6 +1,5 @@
 export const MIN_CODE_ANALYZER_VERSION_REQUIRED = '5.0.0-beta.0'
 
-/* eslint-disable prettier/prettier, prefer-template */
 export const MESSAGES = {
     STEP_LABELS: {
         PREPARING_ENVIRONMENT: 'Preparing Environment',
@@ -50,4 +49,3 @@ export const MESSAGE_FCNS = {
         `${resultsInChangedFilesCount > 0 ? ':warning: ' : ''}Salesforce Code Analyzer found ${resultsCount} violations, including ${resultsInChangedFilesCount} in files changed by this pull request. See [job summary page](${summaryLink}).`,
     CREATED_PR_REVIEW: (reviewId: number) => `Created pull request review with ID ${reviewId}`
 }
-/* eslint-enable */

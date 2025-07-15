@@ -11,5 +11,4 @@ const runtimeDependencies: Dependencies = new RuntimeDependencies()
 const commandExecutor: CommandExecutor = new RuntimeCommandExecutor(runtimeDependencies)
 const resultsFactory: ResultsFactory = new RuntimeResultsFactory()
 const summarizer: Summarizer = new RuntimeSummarizer()
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
 run(runtimeDependencies, commandExecutor, resultsFactory, summarizer)
