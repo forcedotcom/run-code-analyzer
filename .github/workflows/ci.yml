@@ -58,7 +58,7 @@ jobs:
         with:
           node-version: '>=20.9.0'
       - name: Ensure java v11 or greater
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '>=11'
           distribution: 'zulu'
