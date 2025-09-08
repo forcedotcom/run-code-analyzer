@@ -21,7 +21,7 @@ jobs:
 
       - name: Setup Node.js
         id: setup-node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version-file: .node-version
           cache: npm
@@ -54,7 +54,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Ensure node v20.9.0 or greater
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '>=20.9.0'
       - name: Ensure java v11 or greater
