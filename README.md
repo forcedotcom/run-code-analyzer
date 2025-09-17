@@ -68,20 +68,20 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
         runs-on: ubuntu-latest
         steps:
           - name: Check out files
-            uses: actions/checkout@v4
+            uses: actions/checkout@v5
 
           # PREREQUISITES - Only needed if the runner doesn't already satisfy these requirements.
           - name: Ensure node v20.9.0 or greater
-            uses: actions/setup-node@v4
+            uses: actions/setup-node@v5
             with:
               node-version: '>=20.9.0'
           - name: Ensure java v11 or greater
-            uses: actions/setup-java@v4
+            uses: actions/setup-java@v5
             with:
               java-version: '>=11'
               distribution: 'zulu'
           - name: Ensure python v3.10 or greater
-            uses: actions/setup-python@v5
+            uses: actions/setup-python@v6
             with:
               python-version: '>=3.10'
 
@@ -154,7 +154,7 @@ This `run-code-analyzer` action will not exit your GitHub workflow when violatio
         runs-on: ubuntu-latest
         steps:
           - name: Check out files
-            uses: actions/checkout@v4
+            uses: actions/checkout@v5
     
           - name: Install Salesforce CLI
             run: npm install -g @salesforce/cli@latest
