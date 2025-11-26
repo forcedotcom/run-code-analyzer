@@ -20,7 +20,7 @@
         ".": "./dist/index.js"
     },
     "engines": {
-        "node": ">=22.0.0"
+        "node": ">=20.9.0"
     },
     "scripts": {
         "build": "npm run package",
