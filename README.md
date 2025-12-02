@@ -118,48 +118,14 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
 
 If you want to focus only on violations in files that were changed in a pull request, use the `changed-files-only` input. When enabled, the output counts will **only include violations from changed files**, making it easy to set up quality gates that don't fail on existing violations in unchanged code.
 
-    name: Salesforce Code Analyzer Workflow (Changed Files Only)
-    on:
-      pull_request:
-    jobs:
-      salesforce-code-analyzer-workflow:
-        permissions:
-          pull-requests: write
-          contents: read
-          actions: read
-        runs-on: ubuntu-latest
-        steps:
-          - name: Check out files
-            uses: actions/checkout@v5
+**Use Case:** This is ideal when introducing code quality checks to a legacy codebase with existing violations. Instead of blocking all PRs due to pre-existing issues, you can ensure that new code meets quality standards while allowing gradual cleanup of existing code.
 
-          - name: Install Salesforce CLI
-            run: npm install -g @salesforce/cli@latest
-    
-          - name: Install Latest Salesforce Code Analyzer CLI Plugin
-            run: sf plugins install code-analyzer@latest
-    
-          - name: Run Salesforce Code Analyzer (Changed Files Only)
-            id: run-code-analyzer
-            uses: forcedotcom/run-code-analyzer@v2
-            with:
-              run-arguments: --workspace . --view detail --output-file sfca_results.json
-              results-artifact-name: salesforce-code-analyzer-results
-              github-token: ${{ github.token }}
-              changed-files-only: true
-    
-          - name: Quality Gate - Only Fail on Violations in Changed Files
-            if: |
-              steps.run-code-analyzer.outputs.num-sev1-violations > 0 ||
-              steps.run-code-analyzer.outputs.num-sev2-violations > 0 ||
-              steps.run-code-analyzer.outputs.num-violations > 10
-            run: |
-              echo "Quality gate failed: Found violations in changed files"
-              echo "  Critical (Sev 1): ${{ steps.run-code-analyzer.outputs.num-sev1-violations }}"
-              echo "  High (Sev 2): ${{ steps.run-code-analyzer.outputs.num-sev2-violations }}"
-              echo "  Total: ${{ steps.run-code-analyzer.outputs.num-violations }}"
-              exit 1
-
-**Note:** When `changed-files-only: true` is set, all output counts (`num-violations`, `num-sev1-violations`, etc.) automatically reflect only violations in changed files. You can use the same quality gate conditions you would normally use, and they will only consider violations in files modified by the PR.
+When `changed-files-only: true` is set:
+- The action scans the entire workspace for comprehensive analysis
+- Violations are filtered to only those in files changed by the PR
+- All output counts (`num-violations`, `num-sev1-violations`, etc.) reflect only changed file violations
+- Quality gates can evaluate only new violations, not existing codebase issues
+- PR reviews show both total violations (for context) and changed file violations (for quality gate decisions)
 
 # Version: v1
 The `forcedotcom/run-code-analyzer@v1` GitHub Action is based on [Salesforce Code Analyzer v4.x](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer-3x.html), which is the original `@salesforce/sfdx-scanner` Salesforce CLI plugin.
