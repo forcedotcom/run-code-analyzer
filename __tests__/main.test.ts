@@ -1,7 +1,15 @@
 import * as main from '../src/main'
-import { FakeCommandExecutor, FakeDependencies, FakeResultsFactory, FakeSummarizer } from './fakes'
+import {
+    FakeCommandExecutor,
+    FakeDependencies,
+    FakeResults,
+    FakeResultsFactory,
+    FakeSummarizer,
+    FakeViolationLocation
+} from './fakes'
 import { Inputs } from '../src/types'
 import { MESSAGE_FCNS, MESSAGES, MIN_CODE_ANALYZER_VERSION_REQUIRED } from '../src/constants'
+import { RuntimeViolation } from '../src/results'
 
 describe('main run Tests', () => {
     let dependencies: FakeDependencies
@@ -81,7 +89,9 @@ describe('main run Tests', () => {
 
         expect(summarizer.createSummaryMarkdownCallHistory).toHaveLength(1)
         expect(summarizer.createSummaryMarkdownCallHistory).toContainEqual({
-            results: resultsFactory.createResultsReturnValue
+            results: resultsFactory.createResultsReturnValue,
+            changedFiles: [],
+            changedFilesOnly: false
         })
 
         expect(dependencies.writeSummaryCallHistory).toHaveLength(1)
@@ -93,7 +103,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with various output files including json', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f myFile.html --output-file=another.xml -f=great.json --output-file  cool.sarif -w ./src',
-            resultsArtifactName: 'customArtifactName'
+            resultsArtifactName: 'customArtifactName',
+            changedFilesOnly: false
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -127,7 +138,8 @@ describe('main run Tests', () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f myFile.html --view table',
             resultsArtifactName: 'salesforce-code-analyzer-results',
-            githubToken: 'dummyToken'
+            githubToken: 'dummyToken',
+            changedFilesOnly: false
         }
         dependencies.isPullRequestReturnValue = true
         dependencies.getChangedFilesCallback = async () => ['fakeFile'] // Match the file from FakeViolationLocation to get resultsInChangedFilesCount > 0
@@ -162,7 +174,8 @@ describe('main run Tests', () => {
     it('When running on a pull request but missing github token, then a review is not created and an info message is logged', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f myFile.html --view table',
-            resultsArtifactName: 'salesforce-code-analyzer-results'
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            changedFilesOnly: false
         }
         dependencies.isPullRequestReturnValue = true
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
@@ -174,7 +187,7 @@ describe('main run Tests', () => {
         expect(dependencies.warnCallHistory).toHaveLength(0)
 
         expect(dependencies.infoCallHistory).toHaveLength(2)
-        expect(dependencies.infoCallHistory[1].infoMessage).toEqual(MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN)
+        expect(dependencies.infoCallHistory[0].infoMessage).toEqual(MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN)
     })
 
     it.each([
@@ -214,7 +227,8 @@ describe('main run Tests', () => {
             dependencies.getInputsReturnValue = {
                 runArguments: '-f myFile.html --view table',
                 resultsArtifactName: 'salesforce-code-analyzer-results',
-                githubToken: 'dummyToken'
+                githubToken: 'dummyToken',
+                changedFilesOnly: false
             }
             dependencies.isPullRequestReturnValue = isPullRequest
             dependencies.getChangedFilesCallback = getChangedFilesCallback
@@ -246,7 +260,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with non-json output file', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f myFile.html --view table',
-            resultsArtifactName: 'salesforce-code-analyzer-results'
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            changedFilesOnly: false
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -272,7 +287,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with zero output files and no view', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '',
-            resultsArtifactName: 'salesforce-code-analyzer-results'
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            changedFilesOnly: false
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -298,7 +314,8 @@ describe('main run Tests', () => {
     it('Test user supplies non-default inputs with zero output files but supplies a view', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-c someConfig.yml --view detail',
-            resultsArtifactName: 'salesforce-code-analyzer-results'
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            changedFilesOnly: false
         }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
@@ -443,7 +460,8 @@ describe('main run Tests', () => {
     it('Test when the user output file does not exist after run then we fail', async () => {
         dependencies.getInputsReturnValue = {
             runArguments: '-f userResults.xml',
-            resultsArtifactName: 'customArtifactName'
+            resultsArtifactName: 'customArtifactName',
+            changedFilesOnly: false
         }
         dependencies.fileExistsReturnValue = false
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
@@ -451,5 +469,64 @@ describe('main run Tests', () => {
         expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory[0].failMessage).toContain(MESSAGE_FCNS.FILE_NOT_FOUND('userResults.xml'))
+    })
+
+    it('When changed-files-only is true, outputs reflect only violations in changed files', async () => {
+        dependencies.getInputsReturnValue = {
+            runArguments: '--view detail --output-file sfca_results.json',
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            githubToken: 'dummyToken',
+            changedFilesOnly: true
+        }
+        dependencies.isPullRequestReturnValue = true
+        dependencies.getChangedFilesCallback = async () => ['changedFile.ts'] // Only one file changed
+
+        // Create violations with specific file locations
+        const changedFileLocation = new FakeViolationLocation()
+        changedFileLocation.getFileReturnValue = 'changedFile.ts'
+
+        const unchangedFileLocation1 = new FakeViolationLocation()
+        unchangedFileLocation1.getFileReturnValue = 'unchangedFile1.ts'
+
+        const unchangedFileLocation2 = new FakeViolationLocation()
+        unchangedFileLocation2.getFileReturnValue = 'unchangedFile2.ts'
+
+        // Set up results with violations in both changed and unchanged files
+        const fakeResults = resultsFactory.createResultsReturnValue as FakeResults
+        fakeResults.getViolationsSortedBySeverityReturnValue = [
+            // This violation is in the changed file
+            new RuntimeViolation(1, 'engine1', 'rule1', undefined, 'message1', 0, [changedFileLocation]),
+            // These violations are in unchanged files
+            new RuntimeViolation(1, 'engine1', 'rule2', undefined, 'message2', 0, [unchangedFileLocation1]),
+            new RuntimeViolation(2, 'engine1', 'rule3', undefined, 'message3', 0, [unchangedFileLocation1]),
+            new RuntimeViolation(3, 'engine1', 'rule4', undefined, 'message4', 0, [unchangedFileLocation2])
+        ]
+
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        // Outputs should only count the 1 violation in the changed file
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-violations',
+            value: '1'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev1-violations',
+            value: '1'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev2-violations',
+            value: '0'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev3-violations',
+            value: '0'
+        })
+
+        // Summary should be called with changedFilesOnly=true
+        expect(summarizer.createSummaryMarkdownCallHistory).toContainEqual({
+            results: resultsFactory.createResultsReturnValue,
+            changedFiles: ['changedFile.ts'],
+            changedFilesOnly: true
+        })
     })
 })

@@ -33,6 +33,13 @@ inputs:
 
       This token must have write permissions for pull requests.
     required: false
+  changed-files-only:
+    description: |-
+      When set to true, only show violations in files that were changed in the pull request. Violations in unchanged files will be excluded from the summary and counts.
+      This option only has effect when running on a pull request with a github-token provided.
+      Default: false
+    required: false
+    default: 'false'
 
 outputs:
   exit-code:

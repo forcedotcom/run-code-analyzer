@@ -14,31 +14,19 @@ const SEVERITY_EMOJIS: Map<number, string> = new Map<number, string>([
 ])
 
 export interface Summarizer {
-    createSummaryMarkdown(results: Results, changedFiles?: string[]): string
+    createSummaryMarkdown(results: Results, changedFiles?: string[], changedFilesOnly?: boolean): string
 }
 
 export class RuntimeSummarizer implements Summarizer {
-    createSummaryMarkdown(results: Results, changedFiles: string[] = []): string {
+    createSummaryMarkdown(results: Results, changedFiles: string[] = [], changedFilesOnly = false): string {
         let summary = `## Salesforce Code Analyzer Results${EOL}`
-        if (results.getTotalViolationCount() === 0) {
-            summary += `### :white_check_mark: 0 Violations Found${EOL}`
-            return summary
-        }
-
-        summary +=
-            `### :warning: ${results.getTotalViolationCount()} Violation(s) Found${EOL}` +
-            `<blockquote>${EOL}` +
-            `${SEVERITY_EMOJIS.get(1)} ${results.getSev1ViolationCount()} Critical severity violation(s)<br/>${EOL}` +
-            `${SEVERITY_EMOJIS.get(2)} ${results.getSev2ViolationCount()} High severity violation(s)<br/>${EOL}` +
-            `${SEVERITY_EMOJIS.get(3)} ${results.getSev3ViolationCount()} Medium severity violation(s)<br/>${EOL}` +
-            `${SEVERITY_EMOJIS.get(4)} ${results.getSev4ViolationCount()} Low severity violation(s)<br/>${EOL}` +
-            `${SEVERITY_EMOJIS.get(5)} ${results.getSev5ViolationCount()} Info severity violation(s)${EOL}` +
-            `</blockquote>${EOL}`
 
         const violations: Violation[] = results.getViolationsSortedBySeverity()
         const changedFilesSet = new Set(changedFiles)
         const violationsInChangedFiles: Violation[] = []
         const violationsOutsideChangedFiles: Violation[] = []
+
+        // Separate violations by whether they're in changed files
         for (const violation of violations) {
             const hasLocationInChangedFile: boolean = violation
                 .getLocations()
@@ -51,7 +39,50 @@ export class RuntimeSummarizer implements Summarizer {
             }
         }
 
-        if (violationsInChangedFiles.length > 0 && violationsOutsideChangedFiles.length > 0) {
+        // Determine which violations to show based on changedFilesOnly flag
+        const violationsToShow: Violation[] =
+            changedFilesOnly && changedFiles.length > 0 ? violationsInChangedFiles : violations
+
+        // Calculate counts for the violations we're showing
+        const totalCount = violationsToShow.length
+        const sev1Count = violationsToShow.filter(v => v.getSeverity() === 1).length
+        const sev2Count = violationsToShow.filter(v => v.getSeverity() === 2).length
+        const sev3Count = violationsToShow.filter(v => v.getSeverity() === 3).length
+        const sev4Count = violationsToShow.filter(v => v.getSeverity() === 4).length
+        const sev5Count = violationsToShow.filter(v => v.getSeverity() === 5).length
+
+        if (totalCount === 0) {
+            if (changedFilesOnly && changedFiles.length > 0) {
+                summary += `### :white_check_mark: 0 Violations Found in Changed Files${EOL}`
+            } else {
+                summary += `### :white_check_mark: 0 Violations Found${EOL}`
+            }
+            return summary
+        }
+
+        if (changedFilesOnly && changedFiles.length > 0) {
+            summary += `### :warning: ${totalCount} Violation(s) Found in Changed Files${EOL}`
+        } else {
+            summary += `### :warning: ${totalCount} Violation(s) Found${EOL}`
+        }
+
+        summary +=
+            `<blockquote>${EOL}` +
+            `${SEVERITY_EMOJIS.get(1)} ${sev1Count} Critical severity violation(s)<br/>${EOL}` +
+            `${SEVERITY_EMOJIS.get(2)} ${sev2Count} High severity violation(s)<br/>${EOL}` +
+            `${SEVERITY_EMOJIS.get(3)} ${sev3Count} Medium severity violation(s)<br/>${EOL}` +
+            `${SEVERITY_EMOJIS.get(4)} ${sev4Count} Low severity violation(s)<br/>${EOL}` +
+            `${SEVERITY_EMOJIS.get(5)} ${sev5Count} Info severity violation(s)${EOL}` +
+            `</blockquote>${EOL}`
+
+        // Show violations in appropriate format
+        if (
+            !changedFilesOnly &&
+            changedFiles.length > 0 &&
+            violationsInChangedFiles.length > 0 &&
+            violationsOutsideChangedFiles.length > 0
+        ) {
+            // Show both sections when not filtering and both exist
             const violationsInsideFilesTable: string = createTable(violationsInChangedFiles, TABLE_ROWS_CHAR_LIMIT)
             const violationsOutsideFilesTable: string = createTable(
                 violationsOutsideChangedFiles,
@@ -68,7 +99,8 @@ export class RuntimeSummarizer implements Summarizer {
                 violationsOutsideFilesTable +
                 `</details>${EOL}`
         } else {
-            summary += createTable(violations, TABLE_ROWS_CHAR_LIMIT)
+            // Show only the filtered violations
+            summary += createTable(violationsToShow, TABLE_ROWS_CHAR_LIMIT)
         }
 
         return summary

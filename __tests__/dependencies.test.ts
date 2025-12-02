@@ -62,11 +62,15 @@ describe('RuntimeDependencies Code Coverage', () => {
         jest.spyOn(core, 'getInput').mockImplementation((name: string): string => {
             return `${name} Value`
         })
+        jest.spyOn(core, 'getBooleanInput').mockImplementation((name: string): boolean => {
+            return name === 'changed-files-only' ? false : true
+        })
         const inputs: Inputs = dependencies.getInputs()
         expect(inputs).toEqual({
             runArguments: 'run-arguments Value',
             resultsArtifactName: 'results-artifact-name Value',
-            githubToken: 'github-token Value'
+            githubToken: 'github-token Value',
+            changedFilesOnly: false
         })
     })
 

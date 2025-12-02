@@ -33,7 +33,8 @@ export class FakeDependencies implements Dependencies {
     getInputsReturnValue: Inputs = {
         runArguments: '--view detail --output-file sfca_results.json',
         resultsArtifactName: 'salesforce-code-analyzer-results',
-        githubToken: 'dummyToken'
+        githubToken: 'dummyToken',
+        changedFilesOnly: false
     }
     getInputsCallCount = 0
     getInputs(): Inputs {
@@ -242,9 +243,9 @@ export class FakeViolationLocation implements ViolationLocation {
 
 export class FakeSummarizer implements Summarizer {
     createSummaryMarkdownReturnValue = 'someSummaryMarkdown'
-    createSummaryMarkdownCallHistory: { results: Results }[] = []
-    createSummaryMarkdown(results: Results): string {
-        this.createSummaryMarkdownCallHistory.push({ results })
+    createSummaryMarkdownCallHistory: { results: Results; changedFiles?: string[]; changedFilesOnly?: boolean }[] = []
+    createSummaryMarkdown(results: Results, changedFiles?: string[], changedFilesOnly?: boolean): string {
+        this.createSummaryMarkdownCallHistory.push({ results, changedFiles, changedFilesOnly })
         return this.createSummaryMarkdownReturnValue
     }
 }

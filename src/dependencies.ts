@@ -73,7 +73,8 @@ export class RuntimeDependencies implements Dependencies {
         return {
             runArguments: core.getInput('run-arguments'),
             resultsArtifactName: core.getInput('results-artifact-name'),
-            githubToken: core.getInput('github-token')
+            githubToken: core.getInput('github-token'),
+            changedFilesOnly: core.getBooleanInput('changed-files-only')
         }
     }
 

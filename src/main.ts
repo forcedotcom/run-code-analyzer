@@ -61,79 +61,125 @@ export async function run(
         dependencies.startGroup(MESSAGES.STEP_LABELS.ANALYZING_RESULTS)
         assertFileExists(dependencies, jsonOutputFile)
         const results: Results = resultsFactory.createResults(jsonOutputFile)
-        dependencies.setOutput('num-violations', results.getTotalViolationCount().toString())
-        dependencies.setOutput('num-sev1-violations', results.getSev1ViolationCount().toString())
-        dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString())
-        dependencies.setOutput('num-sev3-violations', results.getSev3ViolationCount().toString())
-        dependencies.setOutput('num-sev4-violations', results.getSev4ViolationCount().toString())
-        dependencies.setOutput('num-sev5-violations', results.getSev5ViolationCount().toString())
-        dependencies.info(
-            `outputs:\n` +
-                `  exit-code: ${codeAnalyzerOutput.exitCode}\n` +
-                `  num-violations: ${results.getTotalViolationCount()}\n` +
-                `  num-sev1-violations: ${results.getSev1ViolationCount()}\n` +
-                `  num-sev2-violations: ${results.getSev2ViolationCount()}\n` +
-                `  num-sev3-violations: ${results.getSev3ViolationCount()}\n` +
-                `  num-sev4-violations: ${results.getSev4ViolationCount()}\n` +
-                `  num-sev5-violations: ${results.getSev5ViolationCount()}`
-        )
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
+        let changedFiles: string[] = []
+        let couldReadChangedFiles = false
+
+        // Get changed files for PR context
         if (dependencies.isPullRequest() && inputs.githubToken) {
-            let changedFiles: string[] = []
-            let couldReadChangedFiles = true
             try {
                 dependencies.info(MESSAGES.CALCULATING_CHANGED_FILES)
                 changedFiles = await dependencies.getChangedFiles(inputs.githubToken)
+                couldReadChangedFiles = true
                 dependencies.info(MESSAGES.CALCULATED_CHANGED_FILES)
             } catch (error) {
-                couldReadChangedFiles = false
                 dependencies.warn(MESSAGE_FCNS.FAILED_TO_GET_CHANGED_FILES(getFullErrorMessage(error)))
             }
-
-            const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles)
-
-            if (couldReadChangedFiles) {
-                const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
-                const changedFilesSet: Set<string> = new Set(changedFiles)
-                const violationsInChangedFilesCount: number = results
-                    .getViolationsSortedBySeverity()
-                    .filter((v: Violation): boolean =>
-                        v
-                            .getLocations()
-                            .map(l => l.getFile())
-                            .some(f => f && changedFilesSet.has(f))
-                    ).length
-                const summaryBody = MESSAGE_FCNS.REVIEW_BODY(
-                    results.getTotalViolationCount(),
-                    violationsInChangedFilesCount,
-                    summaryLink
-                )
-                try {
-                    dependencies.info(MESSAGES.ATTEMPTING_TO_CREATE_PR_REVIEW)
-                    const reviewId: number = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody)
-                    dependencies.setOutput('review-id', `${reviewId}`)
-                    dependencies.info(MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId))
-                } catch (error) {
-                    dependencies.warn(MESSAGE_FCNS.FAILED_TO_CREATE_REVIEW(getFullErrorMessage(error)))
-                }
-            }
-
-            await dependencies.writeSummary(summaryMarkdown)
-            dependencies.endGroup()
         } else {
             if (dependencies.isPullRequest()) {
                 dependencies.info(MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN)
             } else {
                 dependencies.info(MESSAGES.NOT_PR)
             }
-            const summaryMarkdown = summarizer.createSummaryMarkdown(results)
-            await dependencies.writeSummary(summaryMarkdown)
-            dependencies.endGroup()
         }
+
+        // Calculate violation counts based on mode
+        const violationCounts = calculateViolationCounts(
+            results,
+            inputs.changedFilesOnly && couldReadChangedFiles ? changedFiles : undefined
+        )
+
+        // Set outputs with final counts
+        dependencies.setOutput('num-violations', violationCounts.total.toString())
+        dependencies.setOutput('num-sev1-violations', violationCounts.sev1.toString())
+        dependencies.setOutput('num-sev2-violations', violationCounts.sev2.toString())
+        dependencies.setOutput('num-sev3-violations', violationCounts.sev3.toString())
+        dependencies.setOutput('num-sev4-violations', violationCounts.sev4.toString())
+        dependencies.setOutput('num-sev5-violations', violationCounts.sev5.toString())
+        dependencies.info(
+            `outputs:\n` +
+                `  exit-code: ${codeAnalyzerOutput.exitCode}\n` +
+                `  num-violations: ${violationCounts.total}\n` +
+                `  num-sev1-violations: ${violationCounts.sev1}\n` +
+                `  num-sev2-violations: ${violationCounts.sev2}\n` +
+                `  num-sev3-violations: ${violationCounts.sev3}\n` +
+                `  num-sev4-violations: ${violationCounts.sev4}\n` +
+                `  num-sev5-violations: ${violationCounts.sev5}`
+        )
+
+        // Generate summary
+        const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles, inputs.changedFilesOnly)
+
+        // Create PR review if applicable
+        if (dependencies.isPullRequest() && inputs.githubToken && couldReadChangedFiles) {
+            const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
+            const changedFilesSet: Set<string> = new Set(changedFiles)
+            const violationsInChangedFilesCount: number = results
+                .getViolationsSortedBySeverity()
+                .filter((v: Violation): boolean =>
+                    v
+                        .getLocations()
+                        .map(l => l.getFile())
+                        .some(f => f && changedFilesSet.has(f))
+                ).length
+
+            const summaryBody = MESSAGE_FCNS.REVIEW_BODY(
+                results.getTotalViolationCount(),
+                violationsInChangedFilesCount,
+                summaryLink
+            )
+            try {
+                dependencies.info(MESSAGES.ATTEMPTING_TO_CREATE_PR_REVIEW)
+                const reviewId: number = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody)
+                dependencies.setOutput('review-id', `${reviewId}`)
+                dependencies.info(MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId))
+            } catch (error) {
+                dependencies.warn(MESSAGE_FCNS.FAILED_TO_CREATE_REVIEW(getFullErrorMessage(error)))
+            }
+        }
+
+        await dependencies.writeSummary(summaryMarkdown)
+        dependencies.endGroup()
     } catch (error) {
         dependencies.fail(`${MESSAGES.UNEXPECTED_ERROR}\n\n${getFullErrorMessage(error)}`)
+    }
+}
+
+/**
+ * Calculate violation counts, optionally filtered by changed files
+ * @param results - The full results from the code analyzer
+ * @param changedFiles - Optional array of changed file paths to filter by
+ * @returns Object containing counts for each severity level and total
+ */
+function calculateViolationCounts(
+    results: Results,
+    changedFiles?: string[]
+): { total: number; sev1: number; sev2: number; sev3: number; sev4: number; sev5: number } {
+    let violations: Violation[]
+
+    if (changedFiles && changedFiles.length > 0) {
+        // Filter to only violations in changed files
+        const changedFilesSet = new Set(changedFiles)
+        violations = results.getViolationsSortedBySeverity().filter((v: Violation): boolean =>
+            v
+                .getLocations()
+                .map(l => l.getFile())
+                .some(f => f && changedFilesSet.has(f))
+        )
+    } else {
+        // Use all violations
+        violations = results.getViolationsSortedBySeverity()
+    }
+
+    return {
+        total: violations.length,
+        sev1: violations.filter(v => v.getSeverity() === 1).length,
+        sev2: violations.filter(v => v.getSeverity() === 2).length,
+        sev3: violations.filter(v => v.getSeverity() === 3).length,
+        sev4: violations.filter(v => v.getSeverity() === 4).length,
+        sev5: violations.filter(v => v.getSeverity() === 5).length
     }
 }
 

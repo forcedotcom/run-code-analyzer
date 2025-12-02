@@ -24,6 +24,13 @@ The `forcedotcom/run-code-analyzer@v2` GitHub Action is based on [Salesforce Cod
   * When this action is run against a pull request, you can provide a GitHub token, which is used to create a review of the pull request. The review specifies how many violations were found (both in the project as a whole and in changed files) and links to the action summary page.
   * This token must have write permissions for pull requests.
     * You can use the default GitHub token stored as the `GITHUB_TOKEN` secret, as long as you also use the job-level `permissions` property to give that token write access for pull requests.
+* <b>`changed-files-only`</b> *(Default: `false`)*
+  * When set to `true`, only violations in files that were changed in the pull request will be:
+    * Shown in the summary
+    * Counted in the output variables (`num-violations`, `num-sev1-violations`, etc.)
+  * Violations in unchanged files will be completely excluded from both the summary and the counts.
+  * This option only has effect when running on a pull request with a `github-token` provided.
+  * **Use Case:** Enable quality gates that only fail on violations in files changed by the PR, rather than all violations in the entire codebase. This is useful when introducing code analysis to a legacy codebase with existing violations.
 
 ## v2 Outputs
 * `exit-code`
@@ -106,6 +113,53 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
               steps.run-code-analyzer.outputs.num-sev2-violations > 0 ||
               steps.run-code-analyzer.outputs.num-violations > 10
             run: exit 1
+
+## Example v2 Usage with Changed Files Only
+
+If you want to focus only on violations in files that were changed in a pull request, use the `changed-files-only` input. When enabled, the output counts will **only include violations from changed files**, making it easy to set up quality gates that don't fail on existing violations in unchanged code.
+
+    name: Salesforce Code Analyzer Workflow (Changed Files Only)
+    on:
+      pull_request:
+    jobs:
+      salesforce-code-analyzer-workflow:
+        permissions:
+          pull-requests: write
+          contents: read
+          actions: read
+        runs-on: ubuntu-latest
+        steps:
+          - name: Check out files
+            uses: actions/checkout@v5
+
+          - name: Install Salesforce CLI
+            run: npm install -g @salesforce/cli@latest
+    
+          - name: Install Latest Salesforce Code Analyzer CLI Plugin
+            run: sf plugins install code-analyzer@latest
+    
+          - name: Run Salesforce Code Analyzer (Changed Files Only)
+            id: run-code-analyzer
+            uses: forcedotcom/run-code-analyzer@v2
+            with:
+              run-arguments: --workspace . --view detail --output-file sfca_results.json
+              results-artifact-name: salesforce-code-analyzer-results
+              github-token: ${{ github.token }}
+              changed-files-only: true
+    
+          - name: Quality Gate - Only Fail on Violations in Changed Files
+            if: |
+              steps.run-code-analyzer.outputs.num-sev1-violations > 0 ||
+              steps.run-code-analyzer.outputs.num-sev2-violations > 0 ||
+              steps.run-code-analyzer.outputs.num-violations > 10
+            run: |
+              echo "Quality gate failed: Found violations in changed files"
+              echo "  Critical (Sev 1): ${{ steps.run-code-analyzer.outputs.num-sev1-violations }}"
+              echo "  High (Sev 2): ${{ steps.run-code-analyzer.outputs.num-sev2-violations }}"
+              echo "  Total: ${{ steps.run-code-analyzer.outputs.num-violations }}"
+              exit 1
+
+**Note:** When `changed-files-only: true` is set, all output counts (`num-violations`, `num-sev1-violations`, etc.) automatically reflect only violations in changed files. You can use the same quality gate conditions you would normally use, and they will only consider violations in files modified by the PR.
 
 # Version: v1
 The `forcedotcom/run-code-analyzer@v1` GitHub Action is based on [Salesforce Code Analyzer v4.x](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer-3x.html), which is the original `@salesforce/sfdx-scanner` Salesforce CLI plugin.

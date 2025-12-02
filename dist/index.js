@@ -102598,7 +102598,8 @@ class RuntimeDependencies {
         return {
             runArguments: core.getInput('run-arguments'),
             resultsArtifactName: core.getInput('results-artifact-name'),
-            githubToken: core.getInput('github-token')
+            githubToken: core.getInput('github-token'),
+            changedFilesOnly: core.getBooleanInput('changed-files-only')
         };
     }
     async getChangedFiles(githubToken) {
@@ -102771,57 +102772,21 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.ANALYZING_RESULTS);
         assertFileExists(dependencies, jsonOutputFile);
         const results = resultsFactory.createResults(jsonOutputFile);
-        dependencies.setOutput('num-violations', results.getTotalViolationCount().toString());
-        dependencies.setOutput('num-sev1-violations', results.getSev1ViolationCount().toString());
-        dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString());
-        dependencies.setOutput('num-sev3-violations', results.getSev3ViolationCount().toString());
-        dependencies.setOutput('num-sev4-violations', results.getSev4ViolationCount().toString());
-        dependencies.setOutput('num-sev5-violations', results.getSev5ViolationCount().toString());
-        dependencies.info(`outputs:\n` +
-            `  exit-code: ${codeAnalyzerOutput.exitCode}\n` +
-            `  num-violations: ${results.getTotalViolationCount()}\n` +
-            `  num-sev1-violations: ${results.getSev1ViolationCount()}\n` +
-            `  num-sev2-violations: ${results.getSev2ViolationCount()}\n` +
-            `  num-sev3-violations: ${results.getSev3ViolationCount()}\n` +
-            `  num-sev4-violations: ${results.getSev4ViolationCount()}\n` +
-            `  num-sev5-violations: ${results.getSev5ViolationCount()}`);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.CREATING_SUMMARY);
+        let changedFiles = [];
+        let couldReadChangedFiles = false;
+        // Get changed files for PR context
         if (dependencies.isPullRequest() && inputs.githubToken) {
-            let changedFiles = [];
-            let couldReadChangedFiles = true;
             try {
                 dependencies.info(constants_1.MESSAGES.CALCULATING_CHANGED_FILES);
                 changedFiles = await dependencies.getChangedFiles(inputs.githubToken);
+                couldReadChangedFiles = true;
                 dependencies.info(constants_1.MESSAGES.CALCULATED_CHANGED_FILES);
             }
             catch (error) {
-                couldReadChangedFiles = false;
                 dependencies.warn(constants_1.MESSAGE_FCNS.FAILED_TO_GET_CHANGED_FILES((0, utils_1.getFullErrorMessage)(error)));
             }
-            const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles);
-            if (couldReadChangedFiles) {
-                const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
-                const changedFilesSet = new Set(changedFiles);
-                const violationsInChangedFilesCount = results
-                    .getViolationsSortedBySeverity()
-                    .filter((v) => v
-                    .getLocations()
-                    .map(l => l.getFile())
-                    .some(f => f && changedFilesSet.has(f))).length;
-                const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), violationsInChangedFilesCount, summaryLink);
-                try {
-                    dependencies.info(constants_1.MESSAGES.ATTEMPTING_TO_CREATE_PR_REVIEW);
-                    const reviewId = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody);
-                    dependencies.setOutput('review-id', `${reviewId}`);
-                    dependencies.info(constants_1.MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId));
-                }
-                catch (error) {
-                    dependencies.warn(constants_1.MESSAGE_FCNS.FAILED_TO_CREATE_REVIEW((0, utils_1.getFullErrorMessage)(error)));
-                }
-            }
-            await dependencies.writeSummary(summaryMarkdown);
-            dependencies.endGroup();
         }
         else {
             if (dependencies.isPullRequest()) {
@@ -102830,14 +102795,82 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             else {
                 dependencies.info(constants_1.MESSAGES.NOT_PR);
             }
-            const summaryMarkdown = summarizer.createSummaryMarkdown(results);
-            await dependencies.writeSummary(summaryMarkdown);
-            dependencies.endGroup();
         }
+        // Calculate violation counts based on mode
+        const violationCounts = calculateViolationCounts(results, inputs.changedFilesOnly && couldReadChangedFiles ? changedFiles : undefined);
+        // Set outputs with final counts
+        dependencies.setOutput('num-violations', violationCounts.total.toString());
+        dependencies.setOutput('num-sev1-violations', violationCounts.sev1.toString());
+        dependencies.setOutput('num-sev2-violations', violationCounts.sev2.toString());
+        dependencies.setOutput('num-sev3-violations', violationCounts.sev3.toString());
+        dependencies.setOutput('num-sev4-violations', violationCounts.sev4.toString());
+        dependencies.setOutput('num-sev5-violations', violationCounts.sev5.toString());
+        dependencies.info(`outputs:\n` +
+            `  exit-code: ${codeAnalyzerOutput.exitCode}\n` +
+            `  num-violations: ${violationCounts.total}\n` +
+            `  num-sev1-violations: ${violationCounts.sev1}\n` +
+            `  num-sev2-violations: ${violationCounts.sev2}\n` +
+            `  num-sev3-violations: ${violationCounts.sev3}\n` +
+            `  num-sev4-violations: ${violationCounts.sev4}\n` +
+            `  num-sev5-violations: ${violationCounts.sev5}`);
+        // Generate summary
+        const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles, inputs.changedFilesOnly);
+        // Create PR review if applicable
+        if (dependencies.isPullRequest() && inputs.githubToken && couldReadChangedFiles) {
+            const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
+            const changedFilesSet = new Set(changedFiles);
+            const violationsInChangedFilesCount = results
+                .getViolationsSortedBySeverity()
+                .filter((v) => v
+                .getLocations()
+                .map(l => l.getFile())
+                .some(f => f && changedFilesSet.has(f))).length;
+            const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), violationsInChangedFilesCount, summaryLink);
+            try {
+                dependencies.info(constants_1.MESSAGES.ATTEMPTING_TO_CREATE_PR_REVIEW);
+                const reviewId = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody);
+                dependencies.setOutput('review-id', `${reviewId}`);
+                dependencies.info(constants_1.MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId));
+            }
+            catch (error) {
+                dependencies.warn(constants_1.MESSAGE_FCNS.FAILED_TO_CREATE_REVIEW((0, utils_1.getFullErrorMessage)(error)));
+            }
+        }
+        await dependencies.writeSummary(summaryMarkdown);
+        dependencies.endGroup();
     }
     catch (error) {
         dependencies.fail(`${constants_1.MESSAGES.UNEXPECTED_ERROR}\n\n${(0, utils_1.getFullErrorMessage)(error)}`);
     }
+}
+/**
+ * Calculate violation counts, optionally filtered by changed files
+ * @param results - The full results from the code analyzer
+ * @param changedFiles - Optional array of changed file paths to filter by
+ * @returns Object containing counts for each severity level and total
+ */
+function calculateViolationCounts(results, changedFiles) {
+    let violations;
+    if (changedFiles && changedFiles.length > 0) {
+        // Filter to only violations in changed files
+        const changedFilesSet = new Set(changedFiles);
+        violations = results.getViolationsSortedBySeverity().filter((v) => v
+            .getLocations()
+            .map(l => l.getFile())
+            .some(f => f && changedFilesSet.has(f)));
+    }
+    else {
+        // Use all violations
+        violations = results.getViolationsSortedBySeverity();
+    }
+    return {
+        total: violations.length,
+        sev1: violations.filter(v => v.getSeverity() === 1).length,
+        sev2: violations.filter(v => v.getSeverity() === 2).length,
+        sev3: violations.filter(v => v.getSeverity() === 3).length,
+        sev4: violations.filter(v => v.getSeverity() === 4).length,
+        sev5: violations.filter(v => v.getSeverity() === 5).length
+    };
 }
 async function installSalesforceCliIfNeeded(dependencies, commandExecutor) {
     if (!(await commandExecutor.isSalesforceCliInstalled())) {
@@ -103088,25 +103121,13 @@ const SEVERITY_EMOJIS = new Map([
     [5, ':white_circle:']
 ]);
 class RuntimeSummarizer {
-    createSummaryMarkdown(results, changedFiles = []) {
+    createSummaryMarkdown(results, changedFiles = [], changedFilesOnly = false) {
         let summary = `## Salesforce Code Analyzer Results${os_1.EOL}`;
-        if (results.getTotalViolationCount() === 0) {
-            summary += `### :white_check_mark: 0 Violations Found${os_1.EOL}`;
-            return summary;
-        }
-        summary +=
-            `### :warning: ${results.getTotalViolationCount()} Violation(s) Found${os_1.EOL}` +
-                `<blockquote>${os_1.EOL}` +
-                `${SEVERITY_EMOJIS.get(1)} ${results.getSev1ViolationCount()} Critical severity violation(s)<br/>${os_1.EOL}` +
-                `${SEVERITY_EMOJIS.get(2)} ${results.getSev2ViolationCount()} High severity violation(s)<br/>${os_1.EOL}` +
-                `${SEVERITY_EMOJIS.get(3)} ${results.getSev3ViolationCount()} Medium severity violation(s)<br/>${os_1.EOL}` +
-                `${SEVERITY_EMOJIS.get(4)} ${results.getSev4ViolationCount()} Low severity violation(s)<br/>${os_1.EOL}` +
-                `${SEVERITY_EMOJIS.get(5)} ${results.getSev5ViolationCount()} Info severity violation(s)${os_1.EOL}` +
-                `</blockquote>${os_1.EOL}`;
         const violations = results.getViolationsSortedBySeverity();
         const changedFilesSet = new Set(changedFiles);
         const violationsInChangedFiles = [];
         const violationsOutsideChangedFiles = [];
+        // Separate violations by whether they're in changed files
         for (const violation of violations) {
             const hasLocationInChangedFile = violation
                 .getLocations()
@@ -103119,7 +103140,44 @@ class RuntimeSummarizer {
                 violationsOutsideChangedFiles.push(violation);
             }
         }
-        if (violationsInChangedFiles.length > 0 && violationsOutsideChangedFiles.length > 0) {
+        // Determine which violations to show based on changedFilesOnly flag
+        const violationsToShow = changedFilesOnly && changedFiles.length > 0 ? violationsInChangedFiles : violations;
+        // Calculate counts for the violations we're showing
+        const totalCount = violationsToShow.length;
+        const sev1Count = violationsToShow.filter(v => v.getSeverity() === 1).length;
+        const sev2Count = violationsToShow.filter(v => v.getSeverity() === 2).length;
+        const sev3Count = violationsToShow.filter(v => v.getSeverity() === 3).length;
+        const sev4Count = violationsToShow.filter(v => v.getSeverity() === 4).length;
+        const sev5Count = violationsToShow.filter(v => v.getSeverity() === 5).length;
+        if (totalCount === 0) {
+            if (changedFilesOnly && changedFiles.length > 0) {
+                summary += `### :white_check_mark: 0 Violations Found in Changed Files${os_1.EOL}`;
+            }
+            else {
+                summary += `### :white_check_mark: 0 Violations Found${os_1.EOL}`;
+            }
+            return summary;
+        }
+        if (changedFilesOnly && changedFiles.length > 0) {
+            summary += `### :warning: ${totalCount} Violation(s) Found in Changed Files${os_1.EOL}`;
+        }
+        else {
+            summary += `### :warning: ${totalCount} Violation(s) Found${os_1.EOL}`;
+        }
+        summary +=
+            `<blockquote>${os_1.EOL}` +
+                `${SEVERITY_EMOJIS.get(1)} ${sev1Count} Critical severity violation(s)<br/>${os_1.EOL}` +
+                `${SEVERITY_EMOJIS.get(2)} ${sev2Count} High severity violation(s)<br/>${os_1.EOL}` +
+                `${SEVERITY_EMOJIS.get(3)} ${sev3Count} Medium severity violation(s)<br/>${os_1.EOL}` +
+                `${SEVERITY_EMOJIS.get(4)} ${sev4Count} Low severity violation(s)<br/>${os_1.EOL}` +
+                `${SEVERITY_EMOJIS.get(5)} ${sev5Count} Info severity violation(s)${os_1.EOL}` +
+                `</blockquote>${os_1.EOL}`;
+        // Show violations in appropriate format
+        if (!changedFilesOnly &&
+            changedFiles.length > 0 &&
+            violationsInChangedFiles.length > 0 &&
+            violationsOutsideChangedFiles.length > 0) {
+            // Show both sections when not filtering and both exist
             const violationsInsideFilesTable = createTable(violationsInChangedFiles, TABLE_ROWS_CHAR_LIMIT);
             const violationsOutsideFilesTable = createTable(violationsOutsideChangedFiles, TABLE_ROWS_CHAR_LIMIT - violationsInsideFilesTable.length);
             summary +=
@@ -103134,7 +103192,8 @@ class RuntimeSummarizer {
                     `</details>${os_1.EOL}`;
         }
         else {
-            summary += createTable(violations, TABLE_ROWS_CHAR_LIMIT);
+            // Show only the filtered violations
+            summary += createTable(violationsToShow, TABLE_ROWS_CHAR_LIMIT);
         }
         return summary;
     }

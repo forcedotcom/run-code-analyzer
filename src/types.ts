@@ -4,6 +4,7 @@ export type Inputs = {
     runArguments: string
     resultsArtifactName: string
     githubToken?: string
+    changedFilesOnly: boolean
 }
 
 export type EnvironmentVariables = { [key: string]: string }
