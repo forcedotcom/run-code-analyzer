@@ -186,8 +186,9 @@ describe('main run Tests', () => {
         expect(resultsFactory.createResultsCallHistory).toHaveLength(1)
         expect(dependencies.warnCallHistory).toHaveLength(0)
 
-        expect(dependencies.infoCallHistory).toHaveLength(2)
-        expect(dependencies.infoCallHistory[0].infoMessage).toEqual(MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN)
+        expect(dependencies.infoCallHistory).toHaveLength(3)
+        expect(dependencies.infoCallHistory[0].infoMessage).toContain('Parsed results from')
+        expect(dependencies.infoCallHistory[1].infoMessage).toEqual(MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN)
     })
 
     it.each([

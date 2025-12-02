@@ -61,6 +61,9 @@ export async function run(
         dependencies.startGroup(MESSAGES.STEP_LABELS.ANALYZING_RESULTS)
         assertFileExists(dependencies, jsonOutputFile)
         const results: Results = resultsFactory.createResults(jsonOutputFile)
+        dependencies.info(
+            `Parsed results from ${jsonOutputFile}: found ${results.getTotalViolationCount()} total violations across all files`
+        )
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
@@ -159,6 +162,9 @@ function calculateViolationCounts(
 ): { total: number; sev1: number; sev2: number; sev3: number; sev4: number; sev5: number } {
     let violations: Violation[]
 
+    // Use all violations
+    violations = results.getViolationsSortedBySeverity()
+
     if (changedFiles && changedFiles.length > 0) {
         // Filter to only violations in changed files
         const changedFilesSet = new Set(changedFiles)
@@ -168,11 +174,7 @@ function calculateViolationCounts(
                 .map(l => l.getFile())
                 .some(f => f && changedFilesSet.has(f))
         )
-    } else {
-        // Use all violations
-        violations = results.getViolationsSortedBySeverity()
     }
-
     return {
         total: violations.length,
         sev1: violations.filter(v => v.getSeverity() === 1).length,

@@ -102772,6 +102772,7 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.ANALYZING_RESULTS);
         assertFileExists(dependencies, jsonOutputFile);
         const results = resultsFactory.createResults(jsonOutputFile);
+        dependencies.info(`Parsed results from ${jsonOutputFile}: found ${results.getTotalViolationCount()} total violations across all files`);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.CREATING_SUMMARY);
         let changedFiles = [];
@@ -102851,6 +102852,8 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
  */
 function calculateViolationCounts(results, changedFiles) {
     let violations;
+    // Use all violations
+    violations = results.getViolationsSortedBySeverity();
     if (changedFiles && changedFiles.length > 0) {
         // Filter to only violations in changed files
         const changedFilesSet = new Set(changedFiles);
@@ -102858,10 +102861,6 @@ function calculateViolationCounts(results, changedFiles) {
             .getLocations()
             .map(l => l.getFile())
             .some(f => f && changedFilesSet.has(f)));
-    }
-    else {
-        // Use all violations
-        violations = results.getViolationsSortedBySeverity();
     }
     return {
         total: violations.length,
