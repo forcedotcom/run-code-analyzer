@@ -1,5 +1,9 @@
 export const MIN_CODE_ANALYZER_VERSION_REQUIRED = '5.0.0-beta.0'
 
+// Maximum number of changed files to use with -t flag for targeted scanning
+// Beyond this threshold, we fall back to scanning the entire workspace
+export const MAX_TARGET_FILES = 50
+
 export const MESSAGES = {
     STEP_LABELS: {
         PREPARING_ENVIRONMENT: 'Preparing Environment',

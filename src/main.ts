@@ -2,11 +2,17 @@ import { InputArguments, getFullErrorMessage } from './utils'
 import { Dependencies } from './dependencies'
 import { CommandOutput, Inputs } from './types'
 import { CommandExecutor } from './commands'
-import { MESSAGE_FCNS, MESSAGES, MIN_CODE_ANALYZER_VERSION_REQUIRED } from './constants'
+import { MAX_TARGET_FILES, MESSAGE_FCNS, MESSAGES, MIN_CODE_ANALYZER_VERSION_REQUIRED } from './constants'
 import { Results, ResultsFactory, Violation } from './results'
 import { Summarizer } from './summary'
 
 const STDERR_ERROR_MARKER = 'Error'
+
+// Enum to track which scanning mode was used
+enum ScanMode {
+    TARGET = 'target', // Using -t flag for specific files
+    WORKSPACE = 'workspace' // Using --workspace for full scan with filtering
+}
 
 /**
  * The main function for the action.
@@ -25,11 +31,42 @@ export async function run(
         await installMinimumCodeAnalyzerPluginVersionIfNeeded(dependencies, commandExecutor)
         dependencies.endGroup()
 
+        // Determine scanning strategy and get changed files
+        let changedFiles: string[] = []
+        let couldReadChangedFiles = false
+        const isPR = dependencies.isPullRequest()
+        const hasToken = !!inputs.githubToken
+
+        // Try to get changed files if we're in a PR context with a token
+        if (isPR && hasToken) {
+            try {
+                dependencies.info(MESSAGES.CALCULATING_CHANGED_FILES)
+                changedFiles = await dependencies.getChangedFiles(inputs.githubToken!)
+                couldReadChangedFiles = true
+                dependencies.info(MESSAGES.CALCULATED_CHANGED_FILES)
+            } catch (error) {
+                dependencies.warn(MESSAGE_FCNS.FAILED_TO_GET_CHANGED_FILES(getFullErrorMessage(error)))
+            }
+        } else {
+            dependencies.info(isPR ? MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN : MESSAGES.NOT_PR)
+        }
+
+        // Use TARGET mode if changedFilesOnly is enabled and file count is within limits
+        const useTargetMode =
+            inputs.changedFilesOnly &&
+            couldReadChangedFiles &&
+            changedFiles.length > 0 &&
+            changedFiles.length <= MAX_TARGET_FILES
+
+        const scanMode: ScanMode = useTargetMode ? ScanMode.TARGET : ScanMode.WORKSPACE
+
         dependencies.startGroup(MESSAGES.STEP_LABELS.RUNNING_CODE_ANALYZER)
         const runArgsInfo = new InputArguments(inputs.runArguments)
         const userOutputFiles: string[] = runArgsInfo.getValuesFor('--output-file', '-f')
         let jsonOutputFile: string | undefined = userOutputFiles.find(f => f.toLowerCase().endsWith('.json'))
         let modifiedRunArgs: string = inputs.runArguments
+
+        // Add JSON output file if not specified
         if (jsonOutputFile === undefined) {
             jsonOutputFile = 'sfca_results.json'
             modifiedRunArgs += ' --output-file sfca_results.json'
@@ -39,6 +76,14 @@ export async function run(
                 modifiedRunArgs += ' --view table'
             }
         }
+
+        // If using target mode, add -t flag for changed files (keep --workspace for context)
+        if (scanMode === ScanMode.TARGET && changedFiles.length > 0) {
+            // Add the -t flag with comma-separated list of changed files
+            const targetFiles = changedFiles.join(',')
+            modifiedRunArgs += ` -t ${targetFiles}`
+        }
+
         const codeAnalyzerOutput: CommandOutput = await commandExecutor.runCodeAnalyzer(modifiedRunArgs)
         dependencies.setOutput('exit-code', codeAnalyzerOutput.exitCode.toString())
         if (codeAnalyzerOutput.exitCode !== 0 && codeAnalyzerOutput.stderr.includes(STDERR_ERROR_MARKER)) {
@@ -62,37 +107,17 @@ export async function run(
         assertFileExists(dependencies, jsonOutputFile)
         const results: Results = resultsFactory.createResults(jsonOutputFile)
         dependencies.info(
-            `Parsed results from ${jsonOutputFile}: found ${results.getTotalViolationCount()} total violations across all files`
+            `Parsed results from ${jsonOutputFile}: found ${results.getTotalViolationCount()} total violation(s)`
         )
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.CREATING_SUMMARY)
-        let changedFiles: string[] = []
-        let couldReadChangedFiles = false
-
-        // Get changed files for PR context
-        if (dependencies.isPullRequest() && inputs.githubToken) {
-            try {
-                dependencies.info(MESSAGES.CALCULATING_CHANGED_FILES)
-                changedFiles = await dependencies.getChangedFiles(inputs.githubToken)
-                couldReadChangedFiles = true
-                dependencies.info(MESSAGES.CALCULATED_CHANGED_FILES)
-            } catch (error) {
-                dependencies.warn(MESSAGE_FCNS.FAILED_TO_GET_CHANGED_FILES(getFullErrorMessage(error)))
-            }
-        } else {
-            if (dependencies.isPullRequest()) {
-                dependencies.info(MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN)
-            } else {
-                dependencies.info(MESSAGES.NOT_PR)
-            }
-        }
 
         // Calculate violation counts based on mode
-        const violationCounts = calculateViolationCounts(
-            results,
-            inputs.changedFilesOnly && couldReadChangedFiles ? changedFiles : undefined
-        )
+        // If we used TARGET mode, results are already filtered, so don't filter again
+        // If we used WORKSPACE mode with changedFilesOnly, filter the results
+        const shouldFilterResults = scanMode === ScanMode.WORKSPACE && inputs.changedFilesOnly && couldReadChangedFiles
+        const violationCounts = calculateViolationCounts(results, shouldFilterResults ? changedFiles : undefined)
 
         // Set outputs with final counts
         dependencies.setOutput('num-violations', violationCounts.total.toString())
@@ -113,13 +138,18 @@ export async function run(
         )
 
         // Generate summary
+        // - changedFilesOnly=true: Shows single table with only changed files violations
+        // - changedFilesOnly=false: Shows two tables (changed files vs other files) when in PR context
         const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles, inputs.changedFilesOnly)
 
         // Create PR review if applicable
         if (dependencies.isPullRequest() && inputs.githubToken && couldReadChangedFiles) {
             const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
+
+            // Calculate violations in changed files for PR review
+            // Filtering irrespective of target/workspace mode will not make a difference
             const changedFilesSet: Set<string> = new Set(changedFiles)
-            const violationsInChangedFilesCount: number = results
+            const violationsInChangedFilesCount = results
                 .getViolationsSortedBySeverity()
                 .filter((v: Violation): boolean =>
                     v

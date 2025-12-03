@@ -187,8 +187,9 @@ describe('main run Tests', () => {
         expect(dependencies.warnCallHistory).toHaveLength(0)
 
         expect(dependencies.infoCallHistory).toHaveLength(3)
-        expect(dependencies.infoCallHistory[0].infoMessage).toContain('Parsed results from')
-        expect(dependencies.infoCallHistory[1].infoMessage).toEqual(MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN)
+        // In the new flow, PR_FOUND_WITHOUT_GH_TOKEN comes first (before running analyzer)
+        expect(dependencies.infoCallHistory[0].infoMessage).toEqual(MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN)
+        expect(dependencies.infoCallHistory[1].infoMessage).toContain('Parsed results from')
     })
 
     it.each([
@@ -472,9 +473,9 @@ describe('main run Tests', () => {
         expect(dependencies.failCallHistory[0].failMessage).toContain(MESSAGE_FCNS.FILE_NOT_FOUND('userResults.xml'))
     })
 
-    it('When changed-files-only is true, outputs reflect only violations in changed files', async () => {
+    it('When changed-files-only is true with few changed files, uses TARGET mode (-t flag)', async () => {
         dependencies.getInputsReturnValue = {
-            runArguments: '--view detail --output-file sfca_results.json',
+            runArguments: '--workspace . --view detail --output-file sfca_results.json',
             resultsArtifactName: 'salesforce-code-analyzer-results',
             githubToken: 'dummyToken',
             changedFilesOnly: true
@@ -482,30 +483,82 @@ describe('main run Tests', () => {
         dependencies.isPullRequestReturnValue = true
         dependencies.getChangedFilesCallback = async () => ['changedFile.ts'] // Only one file changed
 
-        // Create violations with specific file locations
+        // Create violation in the changed file - in TARGET mode, analyzer only scans changed files
         const changedFileLocation = new FakeViolationLocation()
         changedFileLocation.getFileReturnValue = 'changedFile.ts'
 
-        const unchangedFileLocation1 = new FakeViolationLocation()
-        unchangedFileLocation1.getFileReturnValue = 'unchangedFile1.ts'
+        // Set up results with only the violation from the targeted file
+        // (This simulates what the analyzer would return when using -t flag)
+        const fakeResults = resultsFactory.createResultsReturnValue as FakeResults
+        fakeResults.getViolationsSortedBySeverityReturnValue = [
+            new RuntimeViolation(1, 'engine1', 'rule1', undefined, 'message1', 0, [changedFileLocation])
+        ]
+        fakeResults.getTotalViolationCountReturnValue = 1
 
-        const unchangedFileLocation2 = new FakeViolationLocation()
-        unchangedFileLocation2.getFileReturnValue = 'unchangedFile2.ts'
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        // Verify that -t flag was added alongside --workspace
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        const runArguments = commandExecutor.runCodeAnalyzerCallHistory[0].runArguments
+        expect(runArguments).toContain('-t changedFile.ts')
+        expect(runArguments).toContain('--workspace') // --workspace is still needed for context
+
+        // Outputs should count the violation from the targeted file
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-violations',
+            value: '1'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev1-violations',
+            value: '1'
+        })
+
+        // Summary should be called with changedFilesOnly=true
+        expect(summarizer.createSummaryMarkdownCallHistory).toContainEqual({
+            results: resultsFactory.createResultsReturnValue,
+            changedFiles: ['changedFile.ts'],
+            changedFilesOnly: true
+        })
+    })
+
+    it('When changed-files-only is true with many changed files, uses WORKSPACE mode with filtering', async () => {
+        dependencies.getInputsReturnValue = {
+            runArguments: '--workspace . --view detail --output-file sfca_results.json',
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            githubToken: 'dummyToken',
+            changedFilesOnly: true
+        }
+        dependencies.isPullRequestReturnValue = true
+
+        // Create more changed files than MAX_TARGET_FILES (50)
+        const manyChangedFiles = Array.from({ length: 60 }, (_, i) => `changedFile${i}.ts`)
+        dependencies.getChangedFilesCallback = async () => manyChangedFiles
+
+        // Create violations with specific file locations
+        const changedFileLocation = new FakeViolationLocation()
+        changedFileLocation.getFileReturnValue = 'changedFile0.ts'
+
+        const unchangedFileLocation = new FakeViolationLocation()
+        unchangedFileLocation.getFileReturnValue = 'unchangedFile.ts'
 
         // Set up results with violations in both changed and unchanged files
         const fakeResults = resultsFactory.createResultsReturnValue as FakeResults
         fakeResults.getViolationsSortedBySeverityReturnValue = [
-            // This violation is in the changed file
+            // This violation is in a changed file
             new RuntimeViolation(1, 'engine1', 'rule1', undefined, 'message1', 0, [changedFileLocation]),
-            // These violations are in unchanged files
-            new RuntimeViolation(1, 'engine1', 'rule2', undefined, 'message2', 0, [unchangedFileLocation1]),
-            new RuntimeViolation(2, 'engine1', 'rule3', undefined, 'message3', 0, [unchangedFileLocation1]),
-            new RuntimeViolation(3, 'engine1', 'rule4', undefined, 'message4', 0, [unchangedFileLocation2])
+            // This violation is in an unchanged file
+            new RuntimeViolation(2, 'engine1', 'rule2', undefined, 'message2', 0, [unchangedFileLocation])
         ]
 
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
 
-        // Outputs should only count the 1 violation in the changed file
+        // Verify that --workspace was used (not -t)
+        expect(commandExecutor.runCodeAnalyzerCallHistory).toHaveLength(1)
+        const runArguments = commandExecutor.runCodeAnalyzerCallHistory[0].runArguments
+        expect(runArguments).toContain('--workspace')
+        expect(runArguments).not.toContain('-t')
+
+        // Outputs should only count the 1 violation in the changed file (filtered)
         expect(dependencies.setOutputCallHistory).toContainEqual({
             name: 'num-violations',
             value: '1'
@@ -517,17 +570,6 @@ describe('main run Tests', () => {
         expect(dependencies.setOutputCallHistory).toContainEqual({
             name: 'num-sev2-violations',
             value: '0'
-        })
-        expect(dependencies.setOutputCallHistory).toContainEqual({
-            name: 'num-sev3-violations',
-            value: '0'
-        })
-
-        // Summary should be called with changedFilesOnly=true
-        expect(summarizer.createSummaryMarkdownCallHistory).toContainEqual({
-            results: resultsFactory.createResultsReturnValue,
-            changedFiles: ['changedFile.ts'],
-            changedFilesOnly: true
         })
     })
 })

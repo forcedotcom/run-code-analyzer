@@ -102480,8 +102480,11 @@ exports.RuntimeCommandExecutor = RuntimeCommandExecutor;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MESSAGE_FCNS = exports.MESSAGES = exports.MIN_CODE_ANALYZER_VERSION_REQUIRED = void 0;
+exports.MESSAGE_FCNS = exports.MESSAGES = exports.MAX_TARGET_FILES = exports.MIN_CODE_ANALYZER_VERSION_REQUIRED = void 0;
 exports.MIN_CODE_ANALYZER_VERSION_REQUIRED = '5.0.0-beta.0';
+// Maximum number of changed files to use with -t flag for targeted scanning
+// Beyond this threshold, we fall back to scanning the entire workspace
+exports.MAX_TARGET_FILES = 50;
 exports.MESSAGES = {
     STEP_LABELS: {
         PREPARING_ENVIRONMENT: 'Preparing Environment',
@@ -102732,6 +102735,12 @@ exports.run = run;
 const utils_1 = __nccwpck_require__(71798);
 const constants_1 = __nccwpck_require__(27242);
 const STDERR_ERROR_MARKER = 'Error';
+// Enum to track which scanning mode was used
+var ScanMode;
+(function (ScanMode) {
+    ScanMode["TARGET"] = "target";
+    ScanMode["WORKSPACE"] = "workspace"; // Using --workspace for full scan with filtering
+})(ScanMode || (ScanMode = {}));
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -102743,11 +102752,38 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         await installSalesforceCliIfNeeded(dependencies, commandExecutor);
         await installMinimumCodeAnalyzerPluginVersionIfNeeded(dependencies, commandExecutor);
         dependencies.endGroup();
+        // Determine scanning strategy and get changed files
+        let changedFiles = [];
+        let couldReadChangedFiles = false;
+        const isPR = dependencies.isPullRequest();
+        const hasToken = !!inputs.githubToken;
+        // Try to get changed files if we're in a PR context with a token
+        if (isPR && hasToken) {
+            try {
+                dependencies.info(constants_1.MESSAGES.CALCULATING_CHANGED_FILES);
+                changedFiles = await dependencies.getChangedFiles(inputs.githubToken);
+                couldReadChangedFiles = true;
+                dependencies.info(constants_1.MESSAGES.CALCULATED_CHANGED_FILES);
+            }
+            catch (error) {
+                dependencies.warn(constants_1.MESSAGE_FCNS.FAILED_TO_GET_CHANGED_FILES((0, utils_1.getFullErrorMessage)(error)));
+            }
+        }
+        else {
+            dependencies.info(isPR ? constants_1.MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN : constants_1.MESSAGES.NOT_PR);
+        }
+        // Use TARGET mode if changedFilesOnly is enabled and file count is within limits
+        const useTargetMode = inputs.changedFilesOnly &&
+            couldReadChangedFiles &&
+            changedFiles.length > 0 &&
+            changedFiles.length <= constants_1.MAX_TARGET_FILES;
+        const scanMode = useTargetMode ? ScanMode.TARGET : ScanMode.WORKSPACE;
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.RUNNING_CODE_ANALYZER);
         const runArgsInfo = new utils_1.InputArguments(inputs.runArguments);
         const userOutputFiles = runArgsInfo.getValuesFor('--output-file', '-f');
         let jsonOutputFile = userOutputFiles.find(f => f.toLowerCase().endsWith('.json'));
         let modifiedRunArgs = inputs.runArguments;
+        // Add JSON output file if not specified
         if (jsonOutputFile === undefined) {
             jsonOutputFile = 'sfca_results.json';
             modifiedRunArgs += ' --output-file sfca_results.json';
@@ -102756,6 +102792,12 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             if (userOutputFiles.length === 0 && !runArgsInfo.containsFlag('--view', '-v')) {
                 modifiedRunArgs += ' --view table';
             }
+        }
+        // If using target mode, add -t flag for changed files (keep --workspace for context)
+        if (scanMode === ScanMode.TARGET && changedFiles.length > 0) {
+            // Add the -t flag with comma-separated list of changed files
+            const targetFiles = changedFiles.join(',');
+            modifiedRunArgs += ` -t ${targetFiles}`;
         }
         const codeAnalyzerOutput = await commandExecutor.runCodeAnalyzer(modifiedRunArgs);
         dependencies.setOutput('exit-code', codeAnalyzerOutput.exitCode.toString());
@@ -102772,33 +102814,14 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.ANALYZING_RESULTS);
         assertFileExists(dependencies, jsonOutputFile);
         const results = resultsFactory.createResults(jsonOutputFile);
-        dependencies.info(`Parsed results from ${jsonOutputFile}: found ${results.getTotalViolationCount()} total violations across all files`);
+        dependencies.info(`Parsed results from ${jsonOutputFile}: found ${results.getTotalViolationCount()} total violation(s)`);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.CREATING_SUMMARY);
-        let changedFiles = [];
-        let couldReadChangedFiles = false;
-        // Get changed files for PR context
-        if (dependencies.isPullRequest() && inputs.githubToken) {
-            try {
-                dependencies.info(constants_1.MESSAGES.CALCULATING_CHANGED_FILES);
-                changedFiles = await dependencies.getChangedFiles(inputs.githubToken);
-                couldReadChangedFiles = true;
-                dependencies.info(constants_1.MESSAGES.CALCULATED_CHANGED_FILES);
-            }
-            catch (error) {
-                dependencies.warn(constants_1.MESSAGE_FCNS.FAILED_TO_GET_CHANGED_FILES((0, utils_1.getFullErrorMessage)(error)));
-            }
-        }
-        else {
-            if (dependencies.isPullRequest()) {
-                dependencies.info(constants_1.MESSAGES.PR_FOUND_WITHOUT_GH_TOKEN);
-            }
-            else {
-                dependencies.info(constants_1.MESSAGES.NOT_PR);
-            }
-        }
         // Calculate violation counts based on mode
-        const violationCounts = calculateViolationCounts(results, inputs.changedFilesOnly && couldReadChangedFiles ? changedFiles : undefined);
+        // If we used TARGET mode, results are already filtered, so don't filter again
+        // If we used WORKSPACE mode with changedFilesOnly, filter the results
+        const shouldFilterResults = scanMode === ScanMode.WORKSPACE && inputs.changedFilesOnly && couldReadChangedFiles;
+        const violationCounts = calculateViolationCounts(results, shouldFilterResults ? changedFiles : undefined);
         // Set outputs with final counts
         dependencies.setOutput('num-violations', violationCounts.total.toString());
         dependencies.setOutput('num-sev1-violations', violationCounts.sev1.toString());
@@ -102815,10 +102838,14 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             `  num-sev4-violations: ${violationCounts.sev4}\n` +
             `  num-sev5-violations: ${violationCounts.sev5}`);
         // Generate summary
+        // - changedFilesOnly=true: Shows single table with only changed files violations
+        // - changedFilesOnly=false: Shows two tables (changed files vs other files) when in PR context
         const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles, inputs.changedFilesOnly);
         // Create PR review if applicable
         if (dependencies.isPullRequest() && inputs.githubToken && couldReadChangedFiles) {
             const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
+            // Calculate violations in changed files for PR review
+            // Filtering irrespective of target/workspace mode will not make a difference
             const changedFilesSet = new Set(changedFiles);
             const violationsInChangedFilesCount = results
                 .getViolationsSortedBySeverity()
