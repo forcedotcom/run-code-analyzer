@@ -38,17 +38,29 @@ outputs:
   exit-code:
     description: The Salesforce Code Analyzer execution exit code.
   num-violations:
-    description: The total number of violations found.
+    description: The total number of violations found across all files.
   num-sev1-violations:
-    description: The number of Critical (1) severity violations found.
+    description: The number of Critical (1) severity violations found across all files.
   num-sev2-violations:
-    description: The number of High (2) severity violations found.
+    description: The number of High (2) severity violations found across all files.
   num-sev3-violations:
-    description: The number of Medium (3) severity violations found.
+    description: The number of Medium (3) severity violations found across all files.
   num-sev4-violations:
-    description: The number of Low (4) severity violations found.
+    description: The number of Low (4) severity violations found across all files.
   num-sev5-violations:
-    description: The number of Info (5) severity violations found.
+    description: The number of Info (5) severity violations found across all files.
+  num-violations-in-changed-files:
+    description: The total number of violations found in files changed by the pull request. Only available when running on a pull request with a github-token provided.
+  num-sev1-violations-in-changed-files:
+    description: The number of Critical (1) severity violations found in files changed by the pull request. Only available when running on a pull request with a github-token provided.
+  num-sev2-violations-in-changed-files:
+    description: The number of High (2) severity violations found in files changed by the pull request. Only available when running on a pull request with a github-token provided.
+  num-sev3-violations-in-changed-files:
+    description: The number of Medium (3) severity violations found in files changed by the pull request. Only available when running on a pull request with a github-token provided.
+  num-sev4-violations-in-changed-files:
+    description: The number of Low (4) severity violations found in files changed by the pull request. Only available when running on a pull request with a github-token provided.
+  num-sev5-violations-in-changed-files:
+    description: The number of Info (5) severity violations found in files changed by the pull request. Only available when running on a pull request with a github-token provided.
   review-id:
     description: If this action created a pull request review, this is its ID.
 

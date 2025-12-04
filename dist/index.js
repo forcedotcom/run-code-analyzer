@@ -102801,15 +102801,31 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
             }
             const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles);
             if (couldReadChangedFiles) {
-                const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
+                // Calculate violations in changed files
                 const changedFilesSet = new Set(changedFiles);
-                const violationsInChangedFilesCount = results
+                const violationsInChangedFiles = results
                     .getViolationsSortedBySeverity()
                     .filter((v) => v
                     .getLocations()
                     .map(l => l.getFile())
-                    .some(f => f && changedFilesSet.has(f))).length;
-                const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), violationsInChangedFilesCount, summaryLink);
+                    .some(f => f && changedFilesSet.has(f)));
+                // Set outputs for violations in changed files
+                dependencies.setOutput('num-violations-in-changed-files', violationsInChangedFiles.length.toString());
+                dependencies.setOutput('num-sev1-violations-in-changed-files', violationsInChangedFiles.filter(v => v.getSeverity() === 1).length.toString());
+                dependencies.setOutput('num-sev2-violations-in-changed-files', violationsInChangedFiles.filter(v => v.getSeverity() === 2).length.toString());
+                dependencies.setOutput('num-sev3-violations-in-changed-files', violationsInChangedFiles.filter(v => v.getSeverity() === 3).length.toString());
+                dependencies.setOutput('num-sev4-violations-in-changed-files', violationsInChangedFiles.filter(v => v.getSeverity() === 4).length.toString());
+                dependencies.setOutput('num-sev5-violations-in-changed-files', violationsInChangedFiles.filter(v => v.getSeverity() === 5).length.toString());
+                dependencies.info(`changed files outputs:\n` +
+                    `  num-violations-in-changed-files: ${violationsInChangedFiles.length}\n` +
+                    `  num-sev1-violations-in-changed-files: ${violationsInChangedFiles.filter(v => v.getSeverity() === 1).length}\n` +
+                    `  num-sev2-violations-in-changed-files: ${violationsInChangedFiles.filter(v => v.getSeverity() === 2).length}\n` +
+                    `  num-sev3-violations-in-changed-files: ${violationsInChangedFiles.filter(v => v.getSeverity() === 3).length}\n` +
+                    `  num-sev4-violations-in-changed-files: ${violationsInChangedFiles.filter(v => v.getSeverity() === 4).length}\n` +
+                    `  num-sev5-violations-in-changed-files: ${violationsInChangedFiles.filter(v => v.getSeverity() === 5).length}`);
+                // Create PR review
+                const summaryLink = await dependencies.createActionSummaryLink(inputs.githubToken);
+                const summaryBody = constants_1.MESSAGE_FCNS.REVIEW_BODY(results.getTotalViolationCount(), violationsInChangedFiles.length, summaryLink);
                 try {
                     dependencies.info(constants_1.MESSAGES.ATTEMPTING_TO_CREATE_PR_REVIEW);
                     const reviewId = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody);
