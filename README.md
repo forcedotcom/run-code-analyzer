@@ -135,34 +135,6 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
               steps.run-code-analyzer.outputs.num-sev2-violations-in-changed-files > 0
             run: exit 1
 
-## Scanning Only Changed Files
-
-If you want to scan only the files changed in a pull request (instead of the entire codebase), you can use a separate GitHub Action to detect changed files and pass them to Code Analyzer's `--target` flag. This approach can significantly reduce scan time for large repositories.
-
-          # 1. Detect changed files
-          - name: Get changed files
-            id: changed
-            uses: tj-actions/changed-files@v46
-
-          # 2. Convert to comma-separated list for --target
-          - name: Create comma-separated list
-            id: format
-            run: |
-              RAW="${{ steps.changed.outputs.all_changed_files }}"
-              CSV=$(echo "$RAW" | tr ' ' ',')
-              echo "csv_list=$CSV" >> $GITHUB_OUTPUT
-
-          # 3. Run Code Analyzer on changed files only
-          - name: Run Code Analyzer
-            uses: forcedotcom/run-code-analyzer@v2
-            with:
-              run-arguments: |
-                --workspace .
-                --target "${{ steps.format.outputs.csv_list }}"
-                --output-file results.json
-
-**Note:** When using `--target`, the `--workspace` flag is still required to provide the context/root directory for the analysis.
-
 # Version: v1
 The `forcedotcom/run-code-analyzer@v1` GitHub Action is based on [Salesforce Code Analyzer v4.x](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer-3x.html), which is the original `@salesforce/sfdx-scanner` Salesforce CLI plugin.
 
