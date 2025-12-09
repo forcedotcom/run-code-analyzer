@@ -106,37 +106,31 @@ export async function run(
                             .some(f => f && changedFilesSet.has(f))
                     )
 
-                // Set outputs for violations in changed files
-                dependencies.setOutput('num-violations-in-changed-files', violationsInChangedFiles.length.toString())
-                dependencies.setOutput(
-                    'num-sev1-violations-in-changed-files',
-                    violationsInChangedFiles.filter(v => v.getSeverity() === 1).length.toString()
-                )
-                dependencies.setOutput(
-                    'num-sev2-violations-in-changed-files',
-                    violationsInChangedFiles.filter(v => v.getSeverity() === 2).length.toString()
-                )
-                dependencies.setOutput(
-                    'num-sev3-violations-in-changed-files',
-                    violationsInChangedFiles.filter(v => v.getSeverity() === 3).length.toString()
-                )
-                dependencies.setOutput(
-                    'num-sev4-violations-in-changed-files',
-                    violationsInChangedFiles.filter(v => v.getSeverity() === 4).length.toString()
-                )
-                dependencies.setOutput(
-                    'num-sev5-violations-in-changed-files',
-                    violationsInChangedFiles.filter(v => v.getSeverity() === 5).length.toString()
-                )
+                // Count violations by severity
+                const countBySeverity = (sev: number): number =>
+                    violationsInChangedFiles.filter(v => v.getSeverity() === sev).length
+                const sev1 = countBySeverity(1)
+                const sev2 = countBySeverity(2)
+                const sev3 = countBySeverity(3)
+                const sev4 = countBySeverity(4)
+                const sev5 = countBySeverity(5)
+                const total = violationsInChangedFiles.length
 
+                // Set outputs for violations in changed files
+                dependencies.setOutput('num-violations-in-changed-files', total.toString())
+                dependencies.setOutput('num-sev1-violations-in-changed-files', sev1.toString())
+                dependencies.setOutput('num-sev2-violations-in-changed-files', sev2.toString())
+                dependencies.setOutput('num-sev3-violations-in-changed-files', sev3.toString())
+                dependencies.setOutput('num-sev4-violations-in-changed-files', sev4.toString())
+                dependencies.setOutput('num-sev5-violations-in-changed-files', sev5.toString())
                 dependencies.info(
                     `changed files outputs:\n` +
-                        `  num-violations-in-changed-files: ${violationsInChangedFiles.length}\n` +
-                        `  num-sev1-violations-in-changed-files: ${violationsInChangedFiles.filter(v => v.getSeverity() === 1).length}\n` +
-                        `  num-sev2-violations-in-changed-files: ${violationsInChangedFiles.filter(v => v.getSeverity() === 2).length}\n` +
-                        `  num-sev3-violations-in-changed-files: ${violationsInChangedFiles.filter(v => v.getSeverity() === 3).length}\n` +
-                        `  num-sev4-violations-in-changed-files: ${violationsInChangedFiles.filter(v => v.getSeverity() === 4).length}\n` +
-                        `  num-sev5-violations-in-changed-files: ${violationsInChangedFiles.filter(v => v.getSeverity() === 5).length}`
+                        `  num-violations-in-changed-files: ${total}\n` +
+                        `  num-sev1-violations-in-changed-files: ${sev1}\n` +
+                        `  num-sev2-violations-in-changed-files: ${sev2}\n` +
+                        `  num-sev3-violations-in-changed-files: ${sev3}\n` +
+                        `  num-sev4-violations-in-changed-files: ${sev4}\n` +
+                        `  num-sev5-violations-in-changed-files: ${sev5}`
                 )
 
                 // Create PR review
