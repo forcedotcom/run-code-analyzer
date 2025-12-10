@@ -452,4 +452,142 @@ describe('main run Tests', () => {
         expect(dependencies.failCallHistory).toHaveLength(1)
         expect(dependencies.failCallHistory[0].failMessage).toContain(MESSAGE_FCNS.FILE_NOT_FOUND('userResults.xml'))
     })
+
+    it('When running on a pull request with token, changed files outputs are set correctly', async () => {
+        dependencies.getInputsReturnValue = {
+            runArguments: '--view detail --output-file sfca_results.json',
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            githubToken: 'dummyToken'
+        }
+        dependencies.isPullRequestReturnValue = true
+        // 'fakeFile' matches the default file in FakeViolationLocation, so all 15 violations are in changed files
+        dependencies.getChangedFilesCallback = async () => ['fakeFile']
+        dependencies.createPullRequestReviewCallback = async () => 7
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        // Verify the new changed files outputs are set
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-violations-in-changed-files',
+            value: '15' // All 15 violations are in 'fakeFile'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev1-violations-in-changed-files',
+            value: '1'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev2-violations-in-changed-files',
+            value: '2'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev3-violations-in-changed-files',
+            value: '3'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev4-violations-in-changed-files',
+            value: '4'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev5-violations-in-changed-files',
+            value: '5'
+        })
+
+        // Also verify the regular outputs are still set
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-violations',
+            value: '15'
+        })
+    })
+
+    it('When running on a pull request with no matching changed files, changed files outputs show zero', async () => {
+        dependencies.getInputsReturnValue = {
+            runArguments: '--view detail --output-file sfca_results.json',
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            githubToken: 'dummyToken'
+        }
+        dependencies.isPullRequestReturnValue = true
+        // 'otherFile.ts' does NOT match 'fakeFile', so no violations are in changed files
+        dependencies.getChangedFilesCallback = async () => ['otherFile.ts']
+        dependencies.createPullRequestReviewCallback = async () => 7
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        // Verify the changed files outputs show zero
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-violations-in-changed-files',
+            value: '0'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev1-violations-in-changed-files',
+            value: '0'
+        })
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-sev2-violations-in-changed-files',
+            value: '0'
+        })
+
+        // Regular outputs should still show all violations
+        expect(dependencies.setOutputCallHistory).toContainEqual({
+            name: 'num-violations',
+            value: '15'
+        })
+    })
+
+    it('When NOT running on a pull request, changed files outputs are NOT set', async () => {
+        dependencies.getInputsReturnValue = {
+            runArguments: '--view detail --output-file sfca_results.json',
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            githubToken: 'dummyToken'
+        }
+        dependencies.isPullRequestReturnValue = false
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        // Changed files outputs should NOT be in the output history
+        const outputNames = dependencies.setOutputCallHistory.map(o => o.name)
+        expect(outputNames).not.toContain('num-violations-in-changed-files')
+        expect(outputNames).not.toContain('num-sev1-violations-in-changed-files')
+        expect(outputNames).not.toContain('num-sev2-violations-in-changed-files')
+
+        // Regular outputs should still be set
+        expect(outputNames).toContain('num-violations')
+        expect(outputNames).toContain('num-sev1-violations')
+    })
+
+    it('When running on a pull request without github token, changed files outputs are NOT set', async () => {
+        dependencies.getInputsReturnValue = {
+            runArguments: '--view detail --output-file sfca_results.json',
+            resultsArtifactName: 'salesforce-code-analyzer-results'
+            // No githubToken
+        }
+        dependencies.isPullRequestReturnValue = true
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        // Changed files outputs should NOT be in the output history
+        const outputNames = dependencies.setOutputCallHistory.map(o => o.name)
+        expect(outputNames).not.toContain('num-violations-in-changed-files')
+        expect(outputNames).not.toContain('num-sev1-violations-in-changed-files')
+
+        // Regular outputs should still be set
+        expect(outputNames).toContain('num-violations')
+    })
+
+    it('When getChangedFiles fails, changed files outputs are NOT set', async () => {
+        dependencies.getInputsReturnValue = {
+            runArguments: '--view detail --output-file sfca_results.json',
+            resultsArtifactName: 'salesforce-code-analyzer-results',
+            githubToken: 'dummyToken'
+        }
+        dependencies.isPullRequestReturnValue = true
+        dependencies.getChangedFilesCallback = async () => {
+            throw new Error('Failed to get changed files')
+        }
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        // Changed files outputs should NOT be in the output history
+        const outputNames = dependencies.setOutputCallHistory.map(o => o.name)
+        expect(outputNames).not.toContain('num-violations-in-changed-files')
+        expect(outputNames).not.toContain('num-sev1-violations-in-changed-files')
+
+        // Warning should be logged
+        expect(dependencies.warnCallHistory).toHaveLength(1)
+        expect(dependencies.warnCallHistory[0].warnMessage).toContain('Failed to get changed files')
+    })
 })

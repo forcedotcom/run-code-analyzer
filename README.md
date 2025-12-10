@@ -40,10 +40,30 @@ The `forcedotcom/run-code-analyzer@v2` GitHub Action is based on [Salesforce Cod
   * The number of Low (4) severity violations found.
 * `num-sev5-violations`
   * The number of Info (5) severity violations found.
+* `num-violations-in-changed-files`
+  * The total number of violations found in files changed by the pull request.
+  * Only available when running on a pull request with a `github-token` provided.
+* `num-sev1-violations-in-changed-files`
+  * The number of Critical (1) severity violations found in files changed by the pull request.
+  * Only available when running on a pull request with a `github-token` provided.
+* `num-sev2-violations-in-changed-files`
+  * The number of High (2) severity violations found in files changed by the pull request.
+  * Only available when running on a pull request with a `github-token` provided.
+* `num-sev3-violations-in-changed-files`
+  * The number of Medium (3) severity violations found in files changed by the pull request.
+  * Only available when running on a pull request with a `github-token` provided.
+* `num-sev4-violations-in-changed-files`
+  * The number of Low (4) severity violations found in files changed by the pull request.
+  * Only available when running on a pull request with a `github-token` provided.
+* `num-sev5-violations-in-changed-files`
+  * The number of Info (5) severity violations found in files changed by the pull request.
+  * Only available when running on a pull request with a `github-token` provided.
 * `review-id`
   * If the action created a pull request review, this is its ID.
 
 This `run-code-analyzer@v2` action doesn't exit your GitHub workflow when it finds violations. We recommend that you add a subsequent step to your workflow that uses the available outputs to determine how your workflow should proceed.
+
+**Tip:** The `*-in-changed-files` outputs are useful when introducing code analysis to a legacy codebase with existing violations. You can ensure new code meets quality standards without blocking PRs due to pre-existing issues. See "Option 2" in the example below.
 
 ## Environment Prerequisites
 The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/code-analyzer.html) and its bundled engines can each have their own set of requirements in order to run successfully. We recommend that you set up your GitHub runner(s) with this software:
@@ -99,12 +119,20 @@ The [Salesforce Code Analyzer v5.x](https://developer.salesforce.com/docs/platfo
               results-artifact-name: salesforce-code-analyzer-results
               github-token: ${{ github.token }}
     
-          - name: Check the Outputs to Determine Whether to Fail
+          # Option 1: Quality gate on ALL files in the repository
+          - name: Fail on Critical/High Violations (All Files)
             if: |
               steps.run-code-analyzer.outputs.exit-code > 0 ||
               steps.run-code-analyzer.outputs.num-sev1-violations > 0 ||
               steps.run-code-analyzer.outputs.num-sev2-violations > 0 ||
               steps.run-code-analyzer.outputs.num-violations > 10
+            run: exit 1
+
+          # Option 2: Quality gate on CHANGED files only (useful for legacy codebases)
+          - name: Fail on Critical/High Violations (Changed Files Only)
+            if: |
+              steps.run-code-analyzer.outputs.num-sev1-violations-in-changed-files > 0 ||
+              steps.run-code-analyzer.outputs.num-sev2-violations-in-changed-files > 0
             run: exit 1
 
 # Version: v1

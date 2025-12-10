@@ -95,19 +95,25 @@ export async function run(
             const summaryMarkdown = summarizer.createSummaryMarkdown(results, changedFiles)
 
             if (couldReadChangedFiles) {
-                const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
+                // Calculate violations in changed files
                 const changedFilesSet: Set<string> = new Set(changedFiles)
-                const violationsInChangedFilesCount: number = results
+                const violationsInChangedFiles: Violation[] = results
                     .getViolationsSortedBySeverity()
                     .filter((v: Violation): boolean =>
                         v
                             .getLocations()
                             .map(l => l.getFile())
                             .some(f => f && changedFilesSet.has(f))
-                    ).length
+                    )
+
+                const severityCounts = countViolationsBySeverity(violationsInChangedFiles)
+                setChangedFilesOutputs(dependencies, severityCounts)
+
+                // Create PR review
+                const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
                 const summaryBody = MESSAGE_FCNS.REVIEW_BODY(
                     results.getTotalViolationCount(),
-                    violationsInChangedFilesCount,
+                    severityCounts.total,
                     summaryLink
                 )
                 try {
@@ -165,4 +171,43 @@ function assertFileExists(dependencies: Dependencies, file: string): void {
     if (!dependencies.fileExists(file)) {
         throw new Error(MESSAGE_FCNS.FILE_NOT_FOUND(file))
     }
+}
+
+interface SeverityCounts {
+    sev1: number
+    sev2: number
+    sev3: number
+    sev4: number
+    sev5: number
+    total: number
+}
+
+function countViolationsBySeverity(violations: Violation[]): SeverityCounts {
+    const countBySeverity = (sev: number): number => violations.filter(v => v.getSeverity() === sev).length
+    return {
+        sev1: countBySeverity(1),
+        sev2: countBySeverity(2),
+        sev3: countBySeverity(3),
+        sev4: countBySeverity(4),
+        sev5: countBySeverity(5),
+        total: violations.length
+    }
+}
+
+function setChangedFilesOutputs(dependencies: Dependencies, counts: SeverityCounts): void {
+    dependencies.setOutput('num-violations-in-changed-files', counts.total.toString())
+    dependencies.setOutput('num-sev1-violations-in-changed-files', counts.sev1.toString())
+    dependencies.setOutput('num-sev2-violations-in-changed-files', counts.sev2.toString())
+    dependencies.setOutput('num-sev3-violations-in-changed-files', counts.sev3.toString())
+    dependencies.setOutput('num-sev4-violations-in-changed-files', counts.sev4.toString())
+    dependencies.setOutput('num-sev5-violations-in-changed-files', counts.sev5.toString())
+    dependencies.info(
+        `changed files outputs:\n` +
+            `  num-violations-in-changed-files: ${counts.total}\n` +
+            `  num-sev1-violations-in-changed-files: ${counts.sev1}\n` +
+            `  num-sev2-violations-in-changed-files: ${counts.sev2}\n` +
+            `  num-sev3-violations-in-changed-files: ${counts.sev3}\n` +
+            `  num-sev4-violations-in-changed-files: ${counts.sev4}\n` +
+            `  num-sev5-violations-in-changed-files: ${counts.sev5}`
+    )
 }
