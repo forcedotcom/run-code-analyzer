@@ -97,7 +97,7 @@ export async function run(
             if (couldReadChangedFiles) {
                 // Calculate violations in changed files
                 const changedFilesSet: Set<string> = new Set(changedFiles)
-                const violationsInChangedFiles = results
+                const violationsInChangedFiles: Violation[] = results
                     .getViolationsSortedBySeverity()
                     .filter((v: Violation): boolean =>
                         v
