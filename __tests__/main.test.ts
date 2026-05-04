@@ -321,6 +321,40 @@ describe('main run Tests', () => {
         })
     })
 
+    it('When artifact upload fails with GHES error, action warns and continues', async () => {
+        dependencies.uploadArtifactCallback = async () => {
+            throw new Error(
+                'GHESNotSupportedError: @actions/artifact v2.0.0+, upload-artifact@v4+ and download-artifact@v4+ are not currently supported on GHES.'
+            )
+        }
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        // Should have warned about GHES
+        expect(dependencies.warnCallHistory).toHaveLength(1)
+        expect(dependencies.warnCallHistory[0].warnMessage).toEqual(MESSAGES.ARTIFACT_UPLOAD_SKIPPED_GHES)
+
+        // Should NOT have failed — the action should continue
+        expect(dependencies.failCallHistory).toHaveLength(0)
+
+        // Should still have analyzed results and created summary
+        expect(resultsFactory.createResultsCallHistory).toHaveLength(1)
+        expect(dependencies.writeSummaryCallHistory).toHaveLength(1)
+    })
+
+    it('When artifact upload fails with non-GHES error, action fails', async () => {
+        dependencies.uploadArtifactCallback = async () => {
+            throw new Error('Some other upload error')
+        }
+        await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
+
+        // Should have failed with unexpected error
+        expect(dependencies.failCallHistory).toHaveLength(1)
+        expect(dependencies.failCallHistory[0].failMessage).toContain('Some other upload error')
+
+        // Should NOT have warned about GHES
+        expect(dependencies.warnCallHistory).toHaveLength(0)
+    })
+
     it('Test nonzero exit code with stderr not containing error from command call', async () => {
         commandExecutor.runCodeAnalyzerReturnValue = { exitCode: 987, stdout: '', stderr: 'just some warning' }
         await main.run(dependencies, commandExecutor, resultsFactory, summarizer)
