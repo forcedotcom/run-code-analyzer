@@ -105946,7 +105946,9 @@ exports.MESSAGES = {
     CODE_ANALYZER_FAILED: 'Salesforce Code Analyzer failed.',
     UNEXPECTED_ERROR: `An unexpected error was thrown (see below). First check to make sure you're providing valid ` +
         `inputs. If you can't resolve the error, then create an issue at ` +
-        `https://github.com/forcedotcom/run-code-analyzer/issues.`
+        `https://github.com/forcedotcom/run-code-analyzer/issues.`,
+    ARTIFACT_UPLOAD_SKIPPED_GHES: `Artifact upload is not supported on GitHub Enterprise Server. Skipping artifact upload. ` +
+        `All other results (violation counts, job summary, and pull request review) are still available.`
 };
 exports.MESSAGE_FCNS = {
     PLUGIN_FOUND: (pluginName, pluginVersion) => `Found version ${pluginVersion} of the ${pluginName} plugin installed.`,
@@ -106201,7 +106203,17 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.UPLOADING_ARTIFACT);
         userOutputFiles.map(f => assertFileExists(dependencies, f));
         assertFileExists(dependencies, jsonOutputFile);
-        await dependencies.uploadArtifact(inputs.resultsArtifactName, userOutputFiles.length > 0 ? userOutputFiles : [jsonOutputFile]);
+        try {
+            await dependencies.uploadArtifact(inputs.resultsArtifactName, userOutputFiles.length > 0 ? userOutputFiles : [jsonOutputFile]);
+        }
+        catch (error) {
+            if (error instanceof Error && error.message.includes('not currently supported on GHES')) {
+                dependencies.warn(constants_1.MESSAGES.ARTIFACT_UPLOAD_SKIPPED_GHES);
+            }
+            else {
+                throw error;
+            }
+        }
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.ANALYZING_RESULTS);
         assertFileExists(dependencies, jsonOutputFile);
