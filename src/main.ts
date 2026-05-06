@@ -56,22 +56,19 @@ export async function run(
             throw new Error(
                 'GHESNotSupportedError: @actions/artifact v2.0.0+, upload-artifact@v4+ and download-artifact@v4+ are not currently supported on GHES.'
             )
-            // await dependencies.uploadArtifact(
-            //     inputs.resultsArtifactName,
-            //     userOutputFiles.length > 0 ? userOutputFiles : [jsonOutputFile]
-            // )
         } catch (error) {
-            if (error instanceof Error && error.message.includes('not currently supported on GHES')) {
-                dependencies.warn(MESSAGES.ARTIFACT_UPLOAD_SKIPPED_GHES)
-            } else {
-                throw error
-            }
+            // Intentionally throw error to simulate GHES environment
+            throw error
         }
+        await dependencies.uploadArtifact(
+            inputs.resultsArtifactName,
+            userOutputFiles.length > 0 ? userOutputFiles : [jsonOutputFile!]
+        )
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.ANALYZING_RESULTS)
-        assertFileExists(dependencies, jsonOutputFile)
-        const results: Results = resultsFactory.createResults(jsonOutputFile)
+        assertFileExists(dependencies, jsonOutputFile!)
+        const results: Results = resultsFactory.createResults(jsonOutputFile!)
         dependencies.setOutput('num-violations', results.getTotalViolationCount().toString())
         dependencies.setOutput('num-sev1-violations', results.getSev1ViolationCount().toString())
         dependencies.setOutput('num-sev2-violations', results.getSev2ViolationCount().toString())
@@ -96,7 +93,7 @@ export async function run(
             let couldReadChangedFiles = true
             try {
                 dependencies.info(MESSAGES.CALCULATING_CHANGED_FILES)
-                changedFiles = await dependencies.getChangedFiles(inputs.githubToken)
+                changedFiles = await dependencies.getChangedFiles(inputs.githubToken!)
                 dependencies.info(MESSAGES.CALCULATED_CHANGED_FILES)
             } catch (error) {
                 couldReadChangedFiles = false
@@ -121,7 +118,7 @@ export async function run(
                 setChangedFilesOutputs(dependencies, severityCounts)
 
                 // Create PR review
-                const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken)
+                const summaryLink: string = await dependencies.createActionSummaryLink(inputs.githubToken!)
                 const summaryBody = MESSAGE_FCNS.REVIEW_BODY(
                     results.getTotalViolationCount(),
                     severityCounts.total,
@@ -129,7 +126,7 @@ export async function run(
                 )
                 try {
                     dependencies.info(MESSAGES.ATTEMPTING_TO_CREATE_PR_REVIEW)
-                    const reviewId: number = await dependencies.createPullRequestReview(inputs.githubToken, summaryBody)
+                    const reviewId: number = await dependencies.createPullRequestReview(inputs.githubToken!, summaryBody)
                     dependencies.setOutput('review-id', `${reviewId}`)
                     dependencies.info(MESSAGE_FCNS.CREATED_PR_REVIEW(reviewId))
                 } catch (error) {

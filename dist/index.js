@@ -106205,19 +106205,12 @@ async function run(dependencies, commandExecutor, resultsFactory, summarizer) {
         assertFileExists(dependencies, jsonOutputFile);
         try {
             throw new Error('GHESNotSupportedError: @actions/artifact v2.0.0+, upload-artifact@v4+ and download-artifact@v4+ are not currently supported on GHES.');
-            // await dependencies.uploadArtifact(
-            //     inputs.resultsArtifactName,
-            //     userOutputFiles.length > 0 ? userOutputFiles : [jsonOutputFile]
-            // )
         }
         catch (error) {
-            if (error instanceof Error && error.message.includes('not currently supported on GHES')) {
-                dependencies.warn(constants_1.MESSAGES.ARTIFACT_UPLOAD_SKIPPED_GHES);
-            }
-            else {
-                throw error;
-            }
+            // Intentionally throw error to simulate GHES environment
+            throw error;
         }
+        await dependencies.uploadArtifact(inputs.resultsArtifactName, userOutputFiles.length > 0 ? userOutputFiles : [jsonOutputFile]);
         dependencies.endGroup();
         dependencies.startGroup(constants_1.MESSAGES.STEP_LABELS.ANALYZING_RESULTS);
         assertFileExists(dependencies, jsonOutputFile);
