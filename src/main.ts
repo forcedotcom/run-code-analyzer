@@ -53,10 +53,11 @@ export async function run(
         userOutputFiles.map(f => assertFileExists(dependencies, f))
         assertFileExists(dependencies, jsonOutputFile)
         try {
-            await dependencies.uploadArtifact(
-                inputs.resultsArtifactName,
-                userOutputFiles.length > 0 ? userOutputFiles : [jsonOutputFile]
-            )
+            throw new Error('GHESNotSupportedError: @actions/artifact v2.0.0+, upload-artifact@v4+ and download-artifact@v4+ are not currently supported on GHES.')
+            // await dependencies.uploadArtifact(
+            //     inputs.resultsArtifactName,
+            //     userOutputFiles.length > 0 ? userOutputFiles : [jsonOutputFile]
+            // )
         } catch (error) {
             if (error instanceof Error && error.message.includes('not currently supported on GHES')) {
                 dependencies.warn(MESSAGES.ARTIFACT_UPLOAD_SKIPPED_GHES)
