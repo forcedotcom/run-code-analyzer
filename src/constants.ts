@@ -33,7 +33,10 @@ export const MESSAGES = {
     UNEXPECTED_ERROR:
         `An unexpected error was thrown (see below). First check to make sure you're providing valid ` +
         `inputs. If you can't resolve the error, then create an issue at ` +
-        `https://github.com/forcedotcom/run-code-analyzer/issues.`
+        `https://github.com/forcedotcom/run-code-analyzer/issues.`,
+    ARTIFACT_UPLOAD_SKIPPED_GHES:
+        `Artifact upload is not supported on GitHub Enterprise Server. Skipping artifact upload. ` +
+        `All other results (violation counts, job summary, and pull request review) are still available.`
 }
 export const MESSAGE_FCNS = {
     PLUGIN_FOUND: (pluginName: string, pluginVersion: string) =>

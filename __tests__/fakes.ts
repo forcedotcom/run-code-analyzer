@@ -63,8 +63,12 @@ export class FakeDependencies implements Dependencies {
     }
 
     uploadArtifactCallHistory: { artifactName: string; artifactFiles: string[] }[] = []
+    uploadArtifactCallback: (() => Promise<void>) | undefined = undefined
     async uploadArtifact(artifactName: string, artifactFiles: string[]): Promise<void> {
         this.uploadArtifactCallHistory.push({ artifactName, artifactFiles })
+        if (this.uploadArtifactCallback) {
+            return this.uploadArtifactCallback()
+        }
         return Promise.resolve()
     }
 

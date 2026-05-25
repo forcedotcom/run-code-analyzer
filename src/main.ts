@@ -52,10 +52,18 @@ export async function run(
         dependencies.startGroup(MESSAGES.STEP_LABELS.UPLOADING_ARTIFACT)
         userOutputFiles.map(f => assertFileExists(dependencies, f))
         assertFileExists(dependencies, jsonOutputFile)
-        await dependencies.uploadArtifact(
-            inputs.resultsArtifactName,
-            userOutputFiles.length > 0 ? userOutputFiles : [jsonOutputFile]
-        )
+        try {
+            await dependencies.uploadArtifact(
+                inputs.resultsArtifactName,
+                userOutputFiles.length > 0 ? userOutputFiles : [jsonOutputFile]
+            )
+        } catch (error) {
+            if (error instanceof Error && error.message.includes('not currently supported on GHES')) {
+                dependencies.warn(MESSAGES.ARTIFACT_UPLOAD_SKIPPED_GHES)
+            } else {
+                throw error
+            }
+        }
         dependencies.endGroup()
 
         dependencies.startGroup(MESSAGES.STEP_LABELS.ANALYZING_RESULTS)
