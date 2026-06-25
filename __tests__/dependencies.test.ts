@@ -20,7 +20,8 @@ jest.mock('@actions/github', () => ({
         },
         runId: 12345,
         runAttempt: 1,
-        job: 'test-job'
+        job: 'test-job',
+        serverUrl: 'https://github.com'
     },
     getOctokit: jest.fn()
 }))
@@ -302,6 +303,54 @@ describe('RuntimeDependencies Code Coverage', () => {
         const result = await dependencies.createActionSummaryLink('test-token')
 
         expect(result).toEqual('https://github.com/test-owner/test-repo/actions/runs/12345/attempts/1')
+    })
+
+    it('createActionSummaryLink - uses serverUrl for GitHub Enterprise Server', async () => {
+        const originalServerUrl = github.context.serverUrl
+        ;(github.context as { serverUrl: string }).serverUrl = 'https://github.securian.com'
+
+        const mockOctokit = {
+            rest: {
+                actions: {
+                    listJobsForWorkflowRun: jest.fn().mockResolvedValue({
+                        data: {
+                            jobs: [{ id: 5, name: 'test-job' }]
+                        }
+                    })
+                }
+            }
+        }
+        ;(github.getOctokit as jest.Mock).mockReturnValue(mockOctokit)
+
+        const result = await dependencies.createActionSummaryLink('test-token')
+
+        expect(result).toEqual(
+            'https://github.securian.com/test-owner/test-repo/actions/runs/12345/attempts/1#summary-5'
+        )
+        ;(github.context as { serverUrl: string }).serverUrl = originalServerUrl
+    })
+
+    it('createActionSummaryLink - uses serverUrl for GHES without matching job', async () => {
+        const originalServerUrl = github.context.serverUrl
+        ;(github.context as { serverUrl: string }).serverUrl = 'https://github.securian.com'
+
+        const mockOctokit = {
+            rest: {
+                actions: {
+                    listJobsForWorkflowRun: jest.fn().mockResolvedValue({
+                        data: {
+                            jobs: [{ id: 1, name: 'other-job' }]
+                        }
+                    })
+                }
+            }
+        }
+        ;(github.getOctokit as jest.Mock).mockReturnValue(mockOctokit)
+
+        const result = await dependencies.createActionSummaryLink('test-token')
+
+        expect(result).toEqual('https://github.securian.com/test-owner/test-repo/actions/runs/12345/attempts/1')
+        ;(github.context as { serverUrl: string }).serverUrl = originalServerUrl
     })
 
     it('createActionSummaryLink - API error', async () => {
