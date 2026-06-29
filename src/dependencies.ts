@@ -108,6 +108,7 @@ export class RuntimeDependencies implements Dependencies {
         const repo = github.context.repo.repo
         const runId = github.context.runId
         const runAttempt = github.context.runAttempt
+        const serverUrl = github.context.serverUrl
         const octokit = github.getOctokit(githubToken)
         let matchingJob: { id: number } | undefined
         try {
@@ -128,9 +129,9 @@ export class RuntimeDependencies implements Dependencies {
         // matrices, then we can't link directly to the table, and have to link to just the page itself and expect the user]
         // to scroll down the table themselves.
         if (matchingJob) {
-            return `https://github.com/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}#summary-${matchingJob.id}`
+            return `${serverUrl}/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}#summary-${matchingJob.id}`
         } else {
-            return `https://github.com/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}`
+            return `${serverUrl}/${owner}/${repo}/actions/runs/${runId}/attempts/${runAttempt}`
         }
     }
 
