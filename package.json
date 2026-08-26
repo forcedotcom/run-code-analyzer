@@ -78,11 +78,11 @@
         "@eslint/js": "^9.39.4",
         "@types/jest": "^30.0.0",
         "@types/node": "^22.19.19",
-        "@types/semver": "^7.7.1",
+        "@types/semver": "^7.8.0",
         "@vercel/ncc": "^0.38.4",
         "eslint": "^9.39.4",
-        "eslint-plugin-github": "^6.1.1",
-        "eslint-plugin-jest": "^29.15.5",
+        "eslint-plugin-github": "^6.1.2",
+        "eslint-plugin-jest": "^29.16.2",
         "eslint-plugin-jsonc": "^2.21.1",
         "eslint-plugin-prettier": "^5.5.6",
         "globals": "^16.5.0",
@@ -92,6 +92,6 @@
         "prettier-eslint": "^16.4.2",
         "ts-jest": "^29.4.12",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.65.0"
+        "typescript-eslint": "^8.68.0"
     }
 }
